@@ -19,9 +19,20 @@ def main(args):
     :param args: list of parameters given as input
     :type args: list
     """
-    c_sep, csv_file, has_header, semantic, has_dt, missing, index_col, human = extract_args(args)
+    separator_character, csv_file, has_header, semantic, has_date_time, missing, index_column, human_readable = extract_args(args)
+    print("\nCommand-Line Arguments:")
+    print("-separator_character:", separator_character)
+    print("-csv_file:", csv_file)
+    print("-has_header:", has_header)
+    print("-semantic:", semantic)
+    print("-has_date_time:", has_date_time)
+    print("-missing:", missing)
+    print("-index_column:", index_column)
+    print("-human_readable:", human_readable)
+    print()
+
     try:
-        check_correctness(has_dt, hss, index_col)
+        check_correctness(has_date_time, half_sides_specifications, index_column)
     except getopt.GetoptError as gex:
         usage()
         print(str(gex))
@@ -31,35 +42,35 @@ def main(args):
         print(str(aex))
         sys.exit(1)
 
-    if hss is None:
+    if half_sides_specifications is None:
         usage()
-    if isinstance(hss, list):
+    if isinstance(half_sides_specifications, list):
         with ut.timeit_context("Whole time"):
             with ut.timeit_context("Distance time"):
                 if isinstance(has_header, int) and not has_header:
-                    diff_mtx = DiffMatrix(csv_file,
-                                          sep=c_sep,
-                                          index_col=index_col,
+                    distance_matrix = DiffMatrix(csv_file,
+                                          sep=separator_character,
+                                          index_col=index_column,
                                           semantic=semantic,
                                           missing=missing,
-                                          datetime=has_dt)
-                else:
-                    diff_mtx = DiffMatrix(csv_file,
-                                          sep=c_sep,
+                                          datetime=has_date_time)
+                else:  # has header
+                    distance_matrix = DiffMatrix(csv_file,
+                                          sep=separator_character,
                                           first_col_header=has_header,
                                           semantic=semantic,
-                                          index_col=index_col,
+                                          index_col=index_column,
                                           missing=missing,
-                                          datetime=has_dt)
-            for combination in hss:
-                comb_dist_mtx = diff_mtx.split_sides(combination)
+                                          datetime=has_date_time)
+            for combination in half_sides_specifications:
+                combination_distance_matrix = distance_matrix.split_sides(combination)
                 with ut.timeit_context("RFD Discover time for {}".format(str(combination))):
-                    nd = RFDDiscovery(comb_dist_mtx)
-                    if human:
+                    rfd_discovery = RFDDiscovery(combination_distance_matrix)
+                    if human_readable:
                         print(combination)
-                        print_human(nd.get_rfds(nd.standard_algorithm, combination))
+                        print_human(rfd_discovery.get_rfds(rfd_discovery.standard_algorithm, combination))
                     else:
-                        print(nd.get_rfds(nd.standard_algorithm, combination))
+                        print(rfd_discovery.get_rfds(rfd_discovery.standard_algorithm, combination))
 
 
 def print_human(df: pd.DataFrame):
@@ -96,37 +107,37 @@ def extract_args(args):
         # Default values
         c_sep, has_header, semantic, has_dt, missing, ic, human = '', 0, True, False, "?", False, False
         csv_file = ''
-        lhs = []
-        rhs = []
-        opts, args = getopt.getopt(args, "c:r:l:s:hm:d:vi:", ["semantic", "help", "human"])
-        for opt, arg in opts:
-            if opt == '-v':
+        left_half_side = []
+        right_half_side = []
+        options, args = getopt.getopt(args, "c:r:l:s:hm:d:vi:", ["semantic", "help", "human"])
+        for option, arg in options:
+            if option == '-v':
                 print("rdf-discovery version 0.0.1")
                 sys.exit(0)
-            if opt == '-c':
+            if option == '-c':
                 csv_file = arg
-            elif opt == '-r':
-                rhs = [int(arg)]
-                if len(rhs) > 1:
+            elif option == '-r':
+                right_half_side = [int(arg)]
+                if len(right_half_side) > 1:
                     print("You can specify at most 1 RHS attribute")
                     sys.exit(-1)
-            elif opt == '-l':
-                lhs = [int(_) for _ in arg.split(',')]
-            elif opt == '-s':
+            elif option == '-l':
+                left_half_side = [int(_) for _ in arg.split(',')]
+            elif option == '-s':
                 c_sep = arg
-            elif opt == '-h':
+            elif option == '-h':
                 has_header = 0
-            elif opt == '--semantic':
+            elif option == '--semantic':
                 semantic = True
-            elif opt == '-m':
+            elif option == '-m':
                 missing = arg
-            elif opt == '-d':
+            elif option == '-d':
                 has_dt = [int(_) for _ in arg.split(',')]
-            elif opt == '-i':
+            elif option == '-i':
                 ic = int(arg)
-            elif opt == '--human':
+            elif option == '--human':
                 human = True
-            elif opt == '--help':
+            elif option == '--help':
                 usage()
                 sys.exit(0)
             else:
@@ -149,8 +160,8 @@ def extract_args(args):
         if has_header is None:
             has_header = has_header_
         cols_count = ut.get_cols_count(csv_file, c_sep)
-        global hss
-        hss = extract_hss(cols_count, lhs, rhs)
+        global half_sides_specifications
+        half_sides_specifications = extract_hss(cols_count, left_half_side, right_half_side)
     except Exception as ex:
         print("Error while trying to understand arguments: {}".format(str(ex)))
         sys.exit(-1)
