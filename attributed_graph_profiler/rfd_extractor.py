@@ -9,8 +9,9 @@ from dominance.dominance_tools import RFDDiscovery
 
 class RFDExtractor:
 	args = None
-	debug_mode = False
 	'''Command-Line arguments.'''
+	debug_mode = False
+	'''When True, debug info will be printed on the standard output, default is False.'''
 	separator_character = None
 	'''The character used to separate values within the CSV file.'''
 	csv_file = None
@@ -26,6 +27,7 @@ class RFDExtractor:
 	half_sides_specifications = None
 	distance_matrix = None
 	rfd_data_frame_list = None
+	rfd_dictionary_list = None
 
 	def __init__(self, args, debug_mode=False) -> None:
 		super().__init__()
@@ -67,17 +69,17 @@ class RFDExtractor:
 			self.rfd_data_frame_list = list()
 			for combination in self.half_sides_specifications:
 				combination_distance_matrix = self.distance_matrix.split_sides(combination)
-				with ut.timeit_context("RFD Discover time for Combination {}".format(str(combination))):
-					rfd_discovery = RFDDiscovery(combination_distance_matrix)
-					self.rfd_data_frame_list.append(
-						rfd_discovery.get_rfds(rfd_discovery.standard_algorithm, combination))
+				'''with ut.timeit_context("RFD Discover time for Combination {}".format(str(combination))):'''
+				rfd_discovery = RFDDiscovery(combination_distance_matrix)
+				self.rfd_data_frame_list.append(
+					rfd_discovery.get_rfds(rfd_discovery.standard_algorithm, combination))
 
-					if self.debug_mode:
-						print("\nCombination:", combination)
-						if self.human_readable:
-							self.print_human(self.rfd_data_frame_list[-1])
-						else:
-							print(self.rfd_data_frame_list[-1])
+				if self.debug_mode:
+					print("\nCombination:", combination)
+					if self.human_readable:
+						self.print_human(self.rfd_data_frame_list[-1])
+					else:
+						print(self.rfd_data_frame_list[-1])
 
 	def __str__(self) -> str:
 		return "{}\n\t{}\n\t{}\n\t{}\n\t{}\n\t{}\n\t{}\n\t{}\n\t{}\n\t{}\n" \
@@ -308,3 +310,17 @@ class RFDExtractor:
 			string += "-> {}(<= {})".format(rfd_data_frame.columns[0], round(row[0], ndigits=2))
 			string += "\n"
 		print(string)
+
+	def get_rfd_dictionary_list(self):
+		if self.rfd_dictionary_list is None:
+			self.rfd_dictionary_list = list()
+
+			for rfd_data_frame in self.rfd_data_frame_list:
+				for _, row in rfd_data_frame.iterrows():
+					rfd_dictionary = {}
+					for col in range(0, len(row)):
+						rfd_dictionary[rfd_data_frame.columns[col]] = round(row[col], ndigits=2)
+
+					self.rfd_dictionary_list.append(rfd_dictionary)
+
+		return self.rfd_dictionary_list
