@@ -1804,6 +1804,12 @@ static int __pyx_pf_6loader_12distance_mtr_10DiffMatrix___init__(struct __pyx_ob
 static PyObject *__pyx_pf_6loader_12distance_mtr_10DiffMatrix_2split_sides(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self, PyObject *__pyx_v_hss); /* proto */
 static PyObject *__pyx_pf_6loader_12distance_mtr_10DiffMatrix_4semantic_diff(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self, PyObject *__pyx_v_a, PyObject *__pyx_v_b); /* proto */
 static PyObject *__pyx_pf_6loader_12distance_mtr_10DiffMatrix_6get_labels(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_6loader_12distance_mtr_10DiffMatrix_2df___get__(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self); /* proto */
+static int __pyx_pf_6loader_12distance_mtr_10DiffMatrix_2df_2__set__(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static int __pyx_pf_6loader_12distance_mtr_10DiffMatrix_2df_4__del__(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self); /* proto */
+static PyObject *__pyx_pf_6loader_12distance_mtr_10DiffMatrix_11distance_df___get__(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self); /* proto */
+static int __pyx_pf_6loader_12distance_mtr_10DiffMatrix_11distance_df_2__set__(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static int __pyx_pf_6loader_12distance_mtr_10DiffMatrix_11distance_df_4__del__(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
 static PyObject *__pyx_pf_11cfunc_dot_to_py_43__Pyx_CFunc_float____float____float___to_py_wrap(PyObject *__pyx_self, float __pyx_v_a, float __pyx_v_b); /* proto */
@@ -5377,6 +5383,196 @@ static PyObject *__pyx_pf_6loader_12distance_mtr_10DiffMatrix_6get_labels(struct
   __pyx_r = NULL;
   __pyx_L0:;
   __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "loader/distance_mtr.pyx":33
+ *     """
+ *     cdef object path
+ *     cdef public object df             # <<<<<<<<<<<<<<
+ *     cdef public object distance_df
+ *     cdef cython.bint semantic
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_6loader_12distance_mtr_10DiffMatrix_2df_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_6loader_12distance_mtr_10DiffMatrix_2df_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_6loader_12distance_mtr_10DiffMatrix_2df___get__(((struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_6loader_12distance_mtr_10DiffMatrix_2df___get__(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_self->df);
+  __pyx_r = __pyx_v_self->df;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_6loader_12distance_mtr_10DiffMatrix_2df_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_6loader_12distance_mtr_10DiffMatrix_2df_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_6loader_12distance_mtr_10DiffMatrix_2df_2__set__(((struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_6loader_12distance_mtr_10DiffMatrix_2df_2__set__(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __Pyx_INCREF(__pyx_v_value);
+  __Pyx_GIVEREF(__pyx_v_value);
+  __Pyx_GOTREF(__pyx_v_self->df);
+  __Pyx_DECREF(__pyx_v_self->df);
+  __pyx_v_self->df = __pyx_v_value;
+
+  /* function exit code */
+  __pyx_r = 0;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_6loader_12distance_mtr_10DiffMatrix_2df_5__del__(PyObject *__pyx_v_self); /*proto*/
+static int __pyx_pw_6loader_12distance_mtr_10DiffMatrix_2df_5__del__(PyObject *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_6loader_12distance_mtr_10DiffMatrix_2df_4__del__(((struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_6loader_12distance_mtr_10DiffMatrix_2df_4__del__(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__", 0);
+  __Pyx_INCREF(Py_None);
+  __Pyx_GIVEREF(Py_None);
+  __Pyx_GOTREF(__pyx_v_self->df);
+  __Pyx_DECREF(__pyx_v_self->df);
+  __pyx_v_self->df = Py_None;
+
+  /* function exit code */
+  __pyx_r = 0;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "loader/distance_mtr.pyx":34
+ *     cdef object path
+ *     cdef public object df
+ *     cdef public object distance_df             # <<<<<<<<<<<<<<
+ *     cdef cython.bint semantic
+ *     cdef object sysnset_dic
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_6loader_12distance_mtr_10DiffMatrix_11distance_df_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_6loader_12distance_mtr_10DiffMatrix_11distance_df_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_6loader_12distance_mtr_10DiffMatrix_11distance_df___get__(((struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_6loader_12distance_mtr_10DiffMatrix_11distance_df___get__(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(__pyx_v_self->distance_df);
+  __pyx_r = __pyx_v_self->distance_df;
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_6loader_12distance_mtr_10DiffMatrix_11distance_df_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_6loader_12distance_mtr_10DiffMatrix_11distance_df_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_6loader_12distance_mtr_10DiffMatrix_11distance_df_2__set__(((struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_6loader_12distance_mtr_10DiffMatrix_11distance_df_2__set__(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__", 0);
+  __Pyx_INCREF(__pyx_v_value);
+  __Pyx_GIVEREF(__pyx_v_value);
+  __Pyx_GOTREF(__pyx_v_self->distance_df);
+  __Pyx_DECREF(__pyx_v_self->distance_df);
+  __pyx_v_self->distance_df = __pyx_v_value;
+
+  /* function exit code */
+  __pyx_r = 0;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_6loader_12distance_mtr_10DiffMatrix_11distance_df_5__del__(PyObject *__pyx_v_self); /*proto*/
+static int __pyx_pw_6loader_12distance_mtr_10DiffMatrix_11distance_df_5__del__(PyObject *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_6loader_12distance_mtr_10DiffMatrix_11distance_df_4__del__(((struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_6loader_12distance_mtr_10DiffMatrix_11distance_df_4__del__(struct __pyx_obj_6loader_12distance_mtr_DiffMatrix *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__", 0);
+  __Pyx_INCREF(Py_None);
+  __Pyx_GIVEREF(Py_None);
+  __Pyx_GOTREF(__pyx_v_self->distance_df);
+  __Pyx_DECREF(__pyx_v_self->distance_df);
+  __pyx_v_self->distance_df = Py_None;
+
+  /* function exit code */
+  __pyx_r = 0;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -9514,11 +9710,43 @@ static int __pyx_tp_clear_6loader_12distance_mtr_DiffMatrix(PyObject *o) {
   return 0;
 }
 
+static PyObject *__pyx_getprop_6loader_12distance_mtr_10DiffMatrix_df(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_6loader_12distance_mtr_10DiffMatrix_2df_1__get__(o);
+}
+
+static int __pyx_setprop_6loader_12distance_mtr_10DiffMatrix_df(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_6loader_12distance_mtr_10DiffMatrix_2df_3__set__(o, v);
+  }
+  else {
+    return __pyx_pw_6loader_12distance_mtr_10DiffMatrix_2df_5__del__(o);
+  }
+}
+
+static PyObject *__pyx_getprop_6loader_12distance_mtr_10DiffMatrix_distance_df(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_6loader_12distance_mtr_10DiffMatrix_11distance_df_1__get__(o);
+}
+
+static int __pyx_setprop_6loader_12distance_mtr_10DiffMatrix_distance_df(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_6loader_12distance_mtr_10DiffMatrix_11distance_df_3__set__(o, v);
+  }
+  else {
+    return __pyx_pw_6loader_12distance_mtr_10DiffMatrix_11distance_df_5__del__(o);
+  }
+}
+
 static PyMethodDef __pyx_methods_6loader_12distance_mtr_DiffMatrix[] = {
   {"split_sides", (PyCFunction)__pyx_pw_6loader_12distance_mtr_10DiffMatrix_3split_sides, METH_O, __pyx_doc_6loader_12distance_mtr_10DiffMatrix_2split_sides},
   {"semantic_diff", (PyCFunction)__pyx_pw_6loader_12distance_mtr_10DiffMatrix_5semantic_diff, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6loader_12distance_mtr_10DiffMatrix_4semantic_diff},
   {"get_labels", (PyCFunction)__pyx_pw_6loader_12distance_mtr_10DiffMatrix_7get_labels, METH_NOARGS, 0},
   {0, 0, 0, 0}
+};
+
+static struct PyGetSetDef __pyx_getsets_6loader_12distance_mtr_DiffMatrix[] = {
+  {(char *)"df", __pyx_getprop_6loader_12distance_mtr_10DiffMatrix_df, __pyx_setprop_6loader_12distance_mtr_10DiffMatrix_df, (char *)0, 0},
+  {(char *)"distance_df", __pyx_getprop_6loader_12distance_mtr_10DiffMatrix_distance_df, __pyx_setprop_6loader_12distance_mtr_10DiffMatrix_distance_df, (char *)0, 0},
+  {0, 0, 0, 0, 0}
 };
 
 static PyTypeObject __pyx_type_6loader_12distance_mtr_DiffMatrix = {
@@ -9556,7 +9784,7 @@ static PyTypeObject __pyx_type_6loader_12distance_mtr_DiffMatrix = {
   0, /*tp_iternext*/
   __pyx_methods_6loader_12distance_mtr_DiffMatrix, /*tp_methods*/
   0, /*tp_members*/
-  0, /*tp_getset*/
+  __pyx_getsets_6loader_12distance_mtr_DiffMatrix, /*tp_getset*/
   0, /*tp_base*/
   0, /*tp_dict*/
   0, /*tp_descr_get*/

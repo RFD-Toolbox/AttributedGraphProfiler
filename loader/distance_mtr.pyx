@@ -30,8 +30,8 @@ cdef class DiffMatrix:
     After the distance matrix is calculated, the memory area containing the dataset will be freed in order to save memory space.
     """
     cdef object path
-    cdef object df
-    cdef object distance_df
+    cdef public object df
+    cdef public object distance_df
     cdef cython.bint semantic
     cdef object sysnset_dic
     cdef object semantic_diff_dic

@@ -42,6 +42,7 @@ def main():
 
 	for dictionary in rfd_dictionary_list:
 		print("RFD_Dictionary:", dictionary)
+		print(dictionary.keys())
 
 
 if __name__ == "__main__":
