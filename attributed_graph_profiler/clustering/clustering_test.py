@@ -45,14 +45,14 @@ def main():
         for key, val in groups.items():
             group = val
             print("\nGroup{}\n".format(key), group)
+            diff = lambda l1, l2: [x for x in l1 if x not in l2]
 
             print("SET{}".format(key))
             keys = rfd_dic.keys()
             print("Keys:", keys)
+            rhs_header_value = diff(list(group), keys)
 
-            '''for kk in keys:
-                x = group.loc[group["0" if kk == "RHS" else kk] <= rfd_dic[kk]]
-                print("SET{}\n".format(key), x)'''
+            print(group[group[kk] <= rfd_dic[kk]] for kk in keys)
 
 
 if __name__ == "__main__":
