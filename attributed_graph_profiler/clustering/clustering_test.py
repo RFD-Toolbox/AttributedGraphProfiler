@@ -17,7 +17,6 @@ def main():
 
     distance_matrix = DiffMatrix(csv_path,
                                  sep=";",
-                                 index_col=0,
                                  semantic=False,
                                  missing="?",
                                  datetime=False).distance_df
@@ -42,10 +41,18 @@ def main():
 
     print("RFDs...")
     for rfd_dic in rfds:
-        print(rfd_dic)
+        print("RFD:", rfd_dic)
         for key, val in groups.items():
-            group = groups[key]
-            print("Group{}\n".format(key), group)
+            group = val
+            print("\nGroup{}\n".format(key), group)
+
+            print("SET{}".format(key))
+            keys = rfd_dic.keys()
+            print("Keys:", keys)
+
+            '''for kk in keys:
+                x = group.loc[group["0" if kk == "RHS" else kk] <= rfd_dic[kk]]
+                print("SET{}\n".format(key), x)'''
 
 
 if __name__ == "__main__":
