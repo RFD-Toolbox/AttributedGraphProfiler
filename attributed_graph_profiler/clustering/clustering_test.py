@@ -2,6 +2,7 @@ import pandas as pandas
 import numpy as np
 from loader.distance_mtr import DiffMatrix
 from attributed_graph_profiler.rfd_extractor import RFDExtractor
+from attributed_graph_profiler.clustering.mapping import Mapper
 
 
 def main():
@@ -16,6 +17,9 @@ def main():
     print("\nRowsCount:", rows_count)
     print("\nColumnsCount:", columns_count)
     print("\n")
+
+    mapper = Mapper(rows_count)
+    mapping_dict = mapper.diff_to_csv
 
     distance_matrix = DiffMatrix(csv_path,
                                  sep=";",
@@ -68,6 +72,14 @@ def main():
             my_set = group.query(query)
 
             print("SET{}\n".format(key), my_set)
+            set_indexes = my_set.index.tolist()
+            print("Set_Indexes:", set_indexes)
+
+            mapped_set_indexes = list()
+            for index in set_indexes:
+                mapped_set_indexes.append(mapping_dict[index])
+
+            print("MappedSetIndexes:", mapped_set_indexes)
 
 
 if __name__ == "__main__":
