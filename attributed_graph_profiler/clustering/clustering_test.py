@@ -76,10 +76,14 @@ def main():
             print("Set_Indexes:", set_indexes)
 
             mapped_set_indexes = list()
+            mapped_set_indexes.append(key)
             for index in set_indexes:
                 mapped_set_indexes.append(mapping_dict[index])
 
             print("MappedSetIndexes:", mapped_set_indexes)
+
+            for row in mapped_set_indexes:
+                print(pandas.DataFrame(csv_data_frame.loc[row]).T)
 
 
 if __name__ == "__main__":
