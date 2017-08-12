@@ -3,7 +3,7 @@ import numpy as np
 from loader.distance_mtr import DiffMatrix
 from attributed_graph_profiler.rfd_extractor import RFDExtractor
 from attributed_graph_profiler.clustering.mapping import Mapper
-from attributed_graph_profiler.clustering import core_module
+from attributed_graph_profiler.clustering.core_module import core_module
 
 
 def main():
