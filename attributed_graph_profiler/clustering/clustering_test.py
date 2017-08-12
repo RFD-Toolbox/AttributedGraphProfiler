@@ -53,17 +53,12 @@ def main():
         diff = lambda l1, l2: [x for x in l1 if x not in l2]
         keys = rfd_dic.keys()
         print("Keys:", keys)
-        rhs_header_value = diff(list(group), keys)
-        length = len(rhs_header_value)
+        rhs_header_value = diff(csv_headers, keys)
         print("RHS_Header:", rhs_header_value[0])
 
         rfd_dic[rhs_header_value[0]] = rfd_dic.pop("RHS")
         print("RFD after POP:", rfd_dic)
 
-        if length == 0:
-            print("Lenght:", length)
-            print("Group:", group)
-            print("RFD_dic:", rfd_dic)
         # =============================
         for key, group in groups.items():
             print("\nGroup{}\n".format(key), group)
