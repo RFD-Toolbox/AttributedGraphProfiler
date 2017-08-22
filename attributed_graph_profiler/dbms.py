@@ -6,9 +6,10 @@ from attributed_graph_profiler.rfd_extractor import RFDExtractor
 
 
 def main():
-    args = ["-c", "../../resources/dataset.csv"]
+    args = ["-c", "../resources/dataset.csv"]
     rfd_extractor = RFDExtractor(args, False)
-    rfds = rfd_extractor.get_sort_rfd_dictionary_list(True, ["RHS"])
+    rfds = rfd_extractor.get_sort_rfd_dictionary_list(True, ["RHS", "weight"])
 
-    if __name__ == "__main__":
-        main()
+
+if __name__ == "__main__":
+    main()
