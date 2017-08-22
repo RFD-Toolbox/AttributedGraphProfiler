@@ -366,7 +366,8 @@ class RFDExtractor:
                 # start save on file
                 df = pd.DataFrame(rfd_data_frame)
                 filename = rhs_column[0] + ".csv"
-                df.to_csv(filename, index=False, encoding='utf-8', na_rep="?")  #Index if we want index for row
+                df.to_csv(filename, index=False, encoding='utf-8', na_rep="?",
+                          sep=";")  # Index if we want index for row
 
                 # end save on file
                 if sort:
