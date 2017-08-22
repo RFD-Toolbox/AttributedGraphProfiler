@@ -68,6 +68,16 @@ class RFDExtractor:
 
             self.rfd_data_frame_list = list()
             for combination in self.half_sides_specifications:
+                '''
+                combination is a dictionary containing rhs & lhs as keys,
+                and a list of the corresponding indexes as valus.
+                For example, given a set of 4 attributes, there will be 
+                the following 4 combinations:
+                Combination0: {'rhs': [0], 'lhs': [1, 2, 3]}
+                Combination1: {'rhs': [1], 'lhs': [0, 2, 3]}
+                Combination2: {'rhs': [2], 'lhs': [0, 1, 3]}
+                Combination3: {'rhs': [3], 'lhs': [0, 1, 2]}
+                '''
                 combination_distance_matrix = self.distance_matrix.split_sides(combination)
                 '''with ut.timeit_context("RFD Discover time for Combination {}".format(str(combination))):'''
                 rfd_discovery = RFDDiscovery(combination_distance_matrix)
