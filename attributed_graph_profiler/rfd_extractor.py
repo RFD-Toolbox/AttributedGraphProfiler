@@ -25,8 +25,15 @@ class RFDExtractor:
     human_readable = None
     # ==========================================================================
     half_sides_specifications = None
+    '''
+    A list containing all the possible combinations of LHS & RHS indexes.
+    '''
     distance_matrix = None
     rfd_data_frame_list = None
+    '''
+    A list of Pandas DataFrame, one for each possible combination of RHS & LHS indexes.
+    Each DataFrame contains the RFDs found for the corresponding combination of indexes.
+    '''
     rfd_dictionary_list = None
 
     def __init__(self, args, debug_mode=False) -> None:
