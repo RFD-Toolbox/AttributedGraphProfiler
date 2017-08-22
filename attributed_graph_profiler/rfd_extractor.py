@@ -363,7 +363,12 @@ class RFDExtractor:
                 print("BeforeRename:\n", rfd_data_frame)
                 rfd_data_frame.rename(columns={"RHS": rhs_column[0]}, inplace=True)
                 print("AfterRename:\n", rfd_data_frame)
+                # start save on file
+                df = pd.DataFrame(rfd_data_frame)
+                filename = "file_" + rhs_column[0] + ".csv"
+                df.to_csv(filename, index=False, encoding='utf-8')  #Index if we want index for row
 
+                # end save on file
                 if sort:
                     print("before sorting:\n\n", rfd_data_frame)
                     # sortedlist = sorted(reader, key=lambda line: (line["age"], line["name"]), reverse=False)
