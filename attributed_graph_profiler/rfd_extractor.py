@@ -326,14 +326,16 @@ class RFDExtractor:
         return self.rfd_dictionary_list
 
     def get_sort_rfd_dictionary_list(self, sort, sort_param):
+        print("Within get sort...")
+
         if self.rfd_dictionary_list is None:
             self.rfd_dictionary_list = list()
             for rfd_data_frame in self.rfd_data_frame_list:
                 if sort:
-                    print("before sorting : ", rfd_data_frame)
+                    print("before sorting:\n\n", rfd_data_frame)
                     # sortedlist = sorted(reader, key=lambda line: (line["age"], line["name"]), reverse=False)
                     rfd_data_frame = rfd_data_frame.sort_values(by=sort_param)
-                    print("after sorting :", rfd_data_frame)
+                    print("after sorting:\n\n", rfd_data_frame)
 
                 for _, row in rfd_data_frame.iterrows():
                     rfd_dictionary = {}
@@ -342,4 +344,5 @@ class RFDExtractor:
 
                     self.rfd_dictionary_list.append(rfd_dictionary)
 
+        print("Exiting get sort...")
         return self.rfd_dictionary_list
