@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from loader.distance_mtr import DiffMatrix
 from dominance.dominance_tools import RFDDiscovery
+from attributed_graph_profiler.clustering.csv_parser import CSVParser
 
 
 class RFDExtractor:
@@ -36,12 +37,20 @@ class RFDExtractor:
     '''
     rfd_dictionary_list = None
 
+    csv_parser = None
+    header = None
+    data_frame = None
+
     def __init__(self, args, debug_mode=False) -> None:
         super().__init__()
         self.args = args
         self.debug_mode = debug_mode
         self.separator_character, self.csv_file, self.has_header, self.semantic, self.has_date_time, self.missing, \
         self.index_column, self.human_readable, self.half_sides_specifications = self.extract_args(self.args)
+
+        self.csv_parser = CSVParser(self.csv_file)
+        self.data_frame = self.csv_parser.data_frame
+        self.header = self.csv_parser.header
 
         try:
             self.check_correctness(self.has_date_time, self.half_sides_specifications, self.index_column)
@@ -348,10 +357,17 @@ class RFDExtractor:
         if self.rfd_dictionary_list is None:
             self.rfd_dictionary_list = list()
             for rfd_data_frame in self.rfd_data_frame_list:
+                diff = lambda l1, l2: [x for x in l1 if x not in l2]
+                rhs_column = diff(self.header, list(rfd_data_frame))
+                print("RHS_column:", rhs_column[0])
+                print("BeforeRename:\n", rfd_data_frame)
+                rfd_data_frame.rename(columns={"RHS": rhs_column[0]}, inplace=True)
+                print("AfterRename:\n", rfd_data_frame)
+
                 if sort:
                     print("before sorting:\n\n", rfd_data_frame)
                     # sortedlist = sorted(reader, key=lambda line: (line["age"], line["name"]), reverse=False)
-                    rfd_data_frame = rfd_data_frame.sort_values(by=sort_param)
+                    # rfd_data_frame = rfd_data_frame.sort_values(by=sort_param)
                     print("after sorting:\n\n", rfd_data_frame)
 
                 for _, row in rfd_data_frame.iterrows():
