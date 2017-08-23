@@ -7,3 +7,4 @@ class RFDInputOutput:
 
     def load(self, path: str) -> pd.DataFrame:
         return self.csv_io.load(path=path)
+
