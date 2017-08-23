@@ -21,6 +21,15 @@ def main():
     age2_rfd_df = pd.read_csv(filepath_or_buffer="age2.csv", sep=";", na_values="?", header=[0, 1])
     print(age2_rfd_df)
 
+    columns = list(age2_rfd_df.columns)
+    print("\nColumns:\n", columns)
+    lhs_tuples = [col for col in columns if col[1] != "RHS"]
+    print("\nlhs columns:\n", lhs_tuples)
+
+    age2_rfd_df.sort_values(by=lhs_tuples, inplace=True)
+    print("\nSorted by lhs...\n")
+    print(age2_rfd_df)
+
 
 if __name__ == "__main__":
     main()
