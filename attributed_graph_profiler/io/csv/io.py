@@ -23,9 +23,9 @@ class CSVInputOutput:
     Format string for datetime objects.
     '''
 
-    def store(self, rfd_df: pd.DataFrame, path: str):
-        return rfd_df.to_csv(path, sep=self.sep, na_rep=self.na_rep, index=self.index, encoding=self.encoding,
-                             date_format=self.date_format)
+    def store(self, df: pd.DataFrame, path: str):
+        return df.to_csv(path, sep=self.sep, na_rep=self.na_rep, index=self.index, encoding=self.encoding,
+                         date_format=self.date_format)
 
     def load(self, path: str) -> pd.DataFrame:
         return pd.read_csv(path, sep=self.sep, na_values=self.na_rep, parse_dates=True)
