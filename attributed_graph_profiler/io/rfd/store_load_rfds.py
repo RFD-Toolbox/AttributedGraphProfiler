@@ -17,7 +17,7 @@ def diff(list1: list, list2: list):
 
 def main():
     print("Store&Load RFDs")
-    args = ["-c", "../../../resources/dataset_string.csv", "--human"]
+    args = ["-c", "../../../resources/dataset.csv", "--human"]
     rfd_extractor = RFDExtractor(args, False)
     rfds_df_list = rfd_extractor.rfd_data_frame_list
     csv_main_header = rfd_extractor.header
@@ -64,6 +64,23 @@ def main():
     print("\n\nLoaded rfds df\n")
     print(loaded_rfds_df)
 
+    ################STaRT QUERY##############
+    query = 'height==175'
+    my_set = rfd_extractor.data_frame
+    my_set = my_set.query(query)
+    print("My SET \n")
+    print(my_set)
+    loaded_rfds_df.sort_values(by=['height', 'age', 'shoe_size', 'weight'], inplace=True)
+    print("Ordered rfds")
+    print(loaded_rfds_df)
+    print("Group by")
+    df_groupby = loaded_rfds_df.groupby(by='height')
+    better_group = None
+    for name, group in df_groupby:
+        print(name, '\n')
+        better_group = group.sort_values(by=['age', 'shoe_size', 'weight'])
+        better_group.drop(better_group[better_group["RHS"] == 'height'].index, inplace=True)
+        print(better_group)
 
 if __name__ == "__main__":
     main()
