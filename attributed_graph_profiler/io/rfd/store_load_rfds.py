@@ -92,7 +92,7 @@ def main():
 
     query_dict_keys = list(query_dict.keys())
     print("Query Dict Keys:", query_dict_keys)
-    loaded_rfds_df = loaded_rfds_df.dropna(subset=query_dict_keys, )
+    loaded_rfds_df = loaded_rfds_df.dropna(subset=query_dict_keys)
 
     print("Dropped DF Nans on query attributes:", end="\n\n")
     print(loaded_rfds_df)
