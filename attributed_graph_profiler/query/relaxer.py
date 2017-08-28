@@ -33,20 +33,22 @@ class QueryRelaxer:
         # ===============================================
         self.query_attributes = list(self.query.keys())
 
-    def dropna(self):
+    def drop_query_na(self):
         '''
         Drops the RFDs where an attribute of the query is NaN.
         :return:
         '''
-        return self.rfds_df.dropna(subset=self.query_attributes).reset_index(drop=True)
+        self.rfds_df = self.rfds_df.dropna(subset=self.query_attributes).reset_index(drop=True)
+        return self.rfds_df
 
-    def droprhs(self):
+    def drop_query_rhs(self):
         '''
         Drops the RFDs where the RHS attribute is part of the query.
         :return:
         '''
-        return self.rfds_df.drop(self.rfds_df[self.rfds_df["RHS"].isin(self.query_attributes)]
-                                 .index).reset_index(drop=True)
+        self.rfds_df = self.rfds_df.drop(self.rfds_df[self.rfds_df["RHS"].isin(self.query_attributes)]
+                                         .index).reset_index(drop=True)
+        return self.rfds_df
 
     def sort_nan_query_attributes(self):
         nan_count = "NaNs"
@@ -60,6 +62,8 @@ class QueryRelaxer:
         sorting_cols.extend(self.query_attributes)
         ascending.extend([True for _ in self.query_attributes])
 
-        return self.rfds_df.sort_values(by=sorting_cols,
-                                        ascending=ascending,
-                                        na_position="first").reset_index(drop=True)
+        self.rfds_df = self.rfds_df.sort_values(by=sorting_cols,
+                                                ascending=ascending,
+                                                na_position="first").reset_index(drop=True).drop(nan_count, axis=1)
+
+        return self.rfds_df
