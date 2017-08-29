@@ -28,7 +28,7 @@ def extend_query_ranges(query: dict, rfd: dict) -> dict:
                 print("Threshold is positive:", threshold)
                 if isinstance(val, int):
                     print(val, " is int...")
-                    val_range = range(int(val - rfd[key]), int(val + rfd[key] + 1))
+                    val_range = range(int(val - threshold), int(val + threshold + 1))
                     print("Range: ", list(val_range))
                     query[key] = list(val_range)
             else:
