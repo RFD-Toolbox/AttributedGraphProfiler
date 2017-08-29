@@ -1,6 +1,7 @@
 from attributed_graph_profiler.query.relaxer import QueryRelaxer
 from attributed_graph_profiler.io.csv.io import CSVInputOutput
 import numpy as np
+import pandas as pd
 
 
 def rfd_to_string(rfd: dict) -> str:
@@ -16,7 +17,18 @@ def query_dict_to_expr(query: dict) -> str:
     return expr
 
 
-def extend_query_ranges(query: dict, rfd: dict) -> dict:
+def extend_query_ranges(query: dict, rfd: dict, data_set: pd.DataFrame = None) -> dict:
+    '''
+    Given a query and an RFD, extends the query attributes range
+    by the corresponding threshold contained in the RFD.
+    If some of the query attributes are of type string, the full DataFrame
+    is needed to calculate the list of strings similar to the attribute value.
+    :param query: The query to be extended.
+    :param rfd: The RFD containing the thresholds to apply.
+    :param data_set: The full DataFrame to query.
+    :return: the extended query.
+    '''
+
     for key, val in query.items():
         print("{} : {}".format(key, val))
         if key in rfd:
@@ -31,6 +43,9 @@ def extend_query_ranges(query: dict, rfd: dict) -> dict:
                     val_range = range(int(val - threshold), int(val + threshold + 1))
                     print("Range: ", list(val_range))
                     query[key] = list(val_range)
+                elif isinstance(val, str):
+                    print(val, " is string...")
+                    print("DataSet:", data_set)
             else:
                 print("Threshold is not positive:", threshold)
     return query
