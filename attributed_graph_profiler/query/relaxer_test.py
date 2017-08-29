@@ -2,6 +2,7 @@ from attributed_graph_profiler.query.relaxer import QueryRelaxer
 from attributed_graph_profiler.io.csv.io import CSVInputOutput
 import numpy as np
 import pandas as pd
+import editdistance
 
 
 def rfd_to_string(rfd: dict) -> str:
@@ -49,6 +50,21 @@ def extend_query_ranges(query: dict, rfd: dict, data_set: pd.DataFrame = None) -
             else:
                 print("Threshold is not positive:", threshold)
     return query
+
+
+def similar_strings(source: str, data: pd.DataFrame, col: str, threshold: int) -> list:
+    '''
+    Returns a list of strings, from the column col of data DataFrame,
+    that are similar to the source string with an edit distance of at most threshold.
+    :param source: the string against which to compute the edit distances.
+    :param data: the DataFrame containing the string values.
+    :param col: the DataFrame column containing the string values.
+    :param threshold: the maximum edit distance between source and another string.
+    :return: the list of strings similar to source.
+    '''
+
+    return data[data[col].apply(lambda word: int(editdistance.eval(source, word)) <= threshold)][
+        col].tolist()
 
 
 # def query_rhs_rewrite(result_set: pd.DataFrame, rfd: dict)

@@ -1,6 +1,7 @@
 import pandas as pd
 from io import StringIO
 import editdistance
+from attributed_graph_profiler.query.relaxer_test import similar_strings
 
 
 def main():
@@ -25,9 +26,13 @@ def main():
     print(end="\n\n")
     print(string_list)
 
-    similar_strings = df[df[string_column].apply(lambda word: int(editdistance.eval(source, word)) <= max_dist)][
+    similar_strings_list = df[df[string_column].apply(lambda word: int(editdistance.eval(source, word)) <= max_dist)][
         string_column].tolist()
-    print("{} Similar Strings {}:".format(source, max_dist), similar_strings)
+    print("{} Similar Strings {}:\n".format(source, max_dist), similar_strings_list)
+
+    print("Similar Strings from function:")
+    sim_strings = similar_strings(source, df, string_column, max_dist)
+    print(sim_strings)
 
 
 if __name__ == "__main__":
