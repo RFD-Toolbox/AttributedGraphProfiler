@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from loader.distance_mtr import DiffMatrix
 from dominance.dominance_tools import RFDDiscovery
+from attributed_graph_profiler.clustering.csv_parser import CSVParser
 
 
 class RFDExtractor:
@@ -25,9 +26,20 @@ class RFDExtractor:
     human_readable = None
     # ==========================================================================
     half_sides_specifications = None
+    '''
+    A list containing all the possible combinations of LHS & RHS indexes.
+    '''
     distance_matrix = None
     rfd_data_frame_list = None
+    '''
+    A list of Pandas DataFrame, one for each possible combination of RHS & LHS indexes.
+    Each DataFrame contains the RFDs found for the corresponding combination of indexes.
+    '''
     rfd_dictionary_list = None
+
+    csv_parser = None
+    header = None
+    data_frame = None
 
     def __init__(self, args, debug_mode=False) -> None:
         super().__init__()
@@ -35,6 +47,10 @@ class RFDExtractor:
         self.debug_mode = debug_mode
         self.separator_character, self.csv_file, self.has_header, self.semantic, self.has_date_time, self.missing, \
         self.index_column, self.human_readable, self.half_sides_specifications = self.extract_args(self.args)
+
+        self.csv_parser = CSVParser(self.csv_file)
+        self.data_frame = self.csv_parser.data_frame
+        self.header = self.csv_parser.header
 
         try:
             self.check_correctness(self.has_date_time, self.half_sides_specifications, self.index_column)
@@ -68,6 +84,16 @@ class RFDExtractor:
 
             self.rfd_data_frame_list = list()
             for combination in self.half_sides_specifications:
+                '''
+                combination is a dictionary containing rhs & lhs as keys,
+                and a list of the corresponding indexes as valus.
+                For example, given a set of 4 attributes, there will be 
+                the following 4 combinations:
+                Combination0: {'rhs': [0], 'lhs': [1, 2, 3]}
+                Combination1: {'rhs': [1], 'lhs': [0, 2, 3]}
+                Combination2: {'rhs': [2], 'lhs': [0, 1, 3]}
+                Combination3: {'rhs': [3], 'lhs': [0, 1, 2]}
+                '''
                 combination_distance_matrix = self.distance_matrix.split_sides(combination)
                 '''with ut.timeit_context("RFD Discover time for Combination {}".format(str(combination))):'''
                 rfd_discovery = RFDDiscovery(combination_distance_matrix)
@@ -323,4 +349,39 @@ class RFDExtractor:
 
                     self.rfd_dictionary_list.append(rfd_dictionary)
 
+        return self.rfd_dictionary_list
+
+    def get_sort_rfd_dictionary_list(self, sort, sort_param):
+        print("Within get sort...")
+
+        if self.rfd_dictionary_list is None:
+            self.rfd_dictionary_list = list()
+            for rfd_data_frame in self.rfd_data_frame_list:
+                diff = lambda l1, l2: [x for x in l1 if x not in l2]
+                rhs_column = diff(self.header, list(rfd_data_frame))
+                print("RHS_column:", rhs_column[0])
+                print("BeforeRename:\n", rfd_data_frame)
+                rfd_data_frame.rename(columns={"RHS": rhs_column[0]}, inplace=True)
+                print("AfterRename:\n", rfd_data_frame)
+                # start save on file
+                df = pd.DataFrame(rfd_data_frame)
+                filename = rhs_column[0] + ".csv"
+                df.to_csv(filename, index=False, encoding='utf-8', na_rep="?",
+                          sep=";")  # Index if we want index for row
+
+                # end save on file
+                if sort:
+                    print("before sorting:\n\n", rfd_data_frame)
+                    # sortedlist = sorted(reader, key=lambda line: (line["age"], line["name"]), reverse=False)
+                    # rfd_data_frame = rfd_data_frame.sort_values(by=sort_param)
+                    print("after sorting:\n\n", rfd_data_frame)
+
+                for _, row in rfd_data_frame.iterrows():
+                    rfd_dictionary = {}
+                    for col in range(0, len(row)):
+                        rfd_dictionary[rfd_data_frame.columns[col]] = round(row[col], ndigits=2)
+
+                    self.rfd_dictionary_list.append(rfd_dictionary)
+
+        print("Exiting get sort...")
         return self.rfd_dictionary_list

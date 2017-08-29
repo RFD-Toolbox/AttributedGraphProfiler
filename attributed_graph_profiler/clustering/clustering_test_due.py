@@ -8,7 +8,7 @@ from attributed_graph_profiler.clustering.core_module import core_module
 
 def main():
     print("Clustering TEST")
-    csv_path = "../../resources/dataset_string.csv"
+    csv_path = "../../resources/dataset.csv"
     csv_data_frame = pandas.read_csv(csv_path, delimiter=";")
     csv_headers = list(csv_data_frame)
 
@@ -42,7 +42,7 @@ def main():
         print(groups[row_num], end="\n\n")
         group_begin_index = group_end_index
 
-    args = ["-c", "../../resources/dataset_string.csv"]
+    args = ["-c", "../../resources/dataset.csv"]
     rfd_extractor = RFDExtractor(args, False)
     rfds = rfd_extractor.get_rfd_dictionary_list()
 
