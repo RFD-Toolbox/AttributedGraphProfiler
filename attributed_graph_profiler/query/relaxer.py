@@ -33,24 +33,28 @@ class QueryRelaxer:
         # ===============================================
         self.query_attributes = list(self.query.keys())
 
-    def drop_query_na(self):
+    def drop_query_na(self) -> pd.DataFrame:
         '''
         Drops the RFDs where an attribute of the query is NaN.
-        :return:
+        :return: the dropped RFDs DataFrame.
         '''
         self.rfds_df = self.rfds_df.dropna(subset=self.query_attributes).reset_index(drop=True)
         return self.rfds_df
 
-    def drop_query_rhs(self):
+    def drop_query_rhs(self) -> pd.DataFrame:
         '''
         Drops the RFDs where the RHS attribute is part of the query.
-        :return:
+        :return: the dropped RFDs DataFrame.
         '''
         self.rfds_df = self.rfds_df.drop(self.rfds_df[self.rfds_df["RHS"].isin(self.query_attributes)]
                                          .index).reset_index(drop=True)
         return self.rfds_df
 
-    def sort_nan_query_attributes(self):
+    def sort_nan_query_attributes(self) -> pd.DataFrame:
+        '''
+        Sorts the RFDs DataFrame by decreasing number of NaNs and increasing values of query attributes.
+        :return: the sorted RFDs DataFrame.
+        '''
         nan_count = "NaNs"
         kwargs = {nan_count: lambda x: x.isnull().sum(axis=1)}
         self.rfds_df = self.rfds_df.assign(**kwargs)
