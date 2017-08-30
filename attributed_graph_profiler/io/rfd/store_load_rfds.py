@@ -1,8 +1,7 @@
 from attributed_graph_profiler.rfd_extractor import RFDExtractor
 from attributed_graph_profiler.io.csv.io import CSVInputOutput
 import pandas as pd
-
-diff = lambda l1, l2: [x for x in l1 if x not in l2]
+import numpy as np
 
 
 def diff(list1: list, list2: list):
@@ -64,23 +63,103 @@ def main():
     print("\n\nLoaded rfds df\n")
     print(loaded_rfds_df)
 
-    ################STaRT QUERY##############
+    ##############################################START QUERY##########################################
+    print("#" * 50 + " QUERY " + "#" * 50)
     query = 'height==175'
+    print("Query:", query)
+    query_dict = {"height": 175}
+    print("Query dict:", query_dict)
     my_set = rfd_extractor.data_frame
     my_set = my_set.query(query)
-    print("My SET \n")
-    print(my_set)
+    print("Query Result SET:")
+    print(my_set, end="\n\n")
+
     loaded_rfds_df.sort_values(by=['height', 'age', 'shoe_size', 'weight'], inplace=True)
-    print("Ordered rfds")
+    print("Ordered rfds df by height, age, shoe_size, weight:")
+    print(loaded_rfds_df, end="\n\n")
+
+    nan_count = "NaNs"
+    kwargs = {nan_count: lambda x: x.isnull().sum(axis=1)}
+    loaded_rfds_df = loaded_rfds_df.assign(**kwargs)
+
+    diff_sum = "diff_sum"
+    kwargs2 = {diff_sum: lambda x: x.drop(nan_count, axis=1).sum(axis=1)}
+    loaded_rfds_df = loaded_rfds_df.assign(**kwargs2)
+
+    sorting_keys = [nan_count, diff_sum]
+    print("Sorting Keys:", sorting_keys)
+    ascending = [False, True]
+
+    query_dict_keys = list(query_dict.keys())
+    print("Query Dict Keys:", query_dict_keys)
+    loaded_rfds_df = loaded_rfds_df.dropna(subset=query_dict_keys)
+
+    print("Dropped DF Nans on query attributes:", end="\n\n")
     print(loaded_rfds_df)
+
+    # drop RFDs containing an attribute of the Query as the RHS.
+    loaded_rfds_df = loaded_rfds_df.drop(
+        loaded_rfds_df[loaded_rfds_df["RHS"].isin(query_dict_keys)].index).reset_index(
+        drop=True)
+
+    print("Dropped DF RHS query attributes:", end="\n\n")
+    print(loaded_rfds_df)
+
+    sorting_keys.extend(query_dict_keys)
+    print("Extended keys:", sorting_keys)
+    ascending.extend([True for _ in query_dict_keys])
+
+    print("Acending mask:", ascending)
+    # drop RFDs that doesn't contain attributes of the original Query.
+    loaded_rfds_df.drop = loaded_rfds_df.dropna(subset=query_dict_keys)
+
+    loaded_rfds_df = loaded_rfds_df.sort_values(by=sorting_keys,
+                                                ascending=ascending,
+                                                na_position="first").reset_index(drop=True)
+
+    print("Sorted...")
+    print(loaded_rfds_df)
+    '''
     print("Group by")
-    df_groupby = loaded_rfds_df.groupby(by='height')
-    better_group = None
-    for name, group in df_groupby:
-        print(name, '\n')
-        better_group = group.sort_values(by=['age', 'shoe_size', 'weight'])
-        better_group.drop(better_group[better_group["RHS"] == 'height'].index, inplace=True)
-        print(better_group)
+    df_grouped_by_height = loaded_rfds_df.groupby(by='height')
+
+    for name, group in df_grouped_by_height:
+        print("#" * 100)
+        print("Height =", name)
+        df = group.drop(group[group["RHS"] == 'height'].index).reset_index(drop=True)
+        print(df, end="\n\n")
+
+        nan_count = "NaNs"
+        kwargs = {nan_count: lambda x: x.isnull().sum(axis=1)}
+        df = df.assign(**kwargs)
+
+        diff_sum = "diff_sum"
+        kwargs2 = {diff_sum: lambda x: x.drop(nan_count, axis=1).sum(axis=1)}
+        df = df.assign(**kwargs2)
+
+        df = df.sort_values([nan_count, diff_sum, "age", "shoe_size", "weight"],
+                            ascending=[False, True, True, True, True], na_position="first").reset_index(drop=True)
+
+        df = df.drop(nan_count, axis=1)
+        df = df.drop(diff_sum, axis=1)
+
+        print("Sorted RFDs DF + reset_index:")
+        print(df, end="\n\n")
+
+        print("Best RFD:")
+        best_rfd_df = df.ix[[0]]
+        print(best_rfd_df)
+
+        for index, row in best_rfd_df.iterrows():
+            string = ""
+            string += "".join(["" if col == "RHS" or col == row["RHS"] or np.isnan(row[col]) else col + " <= " + str(
+                row[col]) + ", " for col in best_rfd_df])
+            string += "---> {} <= {}".format(row["RHS"], row[row["RHS"]])
+            print("RFD:\n", string)
+
+        print("=" * 100, end="\n\n")
+    '''
+
 
 if __name__ == "__main__":
     main()
