@@ -47,6 +47,8 @@ def extend_query_ranges(query: dict, rfd: dict, data_set: pd.DataFrame = None) -
                 elif isinstance(val, str):
                     print(val, " is string...")
                     print("DataSet:", data_set)
+                    source = val
+                    query[key] = similar_strings(source=source, data=data_set, col=key, threshold=threshold)
             else:
                 print("Threshold is not positive:", threshold)
     return query
