@@ -14,7 +14,8 @@ def rfd_to_string(rfd: dict) -> str:
 
 
 def query_dict_to_expr(query: dict) -> str:
-    expr = " and ".join(["{} == {}".format(k, v) for k, v in query.items()])
+    expr = " and ".join(
+        ["{} == {}".format(k, v) if not isinstance(v, str) else "{} == '{}'".format(k, v) for k, v in query.items()])
     return expr
 
 
@@ -46,10 +47,9 @@ def extend_query_ranges(query: dict, rfd: dict, data_set: pd.DataFrame = None) -
                     query[key] = list(val_range)
                 elif isinstance(val, str):
                     print(val, " is string...")
-                    print("DataSet:", data_set)
                     source = val
                     simil_string = similar_strings(source=source, data=data_set, col=key, threshold=threshold)
-                    print("Simil string: ", simil_string)
+                    print("Similar strings: ", simil_string)
                     query[key] = simil_string
             else:
                 print("Threshold is not positive:", threshold)
@@ -80,7 +80,7 @@ def main():
     data_set_df = csv_io.load(csv_path)
     print("DataSet:\n", data_set_df, end="\n\n")
 
-    query = {"name": "mary"}
+    query = {"name": "john"}
     print("Query:", query, end="\n\n")
 
     rfds_path = "../../resources/dataset_string_rfds.csv"
@@ -124,8 +124,6 @@ def main():
     print("OriginalQuery:", query)
     query_expr = query_dict_to_expr(query)
     print("OriginalQuery expr:", query_expr)
-    print("Da eliminare")
-    query_expr = "name=='mary'"
     query_res_set = data_set_df.query(query_expr)
     print("Original Query Result Set:\n", query_res_set)
 
