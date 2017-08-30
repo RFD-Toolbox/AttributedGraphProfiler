@@ -111,18 +111,38 @@ def main():
     rhs_column = choosen_rfd["RHS"]
     print("\nRHS column:", rhs_column)
 
+    ################################################
+    # @@@@@@@@@@@@__ORIGINAL QUERY__@@@@@@@@@@@@@@@#
+    ################################################
+    print("#" * 200)
+    print("@" * 90 + " __ORIGINAL QUERY__ " + "@" * 90)
+    print("#" * 200)
     print("OriginalQuery:", query)
     query_expr = query_dict_to_expr(query)
     print("OriginalQuery expr:", query_expr)
     query_res_set = data_set_df.query(query_expr)
     print("Original Query Result Set:\n", query_res_set)
 
+    ################################################
+    # @@@@@@@@@@@@__EXTENDED QUERY__@@@@@@@@@@@@@@@#
+    ################################################
+    print("#" * 200)
+    print("@" * 90 + " __EXTENDED QUERY__ " + "@" * 90)
+    print("#" * 200)
     query_extended = extend_query_ranges(query, choosen_rfd)
     print("Query extended: ", query_extended)
     query_extended_expr = query_dict_to_expr(query_extended)
     print("Query Extended Expr:", query_extended_expr)
     query_extended_res_set = data_set_df.query(query_extended_expr)
     print("Query Extended Result Set:\n", query_extended_res_set)
+
+    ################################################
+    # @@@@@@@@@@@@__RELAXED QUERY__@@@@@@@@@@@@@@@#
+    ################################################
+    print("#" * 200)
+    print("@" * 90 + " __RELAXED QUERY__ " + "@" * 90)
+    print("#" * 200)
+
     rhs_values_list = query_extended_res_set[rhs_column].tolist()
     rhs_values_list.sort()
     print("\nRHS values:", rhs_values_list)
