@@ -16,7 +16,7 @@ def diff(list1: list, list2: list):
 
 def main():
     print("Store&Load RFDs")
-    args = ["-c", "../../../resources/dataset.csv", "--human"]
+    args = ["-c", "../../../resources/dataset_string.csv", "--human"]
     rfd_extractor = RFDExtractor(args, False)
     rfds_df_list = rfd_extractor.rfd_data_frame_list
     csv_main_header = rfd_extractor.header
@@ -56,7 +56,7 @@ def main():
     print(ad_hoc_all_rfds_df)
 
     csv_io = CSVInputOutput()
-    path = "ad_hoc_all_rfds_df.csv"
+    path = "dataset_string_rfds.csv"
     csv_io.store(df=ad_hoc_all_rfds_df, path=path)
 
     loaded_rfds_df = csv_io.load(path=path)
