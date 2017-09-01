@@ -1,7 +1,7 @@
-from attributed_graph_profiler.rfd_extractor import RFDExtractor
-from attributed_graph_profiler.io.csv.io import CSVInputOutput
 import pandas as pd
-import numpy as np
+
+from attributed_graph_profiler.io.csv.io import CSVInputOutput
+from attributed_graph_profiler.io.rfd.rfd_extractor import RFDExtractor
 
 
 def diff(list1: list, list2: list):
@@ -16,7 +16,7 @@ def diff(list1: list, list2: list):
 
 def main():
     print("Store&Load RFDs")
-    args = ["-c", "../../../resources/cora.csv", "--human"]
+    args = ["-c", "../../dataset/cora.csv", "--human"]
     rfd_extractor = RFDExtractor(args, False)
     rfds_df_list = rfd_extractor.rfd_data_frame_list
     csv_main_header = rfd_extractor.header

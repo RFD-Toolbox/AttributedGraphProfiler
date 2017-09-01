@@ -1,7 +1,9 @@
-import pandas as pd
 from io import StringIO
+
 import editdistance
-from attributed_graph_profiler.query.relaxer_test import similar_strings
+import pandas as pd
+
+from attributed_graph_profiler.test.relaxer_test import similar_strings
 
 
 def main():

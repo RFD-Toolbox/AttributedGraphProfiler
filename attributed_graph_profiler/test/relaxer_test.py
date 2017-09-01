@@ -76,14 +76,14 @@ def similar_strings(source: str, data: pd.DataFrame, col: str, threshold: int) -
 
 def main():
     csv_io = CSVInputOutput()
-    csv_path = "../../resources/cora.csv"
+    csv_path = "../dataset/dataset_string.csv"
     data_set_df = csv_io.load(csv_path)
     print("DataSet:\n", data_set_df, end="\n\n")
 
-    query = {"title_Text": "Fast perceptual learning in hyperacuity."}
+    query = {"name": "joh"}
     print("Query:", query, end="\n\n")
 
-    rfds_path = "../../resources/cora_rfds.csv"
+    rfds_path = "../dataset/rfds/dataset_string_rfds.csv"
     rfds_df = csv_io.load(rfds_path)
     print("RFDs:\n", rfds_df, end="\n\n")
 
