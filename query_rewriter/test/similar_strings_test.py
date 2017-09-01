@@ -3,7 +3,7 @@ from io import StringIO
 import editdistance
 import pandas as pd
 
-from attributed_graph_profiler.test.relaxer_test import similar_strings
+from query_rewriter.test.relaxer_test import similar_strings
 
 
 def main():

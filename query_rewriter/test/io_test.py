@@ -1,4 +1,4 @@
-from attributed_graph_profiler.io.rfd.io import RFDInputOutput
+from query_rewriter.io.rfd.io import RFDInputOutput
 import pandas as pd
 
 

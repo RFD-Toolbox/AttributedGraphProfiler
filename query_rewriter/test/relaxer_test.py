@@ -1,5 +1,5 @@
-from attributed_graph_profiler.query.relaxer import QueryRelaxer
-from attributed_graph_profiler.io.csv.io import CSVInputOutput
+from query_rewriter.query.relaxer import QueryRelaxer
+from query_rewriter.io.csv.io import CSVInputOutput
 import numpy as np
 import pandas as pd
 import editdistance

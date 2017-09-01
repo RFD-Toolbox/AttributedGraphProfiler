@@ -1,5 +1,5 @@
 import pandas as pd
-from attributed_graph_profiler.io.csv.io import CSVInputOutput
+from query_rewriter.io.csv.io import CSVInputOutput
 
 
 class RFDInputOutput:

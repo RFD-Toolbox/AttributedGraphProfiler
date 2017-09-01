@@ -1,6 +1,6 @@
 import csv
 
-from attributed_graph_profiler.io.rfd.rfd_extractor import RFDExtractor
+from query_rewriter.io.rfd.rfd_extractor import RFDExtractor
 
 
 def main():

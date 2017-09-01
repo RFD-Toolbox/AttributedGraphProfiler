@@ -1,7 +1,7 @@
 import pandas as pd
 
-from attributed_graph_profiler.io.csv.io import CSVInputOutput
-from attributed_graph_profiler.io.rfd.rfd_extractor import RFDExtractor
+from query_rewriter.io.csv.io import CSVInputOutput
+from query_rewriter.io.rfd.rfd_extractor import RFDExtractor
 
 
 def diff(list1: list, list2: list):
