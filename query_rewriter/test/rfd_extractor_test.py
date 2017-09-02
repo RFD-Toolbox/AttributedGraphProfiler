@@ -1,13 +1,11 @@
-import sys
-import os
-import collections
 import numpy as np
-from attributed_graph_profiler.rfd_extractor import RFDExtractor
+
+from query_rewriter.io.rfd.rfd_extractor import RFDExtractor
 
 
 def main():
     print("[Test]")
-    args = ["-c", "../resources/dataset_string.csv", "--human"]
+    args = ["-c", "../dataset/dataset_string.csv", "--human"]
     rfd_extractor = RFDExtractor(args, False)
     rfd_data_frames: list = rfd_extractor.rfd_data_frame_list
 

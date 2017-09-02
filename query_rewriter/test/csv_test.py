@@ -1,12 +1,11 @@
-import sys
-import os
 import csv
-from attributed_graph_profiler.rfd_extractor import RFDExtractor
+
+from query_rewriter.io.rfd.rfd_extractor import RFDExtractor
 
 
 def main():
     print("CSV Test")
-    csv_path = "../resources/dataset_string.csv"
+    csv_path = "../dataset/dataset_string.csv"
 
     with open(csv_path, 'r') as csv_file:
         sniffer = csv.Sniffer()
@@ -36,7 +35,7 @@ def main():
             print()
         print("</Sorted List>\n")
 
-    args = ["-c", "../resources/dataset_string.csv", "--human"]
+    args = ["-c", "../dataset/dataset_string.csv", "--human"]
     rfd_extractor = RFDExtractor(args, False)
     rfd_dictionary_list = rfd_extractor.get_rfd_dictionary_list()
 

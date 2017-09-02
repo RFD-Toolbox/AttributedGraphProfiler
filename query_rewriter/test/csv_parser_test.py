@@ -1,4 +1,4 @@
-from attributed_graph_profiler.clustering.csv_parser import CSVParser
+from query_rewriter.io.csv.csv_parser import CSVParser
 
 
 def main():

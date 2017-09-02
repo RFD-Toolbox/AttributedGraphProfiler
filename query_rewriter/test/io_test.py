@@ -1,10 +1,10 @@
-from attributed_graph_profiler.io.rfd.io import RFDInputOutput
+from query_rewriter.io.rfd.io import RFDInputOutput
 import pandas as pd
 
 
 def main():
     rfd_io = RFDInputOutput()
-    age_rfd_df = rfd_io.load("../../age.csv")
+    age_rfd_df = rfd_io.load("../dataset/age.csv")
     print(age_rfd_df)
 
     zipped = list(zip(age_rfd_df.columns, ["RHS", "height", "weight", "shoe_size"]))

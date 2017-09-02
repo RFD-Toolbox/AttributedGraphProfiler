@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from loader.distance_mtr import DiffMatrix
 from dominance.dominance_tools import RFDDiscovery
-from attributed_graph_profiler.clustering.csv_parser import CSVParser
+from query_rewriter.io.csv.csv_parser import CSVParser
 
 
 class RFDExtractor:
