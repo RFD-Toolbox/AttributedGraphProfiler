@@ -60,11 +60,11 @@ class QueryRelaxer:
         kwargs = {nan_count: lambda x: x.isnull().sum(axis=1)}
         self.rfds_df = self.rfds_df.assign(**kwargs)
 
-        sorting_cols = [nan_count]
-        print("Sorting Keys:", sorting_cols)
+        # print("Sorting Keys:", sorting_cols)
         ascending = [False]
 
-        sorting_cols.extend(self.query_attributes)
+        sorting_cols = self.query_attributes
+        sorting_cols = sorting_cols.extend([nan_count])
         ascending.extend([True for _ in self.query_attributes])
 
         self.rfds_df = self.rfds_df.sort_values(by=sorting_cols,

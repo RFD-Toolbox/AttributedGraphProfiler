@@ -1,5 +1,4 @@
 import sys
-import os
 import argparse
 import logging
 import ast
@@ -61,7 +60,7 @@ def start_process(arguments):
     logging.info("#" * 200)
     logging.info("@" * 90 + " RELAX " + "@" * 90)
     logging.info("#" * 200)
-    choosen_rfd = rfds_dict_list[0]
+    choosen_rfd = rfds_dict_list[2]
     logging.info("\nChoosen RFD:\n%s", choosen_rfd)
     logging.info("\nRFD:\n%s", QueryRelaxer.rfd_to_string(choosen_rfd))
 
