@@ -4,6 +4,7 @@ import logging
 import ast
 from query_rewriter.io.csv.io import CSVInputOutput
 from query_rewriter.query.relaxer import QueryRelaxer
+from query_rewriter.io.rfd import store_load_rfds
 
 
 def main(args):
@@ -27,9 +28,10 @@ def start_process(arguments):
     dataset_path = arguments.path
     rfds_path = arguments.rfds
     if rfds_path is None:
+        rfds_path = "dataset/rfds/now_in_use.csv"
+        store_load_rfds.search_rfds(dataset_path, "dataset/rfds/now_in_use.csv")
         '''calculate rfd from file '''
     query = ast.literal_eval(arguments.query)
-
     data_set_df = csv_io.load(dataset_path)
     logging.info("Dataset: \n%s", data_set_df)
 
@@ -60,7 +62,7 @@ def start_process(arguments):
     logging.info("#" * 200)
     logging.info("@" * 90 + " RELAX " + "@" * 90)
     logging.info("#" * 200)
-    choosen_rfd = rfds_dict_list[2]
+    choosen_rfd = rfds_dict_list[0]
     logging.info("\nChoosen RFD:\n%s", choosen_rfd)
     logging.info("\nRFD:\n%s", QueryRelaxer.rfd_to_string(choosen_rfd))
 
