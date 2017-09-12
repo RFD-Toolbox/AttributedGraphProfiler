@@ -6,6 +6,7 @@ from query_rewriter.io.csv.io import CSVInputOutput
 from query_rewriter.query.relaxer import QueryRelaxer
 from query_rewriter.io.rfd import store_load_rfds
 import pandas as pd
+import math
 
 
 def main(args):
@@ -101,19 +102,30 @@ def start_process(arguments):
     logging.info("@" * 90 + " __RELAXED QUERY__ " + "@" * 90)
     logging.info("#" * 200)
 
-    #start extracting values
+    # start extracting values
     print("#start extracting values")
     relaxing_attributes = [col for col in list(data_set_df)]
+    print(relaxing_attributes)
+    for key, value in choosen_rfd.items():
+        if isinstance(value, float):
+            if math.isnan(value):
+                relaxing_attributes.remove(key)
+        elif isinstance(value, str):
+            if value == 'nan':
+                relaxing_attributes.remove(key)
+    print("Without nan:\n", relaxing_attributes)
+    for key, value in query.items():
+        relaxing_attributes.remove(key)
+    print("Whithout query attributes:\n", relaxing_attributes)
+    rhs_values_list = extract_value_lists(query_extended_res_set, relaxing_attributes)
+    # rhs_values_list = query_extended_res_set[rhs_column].tolist()
+    # rhs_values_list.sort()
+    # logging.info("\nRHS values: %s", rhs_values_list)
+    # # removing duplicates
+    # rhs_values_list = list(set(rhs_values_list))
+    # # sorting
+    # rhs_values_list.sort()
 
-
-
-    rhs_values_list = query_extended_res_set[rhs_column].tolist()
-    rhs_values_list.sort()
-    logging.info("\nRHS values: %s", rhs_values_list)
-    # removing duplicates
-    rhs_values_list = list(set(rhs_values_list))
-    # sorting
-    rhs_values_list.sort()
     logging.info("\nRHS values no duplicates: %s", rhs_values_list)
     logging.info("\nRFD:\n%s", QueryRelaxer.rfd_to_string(choosen_rfd))
     rhs_threshold = choosen_rfd[choosen_rfd["RHS"]]
