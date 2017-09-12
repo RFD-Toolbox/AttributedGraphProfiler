@@ -5,9 +5,12 @@ import ast
 from query_rewriter.io.csv.io import CSVInputOutput
 from query_rewriter.query.relaxer import QueryRelaxer
 from query_rewriter.io.rfd import store_load_rfds
+import pandas as pd
 
 
 def main(args):
+    pd.set_option('display.max_columns', None)
+    pd.set_option('display.max_rows', None)
     path_dataset = None
     path_rfds = None
     query_dict = {}
@@ -35,7 +38,7 @@ def start_process(arguments):
     logging.info("Dataset: \n%s", data_set_df)
 
     logging.info("Query is : %s", query)
-    insert_space(query)
+    # insert_space(query)
 
     rfds_df = csv_io.load(rfds_path)
     logging.info("RFDs:\n%s", rfds_df)
@@ -106,13 +109,12 @@ def start_process(arguments):
     # sorting
     rhs_values_list.sort()
     logging.info("\nRHS values no duplicates: %s", rhs_values_list)
-
     logging.info("\nRFD:\n%s", QueryRelaxer.rfd_to_string(choosen_rfd))
     rhs_threshold = choosen_rfd[choosen_rfd["RHS"]]
     logging.info("RHS threshold: %s", rhs_threshold)
     rhs_extended_values = []
     for x in rhs_values_list:
-        if isinstance(x, int) and isinstance(x, float):
+        if isinstance(x, int) or isinstance(x, float):
             for y in range(int(x - rhs_threshold), int(x + rhs_threshold + 1)):
                 rhs_extended_values.append(y)
         else:
@@ -133,6 +135,9 @@ def start_process(arguments):
     logging.info("Relaxed Query expr: %s", relaxed_query_expr)
 
     relaxed_result_set = data_set_df.query(relaxed_query_expr)
+    # reset index
+    relaxed_result_set.reset_index(inplace=True, level=0, drop=True)
+
     logging.info("\nRelaxed Result Set:\n%s", relaxed_result_set)
 
 

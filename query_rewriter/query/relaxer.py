@@ -66,7 +66,7 @@ class QueryRelaxer:
 
         sorting_cols.extend(self.query_attributes)
         ascending.extend([True for _ in self.query_attributes])
-        print("ASCENDING",ascending)
+        print("ASCENDING", ascending)
         print("BY", sorting_cols)
         self.rfds_df = self.rfds_df.sort_values(by=sorting_cols,
                                                 ascending=ascending,
@@ -108,7 +108,7 @@ class QueryRelaxer:
 
                 if threshold > 0.0:
                     print("Threshold is positive:", threshold)
-                    if isinstance(val, int):
+                    if isinstance(val, int) or isinstance(val, float):
                         print(val, " is int...")
                         val_range = range(int(val - threshold), int(val + threshold + 1))
                         print("Range: ", list(val_range))
