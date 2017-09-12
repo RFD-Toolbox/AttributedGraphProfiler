@@ -101,6 +101,12 @@ def start_process(arguments):
     logging.info("@" * 90 + " __RELAXED QUERY__ " + "@" * 90)
     logging.info("#" * 200)
 
+    #start extracting values
+    print("#start extracting values")
+    relaxing_attributes = [col for col in list(data_set_df)]
+
+
+
     rhs_values_list = query_extended_res_set[rhs_column].tolist()
     rhs_values_list.sort()
     logging.info("\nRHS values: %s", rhs_values_list)
@@ -129,7 +135,9 @@ def start_process(arguments):
     rhs_extended_values_no_duplicates.sort()
     logging.info("RHS extended values no duplicates: %s", rhs_extended_values_no_duplicates)
 
+    # RELAXED QUERY RHS ONLY
     relaxed_query = {rhs_column: rhs_extended_values_no_duplicates}
+
     logging.info("Relaxed Query: %s", relaxed_query)
     relaxed_query_expr = QueryRelaxer.query_dict_to_expr(relaxed_query)
     logging.info("Relaxed Query expr: %s", relaxed_query_expr)
@@ -146,6 +154,22 @@ def insert_space(query):
         query[key] = value.replace('$', ' ')
     logging.info("Query with space is : %s", query)
     return query
+
+
+def extract_value_lists(result_set_df: pd.DataFrame, columns: list):
+    '''
+
+    :param result_set_df:
+    :param columns:
+    :return:
+    '''
+    dictionary = {}
+    for col in columns:
+        # duplicates removed too.
+        dictionary[col] = list(set(result_set_df[col].tolist()))
+        dictionary[col].sort()
+
+    return dictionary
 
 
 if __name__ == "__main__":
