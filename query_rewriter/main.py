@@ -111,8 +111,6 @@ def start_process(arguments):
                            if col not in query.keys() and not np.isnan(choosen_rfd[col])]
     print("RELAXING ATTRIBUTES:\n", relaxing_attributes)
 
-    exit(-1)
-
     '''
     for key, value in choosen_rfd.items():
         if isinstance(value, float):
@@ -127,7 +125,7 @@ def start_process(arguments):
     print("Whithout query attributes:\n", relaxing_attributes)
     '''
 
-    rhs_values_list = extract_value_lists(query_extended_res_set, relaxing_attributes)
+    relaxing_values_list = extract_value_lists(query_extended_res_set, relaxing_attributes)
     # rhs_values_list = query_extended_res_set[rhs_column].tolist()
     # rhs_values_list.sort()
     # print("\nRHS values: ", rhs_values_list)
@@ -136,29 +134,31 @@ def start_process(arguments):
     # # sorting
     # rhs_values_list.sort()
 
-    print("\nRHS values list no duplicates: ", rhs_values_list)
+    print("\nRelaxing values list: ", relaxing_values_list)
+
     print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
-    rhs_threshold = choosen_rfd[choosen_rfd["RHS"]]
-    print("RHS threshold: ", rhs_threshold)
-    rhs_extended_values = []
-    for x in rhs_values_list:
-        if isinstance(x, int) or isinstance(x, float):
-            for y in range(int(x - rhs_threshold), int(x + rhs_threshold + 1)):
-                rhs_extended_values.append(y)
-        else:
-            simil_string = QueryRelaxer.similar_strings(x, data_set_df, rhs_column, rhs_threshold)
-            for a in simil_string:
-                rhs_extended_values.append(a)
 
-    rhs_extended_values.sort()
-    print("RHS extended values: ", rhs_extended_values)
+    relaxing_values_extended = {}
+    for attr, lst in relaxing_values_list.items():
+        relaxing_values_extended[attr] = []
+        threshold = choosen_rfd[attr]
 
-    rhs_extended_values_no_duplicates = list(set(rhs_extended_values))
-    rhs_extended_values_no_duplicates.sort()
-    print("RHS extended values no duplicates: ", rhs_extended_values_no_duplicates)
+        for val in lst:
+            if isinstance(val, int) or isinstance(val, float):
+                for item in range(int(val - threshold), int(val + threshold + 1)):
+                    relaxing_values_extended[attr].append(item)
+            elif isinstance(val, str):
+                simil_strings = QueryRelaxer.similar_strings(val, data_set_df, rhs_column, threshold)
+                for string in simil_strings:
+                    relaxing_values_extended[attr].append(string)
+
+        relaxing_values_extended[attr] = list(set(relaxing_values_extended[attr]))
+        relaxing_values_extended[attr].sort()
+
+    print("Relaxing values extended dict: ", relaxing_values_extended)
 
     # RELAXED QUERY RHS ONLY
-    relaxed_query = {rhs_column: rhs_extended_values_no_duplicates}
+    relaxed_query = relaxing_values_extended
 
     print("Relaxed Query: ", relaxed_query)
     relaxed_query_expr = QueryRelaxer.query_dict_to_expr(relaxed_query)
