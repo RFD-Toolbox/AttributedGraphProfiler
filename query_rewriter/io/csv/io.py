@@ -28,4 +28,4 @@ class CSVInputOutput:
                          date_format=self.date_format)
 
     def load(self, path: str) -> pd.DataFrame:
-        return pd.read_csv(path, sep=self.sep, na_values=self.na_rep, parse_dates=True)
+        return pd.read_csv(path, sep=self.sep, na_values=self.na_rep, parse_dates=True, decimal=".")

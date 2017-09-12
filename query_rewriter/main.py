@@ -30,7 +30,6 @@ def start_process(arguments):
     if rfds_path is None:
         rfds_path = "dataset/rfds/now_in_use.csv"
         store_load_rfds.search_rfds(dataset_path, "dataset/rfds/now_in_use.csv")
-        '''calculate rfd from file '''
     query = ast.literal_eval(arguments.query)
     data_set_df = csv_io.load(dataset_path)
     logging.info("Dataset: \n%s", data_set_df)
@@ -113,7 +112,7 @@ def start_process(arguments):
     logging.info("RHS threshold: %s", rhs_threshold)
     rhs_extended_values = []
     for x in rhs_values_list:
-        if isinstance(x, int):
+        if isinstance(x, int) and isinstance(x, float):
             for y in range(int(x - rhs_threshold), int(x + rhs_threshold + 1)):
                 rhs_extended_values.append(y)
         else:
