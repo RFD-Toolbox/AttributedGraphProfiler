@@ -98,6 +98,7 @@ class QueryRelaxer:
                                    ascending=ascending,
                                    na_position="last").reset_index(drop=True)
 
+    @staticmethod
     def rfd_to_string(rfd: dict) -> str:
         string = ""
         string += "".join(["" if key == "RHS" or key == rfd["RHS"] or np.isnan(val) else "(" + key + " <= " + str(
@@ -105,12 +106,14 @@ class QueryRelaxer:
         string += "---> ({} <= {})".format(rfd["RHS"], rfd[rfd["RHS"]])
         return string
 
+    @staticmethod
     def query_dict_to_expr(query: dict) -> str:
         expr = " and ".join(
             ["{} == {}".format(k, v) if not isinstance(v, str) else "{} == '{}'".format(k, v) for k, v in
              query.items()])
         return expr
 
+    @staticmethod
     def extend_query_ranges(query: dict, rfd: dict, data_set: pd.DataFrame = None) -> dict:
         '''
         Given a query and an RFD, extends the query attributes range
@@ -148,6 +151,7 @@ class QueryRelaxer:
                     print("Threshold is not positive:", threshold)
         return query
 
+    @staticmethod
     def similar_strings(source: str, data: pd.DataFrame, col: str, threshold: int) -> list:
         '''
         Returns a list of strings, from the column col of data DataFrame,

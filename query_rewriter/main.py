@@ -57,8 +57,8 @@ def start_process(arguments):
 
     rfds_dict_list = df.to_dict(orient="records")
     print("RFD dict list:")
-    '''for dct in rfds_dict_list:
-        print(dct)'''
+    for dct in rfds_dict_list:
+        print(dct)
 
     #############################################################################################
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@RELAX@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -66,7 +66,7 @@ def start_process(arguments):
     print("#" * 200)
     print("@" * 90 + " RELAX " + "@" * 90)
     print("#" * 200)
-    choosen_rfd = rfds_dict_list[1]
+    choosen_rfd = rfds_dict_list[0]
     print("\nChoosen RFD:\n", choosen_rfd)
     print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
 
@@ -149,7 +149,8 @@ def start_process(arguments):
                 for item in range(int(val - threshold), int(val + threshold + 1)):
                     relaxing_values_extended[attr].append(item)
             elif isinstance(val, str):
-                simil_strings = QueryRelaxer.similar_strings(val, data_set_df, rhs_column, threshold)
+                simil_strings = QueryRelaxer.similar_strings(val, data_set_df, attr, threshold)
+
                 for string in simil_strings:
                     relaxing_values_extended[attr].append(string)
 
