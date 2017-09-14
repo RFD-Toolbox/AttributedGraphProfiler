@@ -22,7 +22,7 @@ def main(args):
     parser.add_argument("-p", "--path", help="path of dataset", required=True)
     parser.add_argument("-r", "--rfds", help="optional path of rfds")
     parser.add_argument("-q", "--query", help="query", required=True)
-    parser.add_argument("-n", "--numb_test", help="number of tests", default=0)
+    parser.add_argument("-n", "--numb_test", help="number of tests", default=1, type=int)
     arguments = parser.parse_args()
     print(arguments)
     start_process(arguments)
@@ -51,7 +51,7 @@ def start_process(arguments):
     df = query_relaxer.drop_query_rhs()
     print("Dropped query RHS:\n", df)
 
-    #df = query_relaxer.sort_nan_query_attributes()
+    # df = query_relaxer.sort_nan_query_attributes()
     df = query_relaxer.sort2(rfds_df, data_set_df, query)
     print("Sorted by query & non-query attributes:\n", df)
 
@@ -63,114 +63,116 @@ def start_process(arguments):
     #############################################################################################
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@RELAX@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     #############################################################################################
-    print("#" * 200)
-    print("@" * 90 + " RELAX " + "@" * 90)
-    print("#" * 200)
-    choosen_rfd = rfds_dict_list[0]
-    print("\nChoosen RFD:\n", choosen_rfd)
-    print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
 
-    rhs_column = choosen_rfd["RHS"]
-    print("\nRHS column: ", rhs_column)
+    for i in range(0, abs(min(len(rfds_dict_list), arguments.numb_test))):
+        print("#" * 200)
+        print("@" * 90 + " RELAX " + str(i) + "@" * 90)
+        print("#" * 200)
+        choosen_rfd = rfds_dict_list[i]
+        print("\nChoosen RFD:\n", choosen_rfd)
+        print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
 
-    ################################################
-    # @@@@@@@@@@@@__ORIGINAL QUERY__@@@@@@@@@@@@@@@#
-    ################################################
-    print("#" * 200)
-    print("@" * 90 + " __ORIGINAL QUERY__ " + "@" * 90)
-    print("#" * 200)
-    print("OriginalQuery: ", query)
-    query_expr = QueryRelaxer.query_dict_to_expr(query)
-    print("OriginalQuery expr: ", query_expr)
-    query_res_set = data_set_df.query(query_expr)
-    print("Original Query Result Set:\n", query_res_set)
-    ################################################
-    # @@@@@@@@@@@@__EXTENDED QUERY__@@@@@@@@@@@@@@@#
-    ################################################
-    print("#" * 200)
-    print("@" * 90 + " __EXTENDED QUERY__ " + "@" * 90)
-    print("#" * 200)
-    query_extended: dict = QueryRelaxer.extend_query_ranges(query, choosen_rfd, data_set_df)
-    print("Query extended: ", query_extended)
-    query_extended_expr = QueryRelaxer.query_dict_to_expr(query_extended)
-    print("Query Extended Expr: ", query_extended_expr)
+        rhs_column = choosen_rfd["RHS"]
+        print("\nRHS column: ", rhs_column)
 
-    query_extended_res_set = data_set_df.query(query_extended_expr)
-    print("Query Extended Result Set:\n ", query_extended_res_set)
-    ################################################
-    # @@@@@@@@@@@@__RELAXED QUERY__@@@@@@@@@@@@@@@#
-    ################################################
-    print("#" * 200)
-    print("@" * 90 + " __RELAXED QUERY__ " + "@" * 90)
-    print("#" * 200)
+        ################################################
+        # @@@@@@@@@@@@__ORIGINAL QUERY__@@@@@@@@@@@@@@@#
+        ################################################
+        print("#" * 200)
+        print("@" * 90 + " __ORIGINAL QUERY__ " + "@" * 90)
+        print("#" * 200)
+        print("OriginalQuery: ", query)
+        query_expr = QueryRelaxer.query_dict_to_expr(query)
+        print("OriginalQuery expr: ", query_expr)
+        query_res_set = data_set_df.query(query_expr)
+        print("Original Query Result Set:\n", query_res_set)
+        ################################################
+        # @@@@@@@@@@@@__EXTENDED QUERY__@@@@@@@@@@@@@@@#
+        ################################################
+        print("#" * 200)
+        print("@" * 90 + " __EXTENDED QUERY__ " + "@" * 90)
+        print("#" * 200)
+        query_extended: dict = QueryRelaxer.extend_query_ranges(query, choosen_rfd, data_set_df)
+        print("Query extended: ", query_extended)
+        query_extended_expr = QueryRelaxer.query_dict_to_expr(query_extended)
+        print("Query Extended Expr: ", query_extended_expr)
 
-    # start extracting values
-    print("#start extracting values")
-    print("\nChoosen RFD:\n", choosen_rfd)
-    print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
-    relaxing_attributes = [col for col in list(data_set_df)
-                           if col not in query.keys() and not np.isnan(choosen_rfd[col])]
-    print("RELAXING ATTRIBUTES:\n", relaxing_attributes)
+        query_extended_res_set = data_set_df.query(query_extended_expr)
+        print("Query Extended Result Set:\n ", query_extended_res_set)
+        ################################################
+        # @@@@@@@@@@@@__RELAXED QUERY__@@@@@@@@@@@@@@@#
+        ################################################
+        print("#" * 200)
+        print("@" * 90 + " __RELAXED QUERY__ " + "@" * 90)
+        print("#" * 200)
 
-    '''
-    for key, value in choosen_rfd.items():
-        if isinstance(value, float):
-            if math.isnan(value):
-                relaxing_attributes.remove(key)
-        elif isinstance(value, str):
-            if value == 'nan':
-                relaxing_attributes.remove(key)
-    print("Without nan:\n", relaxing_attributes)
-    for key, value in query.items():
-        relaxing_attributes.remove(key)
-    print("Whithout query attributes:\n", relaxing_attributes)
-    '''
+        # start extracting values
+        print("#start extracting values")
+        print("\nChoosen RFD:\n", choosen_rfd)
+        print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
+        relaxing_attributes = [col for col in list(data_set_df)
+                               if col not in query.keys() and not np.isnan(choosen_rfd[col])]
+        print("RELAXING ATTRIBUTES:\n", relaxing_attributes)
 
-    relaxing_values_list = extract_value_lists(query_extended_res_set, relaxing_attributes)
-    # rhs_values_list = query_extended_res_set[rhs_column].tolist()
-    # rhs_values_list.sort()
-    # print("\nRHS values: ", rhs_values_list)
-    # # removing duplicates
-    # rhs_values_list = list(set(rhs_values_list))
-    # # sorting
-    # rhs_values_list.sort()
+        '''
+        for key, value in choosen_rfd.items():
+            if isinstance(value, float):
+                if math.isnan(value):
+                    relaxing_attributes.remove(key)
+            elif isinstance(value, str):
+                if value == 'nan':
+                    relaxing_attributes.remove(key)
+        print("Without nan:\n", relaxing_attributes)
+        for key, value in query.items():
+            relaxing_attributes.remove(key)
+        print("Whithout query attributes:\n", relaxing_attributes)
+        '''
 
-    print("\nRelaxing values list: ", relaxing_values_list)
+        relaxing_values_list = extract_value_lists(query_extended_res_set, relaxing_attributes)
+        # rhs_values_list = query_extended_res_set[rhs_column].tolist()
+        # rhs_values_list.sort()
+        # print("\nRHS values: ", rhs_values_list)
+        # # removing duplicates
+        # rhs_values_list = list(set(rhs_values_list))
+        # # sorting
+        # rhs_values_list.sort()
 
-    print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
+        print("\nRelaxing values list: ", relaxing_values_list)
 
-    relaxing_values_extended = {}
-    for attr, lst in relaxing_values_list.items():
-        relaxing_values_extended[attr] = []
-        threshold = choosen_rfd[attr]
+        print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
 
-        for val in lst:
-            if isinstance(val, int) or isinstance(val, float):
-                for item in range(int(val - threshold), int(val + threshold + 1)):
-                    relaxing_values_extended[attr].append(item)
-            elif isinstance(val, str):
-                simil_strings = QueryRelaxer.similar_strings(val, data_set_df, attr, threshold)
+        relaxing_values_extended = {}
+        for attr, lst in relaxing_values_list.items():
+            relaxing_values_extended[attr] = []
+            threshold = choosen_rfd[attr]
 
-                for string in simil_strings:
-                    relaxing_values_extended[attr].append(string)
+            for val in lst:
+                if isinstance(val, int) or isinstance(val, float):
+                    for item in range(int(val - threshold), int(val + threshold + 1)):
+                        relaxing_values_extended[attr].append(item)
+                elif isinstance(val, str):
+                    simil_strings = QueryRelaxer.similar_strings(val, data_set_df, attr, threshold)
 
-        relaxing_values_extended[attr] = list(set(relaxing_values_extended[attr]))
-        relaxing_values_extended[attr].sort()
+                    for string in simil_strings:
+                        relaxing_values_extended[attr].append(string)
 
-    print("Relaxing values extended dict: ", relaxing_values_extended)
+            relaxing_values_extended[attr] = list(set(relaxing_values_extended[attr]))
+            relaxing_values_extended[attr].sort()
 
-    # RELAXED QUERY RHS ONLY
-    relaxed_query = relaxing_values_extended
+        print("Relaxing values extended dict: ", relaxing_values_extended)
 
-    print("Relaxed Query: ", relaxed_query)
-    relaxed_query_expr = QueryRelaxer.query_dict_to_expr(relaxed_query)
-    print("Relaxed Query expr: ", relaxed_query_expr)
+        # RELAXED QUERY RHS ONLY
+        relaxed_query = relaxing_values_extended
 
-    relaxed_result_set = data_set_df.query(relaxed_query_expr)
-    # reset index
-    relaxed_result_set.reset_index(inplace=True, level=0, drop=True)
+        print("Relaxed Query: ", relaxed_query)
+        relaxed_query_expr = QueryRelaxer.query_dict_to_expr(relaxed_query)
+        print("Relaxed Query expr: ", relaxed_query_expr)
 
-    print("\nRelaxed Result Set:\n", relaxed_result_set)
+        relaxed_result_set = data_set_df.query(relaxed_query_expr)
+        # reset index
+        relaxed_result_set.reset_index(inplace=True, level=0, drop=True)
+
+        print("\nRelaxed Result Set:\n", relaxed_result_set)
 
 
 def extract_value_lists(df: pd.DataFrame, columns: list):
