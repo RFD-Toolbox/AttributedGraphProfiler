@@ -33,8 +33,10 @@ def start_process(arguments):
     dataset_path = arguments.path
     rfds_path = arguments.rfds
     if rfds_path is None:
-        rfds_path = "dataset/rfds/now_in_use.csv"
-        store_load_rfds.search_rfds(dataset_path, "dataset/rfds/now_in_use.csv")
+        rfds_path = dataset_path.replace(".csv", "_rfds.csv")
+        rfds_path = rfds_path.replace("dataset/", "dataset/rfds/")
+        print(rfds_path)
+        store_load_rfds.search_rfds(dataset_path, rfds_path)
     query = ast.literal_eval(arguments.query)
     data_set_df = csv_io.load(dataset_path)
     print("Dataset:\n", data_set_df)
@@ -51,8 +53,8 @@ def start_process(arguments):
     df = query_relaxer.drop_query_rhs()
     print("Dropped query RHS:\n", df)
 
-    # df = query_relaxer.sort_nan_query_attributes()
-    df = query_relaxer.sort2(rfds_df, data_set_df, query)
+    df = query_relaxer.sort_nan_query_attributes()
+    # df = query_relaxer.sort2(rfds_df, data_set_df, query)
     print("Sorted by query & non-query attributes:\n", df)
 
     rfds_dict_list = df.to_dict(orient="records")
@@ -173,6 +175,8 @@ def start_process(arguments):
         relaxed_result_set.reset_index(inplace=True, level=0, drop=True)
 
         print("\nRelaxed Result Set:\n", relaxed_result_set)
+
+        
 
 
 def extract_value_lists(df: pd.DataFrame, columns: list):
