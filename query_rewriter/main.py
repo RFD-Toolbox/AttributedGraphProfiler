@@ -51,8 +51,9 @@ def start_process(arguments):
     df = query_relaxer.drop_query_rhs()
     print("Dropped query RHS:\n", df)
 
-    df = query_relaxer.sort_nan_query_attributes()
-    print("Sorted by NaNs and query attributes:\n", df)
+    #df = query_relaxer.sort_nan_query_attributes()
+    df = query_relaxer.sort2(rfds_df, data_set_df, query)
+    print("Sorted by query & non-query attributes:\n", df)
 
     rfds_dict_list = df.to_dict(orient="records")
     print("RFD dict list:")

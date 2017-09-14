@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import editdistance
+from random import shuffle
 
 
 class QueryRelaxer:
@@ -73,6 +74,29 @@ class QueryRelaxer:
                                                 na_position="first").reset_index(drop=True).drop(nan_count, axis=1)
 
         return self.rfds_df
+
+    def sort2(self, rfds_df: pd.DataFrame, data_set: pd.DataFrame, query: dict) -> pd.DataFrame:
+        query_attributes = list(query.keys())
+        sorting_attributes = [attr for attr in query_attributes]
+        ascending = [True for _ in query_attributes]
+
+        data_set_attributes = list(data_set)
+
+        non_query_attributes = [attr for attr in data_set_attributes if attr not in query_attributes]
+        print("Non query attrs before shuffle:\n", non_query_attributes)
+        shuffle(non_query_attributes)
+        print("Non query attrs after shuffle:\n", non_query_attributes)
+
+        for attr in non_query_attributes:
+            sorting_attributes.append(attr)
+            ascending.append(True)
+
+        print("Sorting Attributes:\n", sorting_attributes)
+        print("Ascending:\n", ascending)
+
+        return rfds_df.sort_values(by=sorting_attributes,
+                                   ascending=ascending,
+                                   na_position="last").reset_index(drop=True)
 
     def rfd_to_string(rfd: dict) -> str:
         string = ""
