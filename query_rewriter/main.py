@@ -176,7 +176,20 @@ def start_process(arguments):
 
         print("\nRelaxed Result Set:\n", relaxed_result_set)
 
-        
+        original_query_result_set_size = query_res_set.shape[0]
+        relaxed_query_result_set_size = relaxed_result_set.shape[0]
+        full_data_set_size = data_set_df.shape[0]
+        original_to_relaxed_ratio = relaxed_query_result_set_size / original_query_result_set_size
+        original_to_relaxed_increment_rate = original_to_relaxed_ratio - 1
+        relaxed_to_full_ratio = relaxed_query_result_set_size / full_data_set_size
+
+        print("original_query_result_set_size:", original_query_result_set_size)
+        print("relaxed_query_result_set_size:", relaxed_query_result_set_size)
+        print("full_data_set_size:", full_data_set_size)
+        print("original_to_relaxed_ratio:", original_to_relaxed_ratio)
+        print("original_to_relaxed_increment_rate:", original_to_relaxed_increment_rate, "%")
+        print("original_to_relaxed_increment_rate: +{:.0%}".format(original_to_relaxed_increment_rate))
+        print("relaxed_to_full_ratio: {:.0%}".format(relaxed_to_full_ratio))
 
 
 def extract_value_lists(df: pd.DataFrame, columns: list):
