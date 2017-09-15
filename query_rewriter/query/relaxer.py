@@ -9,57 +9,36 @@ class QueryRelaxer:
     Auxiliary class to relax a certain Query by means of a Relaxed Functional Dependency.
     '''
 
-    #query: dict = None
-    '''
-    Dictionary of key-value pairs representing the original query.
-    Each key is an attribute of the DataSet.
-    The corresponding value can be a single value or a list of values for which the equality has to be true.
-    '''
-    #rfds_df: pd.DataFrame = None
-    '''
-    DataFrame containing all the RFDs in the following format:
-    RHS | Attributes
-    RHS column is the RHS attribute label of the RFD for each row.
-    Attributes columns contains the corresponding threshold for the RFD attribute.
-    '''
-    #data_set_df: pd.DataFrame = None
-    '''
-    DataFrame containing the data to query.
-    '''
-    #query_attributes: list = None
-    '''
-    List of the attributes involved in the query.
-    '''
-
-    def __init__(self, query: dict, rfds_df: pd.DataFrame, data_set_df: pd.DataFrame) -> None:
-        super().__init__()
-        self.query = query
-        self.rfds_df = rfds_df
-        self.data_set_df = data_set_df
-        # ===============================================
-        self.query_attributes = list(self.query.keys())
-
-    def drop_query_na(self) -> pd.DataFrame:
+    @staticmethod
+    def drop_query_na(rfds_df: pd.DataFrame, query: dict) -> pd.DataFrame:
         '''
         Drops the RFDs where an attribute of the query is NaN.
+        :param rfds_df: the Relaxed Functional Dependencies DataFrame to drop.
+        :param query: the query containing the attributes for dropping.
         :return: the dropped RFDs DataFrame.
         '''
-        self.rfds_df = self.rfds_df.dropna(subset=self.query_attributes).reset_index(drop=True)
-        return self.rfds_df
-
-    def drop_query_rhs(self) -> pd.DataFrame:
-        '''
-        Drops the RFDs where the RHS attribute is part of the query.
-        :return: the dropped RFDs DataFrame.
-        '''
-        self.rfds_df = self.rfds_df.drop(self.rfds_df[self.rfds_df["RHS"].isin(self.query_attributes)]
-                                         .index).reset_index(drop=True)
-        return self.rfds_df
+        query_attributes = list(query.keys())
+        rfds = rfds_df.dropna(subset=query_attributes).reset_index(drop=True)
+        return rfds
 
     @staticmethod
-    def sort_by_decresing_nan_incresing_threshold(rfds_df: pd.DataFrame, data_set: pd.DataFrame, query: dict) -> pd.DataFrame:
+    def drop_query_rhs(rfds_df: pd.DataFrame, query: dict) -> pd.DataFrame:
+        '''
+        Drops the RFDs where the RHS attribute is part of the query.
+        :param rfds_df: the Relaxed Functional Dependencies DataFrame to drop.
+        :param query: the query containing the attributes for dropping.
+        :return: the dropped RFDs DataFrame.
+        '''
+        query_attributes = list(query.keys())
+        rfds = rfds_df.drop(rfds_df[rfds_df["RHS"].isin(query_attributes)].index).reset_index(drop=True)
+        return rfds
+
+    @staticmethod
+    def sort_by_decresing_nan_incresing_threshold(rfds_df: pd.DataFrame, query: dict) -> pd.DataFrame:
         '''
         Sorts the RFDs DataFrame by decreasing number of NaNs and increasing threshold values of query attributes.
+        :param rfds_df: the Relaxed Functional Dependencies DataFrame to sort.
+        :param query: the query containing the attributes for sorting.
         :return: the sorted RFDs DataFrame.
         '''
         query_attributes = list(query.keys())
@@ -89,7 +68,7 @@ class QueryRelaxer:
         by increasing threshold value of the query and non-query attributes.
         :param rfds_df: the Relaxed Functional Dependencies DataFrame to sort.
         :param data_set: the data set which the RFDs refers to.
-        :param query: the query containg the attributes for sorting.
+        :param query: the query containing the attributes for sorting.
         :return: the sorted Relaxed Functional Dependencies DataFrame.
         '''
         query_attributes = list(query.keys())

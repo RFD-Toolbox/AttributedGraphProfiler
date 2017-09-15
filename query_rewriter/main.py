@@ -41,18 +41,16 @@ def start_process(arguments):
     rfds_df = csv_io.load(rfds_path)
     print("RFDs:\n", rfds_df)
 
-    query_relaxer = QueryRelaxer(query=query, rfds_df=rfds_df, data_set_df=data_set_df)
-    df = query_relaxer.drop_query_na()
-    print("Dropped query N/A:\n", df)
+    rfds: pd.DataFrame = QueryRelaxer.drop_query_na(rfds_df, query)
+    print("Dropped query N/A:\n", rfds)
 
-    df = query_relaxer.drop_query_rhs()
-    print("Dropped query RHS:\n", df)
+    rfds = QueryRelaxer.drop_query_rhs(rfds, query)
+    print("Dropped query RHS:\n", rfds)
 
-    df = query_relaxer.sort_by_decresing_nan_incresing_threshold()
-    # df = query_relaxer.sort2(rfds_df, data_set_df, query)
-    print("Sorted by query & non-query attributes:\n", df)
+    rfds = QueryRelaxer.sort_by_decresing_nan_incresing_threshold(rfds, query)
+    print("Sorted by decreasing NaNs & increasing query threshold attributes:\n", rfds)
 
-    rfds_dict_list = df.to_dict(orient="records")
+    rfds_dict_list = rfds.to_dict(orient="records")
     print("RFD dict list:")
     for dct in rfds_dict_list:
         print(dct)
