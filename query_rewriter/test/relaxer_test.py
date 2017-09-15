@@ -90,7 +90,7 @@ def relax_query(csv_path: str, query: {}, rfds_path, numb_test):
     df = query_relaxer.drop_query_rhs()
     print("Dropped query RHS:\n", df, end="\n\n")
 
-    df = query_relaxer.sort_nan_query_attributes()
+    df = query_relaxer.sort_by_decresing_nan_incresing_threshold()
     print("Sorted by NaNs and query attributes:\n", df, end="\n\n")
 
     rfds_dict_list = df.to_dict(orient="records")
@@ -204,7 +204,7 @@ def main():
     df = query_relaxer.drop_query_rhs()
     print("Dropped query RHS:\n", df, end="\n\n")
 
-    df = query_relaxer.sort_nan_query_attributes()
+    df = query_relaxer.sort_by_decresing_nan_incresing_threshold()
     print("Sorted by NaNs and query attributes:\n", df, end="\n\n")
 
     rfds_dict_list = df.to_dict(orient="records")
