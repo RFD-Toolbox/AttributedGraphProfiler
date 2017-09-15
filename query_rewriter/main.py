@@ -19,6 +19,7 @@ def main(args):
     parser.add_argument("-r", "--rfds", help="optional path of rfds")
     parser.add_argument("-q", "--query", help="query", required=True)
     parser.add_argument("-n", "--numb_test", help="number of tests", default=1, type=int)
+    parser.add_argument("-o", "--out", help="query output path", type=str, required=True)
     arguments = parser.parse_args()
     start_process(arguments)
 
@@ -188,6 +189,10 @@ def start_process(arguments):
     loaded_rel_query_dict = json.loads(rel_query_json)
     print("Loaded REL query JSON:", loaded_rel_query_dict)
     print("Type of Loaded REL query JSON:", type(loaded_rel_query_dict))
+
+    relaxed_query_path = arguments.out
+    with open(relaxed_query_path, 'w') as fp:
+        json.dump(BEST_RELAXED_QUERY, fp)
 
 
 def extract_value_lists(df: pd.DataFrame, columns: list):
