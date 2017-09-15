@@ -73,6 +73,7 @@ def start_process(arguments):
     BEST_RFD = None
     BEST_RFD_DATA_SET_SIZE = np.inf
     BEST_RFD_DATA_SET = None
+    BEST_RELAXED_QUERY = None
 
     for i in range(0, abs(min(len(rfds_dict_list), arguments.numb_test))):
         # print("#" * 200)
@@ -170,11 +171,12 @@ def start_process(arguments):
         if ORIGINAL_QUERY_DATA_SET_SIZE < relaxed_query_result_set_size < BEST_RFD_DATA_SET_SIZE:
             BEST_RFD = choosen_rfd
             BEST_RFD_DATA_SET = relaxed_result_set
+            BEST_RELAXED_QUERY = relaxed_query
             BEST_RFD_DATA_SET_SIZE = relaxed_query_result_set_size
-
 
     print("#" * 50 + "THE WINNER IS:" + "#" * 50)
     print("BEST_RFD:\n", QueryRelaxer.rfd_to_string(BEST_RFD))
+    print("BEST_RELAXED_QUERY:\n", BEST_RELAXED_QUERY)
     print("BEST_RFD_DATA_SET:\n", BEST_RFD_DATA_SET)
     print("BEST_RFD_DATA_SET_SIZE:\n", BEST_RFD_DATA_SET_SIZE)
 
