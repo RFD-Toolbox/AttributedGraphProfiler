@@ -7,6 +7,7 @@ from query_rewriter.query.relaxer import QueryRelaxer
 from query_rewriter.io.rfd import store_load_rfds
 import pandas as pd
 import numpy as np
+import json
 
 
 def main(args):
@@ -179,6 +180,14 @@ def start_process(arguments):
     print("BEST_RELAXED_QUERY:\n", BEST_RELAXED_QUERY)
     print("BEST_RFD_DATA_SET:\n", BEST_RFD_DATA_SET)
     print("BEST_RFD_DATA_SET_SIZE:\n", BEST_RFD_DATA_SET_SIZE)
+
+    ######JSON###########
+    rel_query_json = json.dumps(BEST_RELAXED_QUERY)
+    print("REL_QUERY_JSON:", rel_query_json)
+
+    loaded_rel_query_dict = json.loads(rel_query_json)
+    print("Loaded REL query JSON:", loaded_rel_query_dict)
+    print("Type of Loaded REL query JSON:", type(loaded_rel_query_dict))
 
 
 def extract_value_lists(df: pd.DataFrame, columns: list):
