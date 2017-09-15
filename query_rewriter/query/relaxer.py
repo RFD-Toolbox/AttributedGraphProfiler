@@ -48,13 +48,10 @@ class QueryRelaxer:
         rfds = rfds_df.assign(**kwargs)
 
         sorting_cols = [nan_count]
-        print("Sorting Keys:", sorting_cols)
         ascending = [False]
 
         sorting_cols.extend(query_attributes)
         ascending.extend([True for _ in query_attributes])
-        print("ASCENDING", ascending)
-        print("BY", sorting_cols)
         rfds = rfds.sort_values(by=sorting_cols,
                                 ascending=ascending,
                                 na_position="first").reset_index(drop=True).drop(nan_count, axis=1)
@@ -78,16 +75,11 @@ class QueryRelaxer:
         data_set_attributes = list(data_set)
 
         non_query_attributes = [attr for attr in data_set_attributes if attr not in query_attributes]
-        print("Non query attrs before shuffle:\n", non_query_attributes)
         shuffle(non_query_attributes)
-        print("Non query attrs after shuffle:\n", non_query_attributes)
 
         for attr in non_query_attributes:
             sorting_attributes.append(attr)
             ascending.append(True)
-
-        print("Sorting Attributes:\n", sorting_attributes)
-        print("Ascending:\n", ascending)
 
         return rfds_df.sort_values(by=sorting_attributes,
                                    ascending=ascending,
@@ -132,28 +124,19 @@ class QueryRelaxer:
         '''
 
         for key, val in query.items():
-            print("{} : {}".format(key, val))
             if key in rfd:
-                print(key + " in RFD")
                 threshold = rfd[key]
-                print("Threshold:", threshold)
 
                 if threshold > 0.0:
-                    print("Threshold is positive:", threshold)
                     if isinstance(val, int) or isinstance(val, float):
-                        print(val, " is int...")
                         val_range = range(int(val - threshold), int(val + threshold + 1))
-                        print("Range: ", list(val_range))
                         query[key] = list(val_range)
                     elif isinstance(val, str):
-                        print(val, " is string...")
                         source = val
                         simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
                                                                     threshold=threshold)
-                        print("Similar strings: ", simil_string)
                         query[key] = simil_string
-                else:
-                    print("Threshold is not positive:", threshold)
+                
         return query
 
     @staticmethod

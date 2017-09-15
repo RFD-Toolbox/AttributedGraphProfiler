@@ -19,7 +19,6 @@ def main(args):
     parser.add_argument("-q", "--query", help="query", required=True)
     parser.add_argument("-n", "--numb_test", help="number of tests", default=1, type=int)
     arguments = parser.parse_args()
-    print(arguments)
     start_process(arguments)
 
 
@@ -34,26 +33,23 @@ def start_process(arguments):
         store_load_rfds.search_rfds(dataset_path, rfds_path)
     query = ast.literal_eval(arguments.query)
     data_set_df = csv_io.load(dataset_path)
-    print("Dataset:\n", data_set_df)
+    #print("Dataset:\n", data_set_df)
 
     print("Query is : ", query)
 
     rfds_df = csv_io.load(rfds_path)
-    print("RFDs:\n", rfds_df)
+    #print("RFDs:\n", rfds_df)
 
     rfds: pd.DataFrame = QueryRelaxer.drop_query_na(rfds_df, query)
-    print("Dropped query N/A:\n", rfds)
+    #print("Dropped query N/A:\n", rfds)
 
     rfds = QueryRelaxer.drop_query_rhs(rfds, query)
-    print("Dropped query RHS:\n", rfds)
+    #print("Dropped query RHS:\n", rfds)
 
     rfds = QueryRelaxer.sort_by_decresing_nan_incresing_threshold(rfds, query)
-    print("Sorted by decreasing NaNs & increasing query threshold attributes:\n", rfds)
+    #print("Sorted by decreasing NaNs & increasing query threshold attributes:\n", rfds)
 
     rfds_dict_list = rfds.to_dict(orient="records")
-    print("RFD dict list:")
-    for dct in rfds_dict_list:
-        print(dct)
 
     #############################################################################################
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@RELAX@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
