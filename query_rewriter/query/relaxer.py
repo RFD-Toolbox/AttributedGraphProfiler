@@ -5,6 +5,10 @@ from random import shuffle
 
 
 class QueryRelaxer:
+    '''
+    Auxiliary class to relax a certain Query by means of a Relaxed Functional Dependency.
+    '''
+
     query: dict = None
     '''
     Dictionary of key-value pairs representing the original query.
@@ -100,6 +104,11 @@ class QueryRelaxer:
 
     @staticmethod
     def rfd_to_string(rfd: dict) -> str:
+        '''
+        Converts the Relaxed Functional Dependency to a human readable string representation.
+        :param rfd: the Relaxed Functional Dependency to convert.
+        :return: a human readable string representation of the Relaxed Functional Dependency.
+        '''
         string = ""
         string += "".join(["" if key == "RHS" or key == rfd["RHS"] or np.isnan(val) else "(" + key + " <= " + str(
             val) + ") " for key, val in rfd.items()])
@@ -108,6 +117,11 @@ class QueryRelaxer:
 
     @staticmethod
     def query_dict_to_expr(query: dict) -> str:
+        '''
+        Converts the query dictionary to the string format required by Pandas.DataFrame.Query() method.
+        :param query: the Query dictionary to convert.
+        :return: the string format corresponding to the query dictionary.
+        '''
         expr = " and ".join(
             ["{} == {}".format(k, v) if not isinstance(v, str) else "{} == '{}'".format(k, v) for k, v in
              query.items()])
