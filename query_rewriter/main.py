@@ -174,9 +174,9 @@ def start_process(arguments):
 
 
     print("#" * 50 + "THE WINNER IS:" + "#" * 50)
-    print("BEST_RFD:", QueryRelaxer.rfd_to_string(BEST_RFD))
-    print("BEST_RFD_DATA_SET:", BEST_RFD_DATA_SET)
-    print("BEST_RFD_DATA_SET_SIZE:", BEST_RFD_DATA_SET_SIZE)
+    print("BEST_RFD:\n", QueryRelaxer.rfd_to_string(BEST_RFD))
+    print("BEST_RFD_DATA_SET:\n", BEST_RFD_DATA_SET)
+    print("BEST_RFD_DATA_SET_SIZE:\n", BEST_RFD_DATA_SET_SIZE)
 
 
 def extract_value_lists(df: pd.DataFrame, columns: list):
