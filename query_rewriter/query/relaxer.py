@@ -9,24 +9,24 @@ class QueryRelaxer:
     Auxiliary class to relax a certain Query by means of a Relaxed Functional Dependency.
     '''
 
-    query: dict = None
+    #query: dict = None
     '''
     Dictionary of key-value pairs representing the original query.
     Each key is an attribute of the DataSet.
     The corresponding value can be a single value or a list of values for which the equality has to be true.
     '''
-    rfds_df: pd.DataFrame = None
+    #rfds_df: pd.DataFrame = None
     '''
     DataFrame containing all the RFDs in the following format:
     RHS | Attributes
     RHS column is the RHS attribute label of the RFD for each row.
     Attributes columns contains the corresponding threshold for the RFD attribute.
     '''
-    data_set_df: pd.DataFrame = None
+    #data_set_df: pd.DataFrame = None
     '''
     DataFrame containing the data to query.
     '''
-    query_attributes: list = None
+    #query_attributes: list = None
     '''
     List of the attributes involved in the query.
     '''
@@ -56,30 +56,42 @@ class QueryRelaxer:
                                          .index).reset_index(drop=True)
         return self.rfds_df
 
-    def sort_nan_query_attributes(self) -> pd.DataFrame:
+    @staticmethod
+    def sort_by_decresing_nan_incresing_threshold(rfds_df: pd.DataFrame, data_set: pd.DataFrame, query: dict) -> pd.DataFrame:
         '''
-        Sorts the RFDs DataFrame by decreasing number of NaNs and increasing values of query attributes.
+        Sorts the RFDs DataFrame by decreasing number of NaNs and increasing threshold values of query attributes.
         :return: the sorted RFDs DataFrame.
         '''
+        query_attributes = list(query.keys())
+
         nan_count = "NaNs"
         kwargs = {nan_count: lambda x: x.isnull().sum(axis=1)}
-        self.rfds_df = self.rfds_df.assign(**kwargs)
+        rfds = rfds_df.assign(**kwargs)
 
         sorting_cols = [nan_count]
         print("Sorting Keys:", sorting_cols)
         ascending = [False]
 
-        sorting_cols.extend(self.query_attributes)
-        ascending.extend([True for _ in self.query_attributes])
+        sorting_cols.extend(query_attributes)
+        ascending.extend([True for _ in query_attributes])
         print("ASCENDING", ascending)
         print("BY", sorting_cols)
-        self.rfds_df = self.rfds_df.sort_values(by=sorting_cols,
-                                                ascending=ascending,
-                                                na_position="first").reset_index(drop=True).drop(nan_count, axis=1)
+        rfds = rfds.sort_values(by=sorting_cols,
+                                ascending=ascending,
+                                na_position="first").reset_index(drop=True).drop(nan_count, axis=1)
 
-        return self.rfds_df
+        return rfds
 
-    def sort2(self, rfds_df: pd.DataFrame, data_set: pd.DataFrame, query: dict) -> pd.DataFrame:
+    @staticmethod
+    def sort_by_increasing_threshold(rfds_df: pd.DataFrame, data_set: pd.DataFrame, query: dict) -> pd.DataFrame:
+        '''
+        Sorts the Relaxed Functional Dependencies DataFrame
+        by increasing threshold value of the query and non-query attributes.
+        :param rfds_df: the Relaxed Functional Dependencies DataFrame to sort.
+        :param data_set: the data set which the RFDs refers to.
+        :param query: the query containg the attributes for sorting.
+        :return: the sorted Relaxed Functional Dependencies DataFrame.
+        '''
         query_attributes = list(query.keys())
         sorting_attributes = [attr for attr in query_attributes]
         ascending = [True for _ in query_attributes]
