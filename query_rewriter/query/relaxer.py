@@ -136,7 +136,7 @@ class QueryRelaxer:
                         simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
                                                                     threshold=threshold)
                         query[key] = simil_string
-                
+
         return query
 
     @staticmethod
@@ -153,3 +153,20 @@ class QueryRelaxer:
 
         return data[data[col].apply(lambda word: int(editdistance.eval(source, word)) <= threshold)][
             col].tolist()
+
+    @staticmethod
+    def extract_value_lists(df: pd.DataFrame, columns: list):
+        '''
+        Extracts values of given columns from thd DataFrane and returns them as a
+        Dictionary of value lists.
+        :param df: The DataFrame from which to extract values.
+        :param columns: The columns we are interested in extracting values.
+        :return: A Dictionary of lists containing the values for the corresponding columns.
+        '''
+        dictionary = {}
+        for col in columns:
+            # duplicates removed too.
+            dictionary[col] = list(set(df[col].tolist()))
+            dictionary[col].sort()
+
+        return dictionary

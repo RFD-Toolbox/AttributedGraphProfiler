@@ -116,7 +116,7 @@ def start_process(arguments):
                                if col not in query.keys() and not np.isnan(choosen_rfd[col])]
         # print("RELAXING ATTRIBUTES:\n", relaxing_attributes)
 
-        relaxing_values_list = extract_value_lists(query_extended_res_set, relaxing_attributes)
+        relaxing_values_list = QueryRelaxer.extract_value_lists(query_extended_res_set, relaxing_attributes)
 
         # print("\nRelaxing values list: ", relaxing_values_list)
 
@@ -193,23 +193,6 @@ def start_process(arguments):
     relaxed_query_path = arguments.out
     with open(relaxed_query_path, 'w') as fp:
         json.dump(BEST_RELAXED_QUERY, fp)
-
-
-def extract_value_lists(df: pd.DataFrame, columns: list):
-    '''
-    Extracts values of given columns from thd DataFrane and returns them as a
-    Dictionary of value lists.
-    :param df: The DataFrame from which to extract values.
-    :param columns: The columns we are interested in extracting values.
-    :return: A Dictionary of lists containing the values for the corresponding columns.
-    '''
-    dictionary = {}
-    for col in columns:
-        # duplicates removed too.
-        dictionary[col] = list(set(df[col].tolist()))
-        dictionary[col].sort()
-
-    return dictionary
 
 
 if __name__ == "__main__":
