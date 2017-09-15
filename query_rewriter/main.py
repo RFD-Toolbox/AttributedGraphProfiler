@@ -7,16 +7,11 @@ from query_rewriter.query.relaxer import QueryRelaxer
 from query_rewriter.io.rfd import store_load_rfds
 import pandas as pd
 import numpy as np
-import math
 
 
 def main(args):
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_rows', None)
-    path_dataset = None
-    path_rfds = None
-    query_dict = {}
-    numb_rfd_test = None
     logging.basicConfig(filemode='w', level=logging.INFO)
     parser = argparse.ArgumentParser()
     parser.add_argument("-p", "--path", help="path of dataset", required=True)
@@ -116,28 +111,7 @@ def start_process(arguments):
                                if col not in query.keys() and not np.isnan(choosen_rfd[col])]
         print("RELAXING ATTRIBUTES:\n", relaxing_attributes)
 
-        '''
-        for key, value in choosen_rfd.items():
-            if isinstance(value, float):
-                if math.isnan(value):
-                    relaxing_attributes.remove(key)
-            elif isinstance(value, str):
-                if value == 'nan':
-                    relaxing_attributes.remove(key)
-        print("Without nan:\n", relaxing_attributes)
-        for key, value in query.items():
-            relaxing_attributes.remove(key)
-        print("Whithout query attributes:\n", relaxing_attributes)
-        '''
-
         relaxing_values_list = extract_value_lists(query_extended_res_set, relaxing_attributes)
-        # rhs_values_list = query_extended_res_set[rhs_column].tolist()
-        # rhs_values_list.sort()
-        # print("\nRHS values: ", rhs_values_list)
-        # # removing duplicates
-        # rhs_values_list = list(set(rhs_values_list))
-        # # sorting
-        # rhs_values_list.sort()
 
         print("\nRelaxing values list: ", relaxing_values_list)
 
