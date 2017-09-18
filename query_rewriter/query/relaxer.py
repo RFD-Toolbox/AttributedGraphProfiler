@@ -105,9 +105,23 @@ class QueryRelaxer:
         :param query: the Query dictionary to convert.
         :return: the string format corresponding to the query dictionary.
         '''
-        expr = " and ".join(
-            ["{} == {}".format(k, v) if not isinstance(v, str) else "{} == '{}'".format(k, v) for k, v in
-             query.items()])
+        # expr = " and ".join(
+        #     ["{} == {}".format(k, v) if not isinstance(v, str) else "{} == '{}'".format(k, v) for k, v in
+        #      query.items()])
+        last_keys = list(query.keys())[-1]
+        expr = ""
+        for k, v in query.items():
+            if isinstance(v, dict):
+                expr += " {} >= {} and {} <= {}".format(k, v['min'], k, v['max'])
+            elif isinstance(v, (int, float, list)):
+                expr += " {} == {}".format(k, v)
+            elif isinstance(v, str):
+                needle = k + ".str.contains('{}') ".format(v)
+                print("Like instance " + needle)
+                expr += needle
+            if k is not last_keys:
+                expr += " and "
+        print("FIXED expression", expr)
         return expr
 
     @staticmethod

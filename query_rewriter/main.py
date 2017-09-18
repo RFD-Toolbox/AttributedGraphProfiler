@@ -36,7 +36,6 @@ def start_process(arguments):
     query = ast.literal_eval(arguments.query)
     data_set_df = csv_io.load(dataset_path)
     # print("Dataset:\n", data_set_df)
-
     print("Query is : ", query)
 
     rfds_df = csv_io.load(rfds_path)
@@ -82,8 +81,8 @@ def start_process(arguments):
         # print("@" * 90 + " RELAX " + str(i) + "@" * 90)
         # print("#" * 200)
         choosen_rfd = rfds_dict_list[i]
-        # print("\nChoosen RFD:\n", choosen_rfd)
-        # print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
+        print("\nChoosen RFD:\n", choosen_rfd)
+        print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
 
         rhs_column = choosen_rfd["RHS"]
         # print("\nRHS column: ", rhs_column)
@@ -153,12 +152,16 @@ def start_process(arguments):
         # reset index
         relaxed_result_set.reset_index(inplace=True, level=0, drop=True)
 
-        # print("\nRelaxed Result Set:\n", relaxed_result_set)
+        print("\nRelaxed Result Set:\n", relaxed_result_set)
 
         original_query_result_set_size = query_res_set.shape[0]
         relaxed_query_result_set_size = relaxed_result_set.shape[0]
         full_data_set_size = data_set_df.shape[0]
-        original_to_relaxed_ratio = relaxed_query_result_set_size / original_query_result_set_size
+        original_to_relaxed_ratio = None
+        if original_query_result_set_size == 0:
+            original_to_relaxed_ratio = 1.0
+        else:
+            original_to_relaxed_ratio = relaxed_query_result_set_size / original_query_result_set_size
         original_to_relaxed_increment_rate = original_to_relaxed_ratio - 1
         relaxed_to_full_ratio = relaxed_query_result_set_size / full_data_set_size
 
@@ -191,8 +194,9 @@ def start_process(arguments):
     print("Type of Loaded REL query JSON:", type(loaded_rel_query_dict))
 
     relaxed_query_path = arguments.out
-    with open(relaxed_query_path, 'w') as fp:
-        json.dump(BEST_RELAXED_QUERY, fp)
+    if relaxed_query_path is not None:
+        with open(relaxed_query_path, 'w') as fp:
+            json.dump(BEST_RELAXED_QUERY, fp)
 
 
 if __name__ == "__main__":
