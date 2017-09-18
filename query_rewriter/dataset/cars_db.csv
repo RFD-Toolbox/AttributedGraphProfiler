@@ -1,4 +1,4 @@
-make;mode;price;location;year;start_production_year;color;mileage;lenght;power;enginecc;torque;consumption;fuel
+make;model;price;location;year;start_production_year;color;mileage;lenght;power;enginecc;torque;consumption;fuel
 Ford;Focus 1.6tdci;6500;Pittisburgh(PA);2007;2004;Red;60000;4342;80;1560;260;37.97/58.78/49.04;Diesel
 Mazda;3 td;8000;Denver(CO);2009;2009;Gray;45000;4580;80;1560;240;44.38/60.28/53.45;Diesel
 Ford;Focus 1.3tdci;11000;San Diego(CA);2010;2010;Blue;15000;4337;85;1560;270;52.29/69.19/61.86;Diesel
