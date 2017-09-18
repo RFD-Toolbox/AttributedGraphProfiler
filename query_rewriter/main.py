@@ -19,7 +19,7 @@ def main(args):
     parser.add_argument("-r", "--rfds", help="optional path of rfds")
     parser.add_argument("-q", "--query", help="query", required=True)
     parser.add_argument("-n", "--numb_test", help="number of tests", default=1, type=int)
-    parser.add_argument("-o", "--out", help="query output path", type=str, required=True)
+    parser.add_argument("-o", "--out", help="query output path", type=str)
     arguments = parser.parse_args()
     start_process(arguments)
 
