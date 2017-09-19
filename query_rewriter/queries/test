@@ -1,0 +1,16 @@
+[
+  {
+    "data_path": "dataset/cars.csv",
+    "rfds_path": "dataset/rfds/cars_rfds.csv",
+    "query": "{'Horsepower':130}",
+    "tests": 10,
+    "output": "cars_best_rfd.json"
+  },
+  {
+    "data_path": "dataset/cars_db.csv",
+    "rfds_path": "dataset/rfds/cars_db_rfds.csv",
+    "query": "{'make':'Ford'}",
+    "tests": 10,
+    "output": "cars_best_rfd.json"
+  }
+]

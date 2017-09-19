@@ -14,8 +14,24 @@ def rfd_to_string(rfd: dict) -> str:
 
 
 def query_dict_to_expr(query: dict) -> str:
-    expr = " and ".join(
-        ["{} == {}".format(k, v) if not isinstance(v, str) else "{} == '{}'".format(k, v) for k, v in query.items()])
+    # expr = " and ".join(
+    #     ["{} == {}".format(k, v) if not isinstance(v, str) else "{} == '{}'".format(k, v) for k, v in query.items()])
+    last_keys = query.keys()[-1]
+    print(last_keys)
+    expr = ""
+    for k, v in query.items():
+        print(type(v))
+        if isinstance(v, dict):
+            expr + " {} >= v['{}'] and {} <= v['{}']".format(k, v['min'], k, v['max'])
+        elif isinstance(v, [int, float]):
+            expr + " {} == {}".format(k, v)
+        elif isinstance(v, str):
+            needle = k + ".str.contains('{}')".format(v)
+            print("Like instance " + needle)
+            expr + " {} == '{}'".format(k, needle)
+        if k is not last_keys:
+            expr + " and "
+    print("FIXED expression")
     return expr
 
 
@@ -183,6 +199,7 @@ def relax_query(csv_path: str, query: {}, rfds_path, numb_test):
 
     relaxed_result_set = data_set_df.query(relaxed_query_expr)
     print("\nRelaxed Result Set:\n", relaxed_result_set)
+
 
 def main():
     csv_io = CSVInputOutput()

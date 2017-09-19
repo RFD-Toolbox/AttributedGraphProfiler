@@ -20,6 +20,6 @@ class CSVParser:
     def __guess_delimiter(self):
         with open(self.path) as csv_file:
             sniffer = csv.Sniffer()
-            dialect = sniffer.sniff(csv_file.read(2048))
+            dialect = sniffer.sniff(csv_file.readline())
             delimiter = dialect.delimiter
         return delimiter
