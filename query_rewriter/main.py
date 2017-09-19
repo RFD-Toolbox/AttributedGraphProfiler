@@ -137,6 +137,7 @@ def start_process(arguments):
                         relaxing_values_extended[attr].append(string)
 
             relaxing_values_extended[attr] = list(set(relaxing_values_extended[attr]))
+            #print("RELAXING VALUES EXTENDED[{}]:".format(attr), relaxing_values_extended[attr])
             relaxing_values_extended[attr].sort()
 
         # print("Relaxing values extended dict: ", relaxing_values_extended)
