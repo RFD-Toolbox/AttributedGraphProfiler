@@ -19,6 +19,11 @@ def main():
         print("Row{}".format(i))
         print(curr_row_df, end="\n\n")
 
+    slices = [df[i:i + 1] for i in range(0, rows)]
+    print("Slices of DF...")
+    for slice in slices:
+        print(slice, end="\n\n")
+
 
 if __name__ == '__main__':
     main()
