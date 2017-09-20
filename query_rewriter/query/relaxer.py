@@ -124,7 +124,7 @@ class QueryRelaxer:
                     elif v.endswith("%"):
                         expr += k + ".str.startswith('{}') ".format(v[:-1])
                 else:
-                    expr += " {} == {}".format(k, v)
+                    expr += " {} == '{}'".format(k, v)
 
             if k is not last_key:
                 expr += " and "
@@ -152,10 +152,17 @@ class QueryRelaxer:
                         val_range = range(int(val - threshold), int(val + threshold + 1))
                         query[key] = val_range  # list(val_range)
                     elif isinstance(val, str):
-                        source = val
-                        simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
-                                                                    threshold=threshold)
-                        query[key] = simil_string
+                        if "%" not in val:
+                            source = val
+                            simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
+                                                                        threshold=threshold)
+                            query[key] = simil_string
+                        else:
+                            if val.startswith("%") and val.endswith("%"):
+                                
+                            elif val.startswith("%"):
+
+                            elif val.endswith("%"):
 
         return query
 
