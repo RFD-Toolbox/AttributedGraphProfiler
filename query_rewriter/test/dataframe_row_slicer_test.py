@@ -46,6 +46,9 @@ def main():
     expr = QueryRelaxer.query_dict_to_expr({"r": r})
     print("Expression:", expr)
 
+    test = "$test$"
+    print(test[:-1])
+
 
 if __name__ == '__main__':
     main()

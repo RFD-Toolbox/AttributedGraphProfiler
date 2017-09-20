@@ -104,11 +104,9 @@ class QueryRelaxer:
         Converts the query dictionary to the string format required by Pandas.DataFrame.Query() method.
         :param query: the Query dictionary to convert.
         :return: the string format corresponding to the query dictionary.
+        :rtype:
         '''
-        # expr = " and ".join(
-        #     ["{} == {}".format(k, v) if not isinstance(v, str) else "{} == '{}'".format(k, v) for k, v in
-        #      query.items()])
-        last_keys = list(query.keys())[-1]
+        last_key = list(query.keys())[-1]
         expr = ""
         for k, v in query.items():
             if isinstance(v, range):
@@ -118,10 +116,17 @@ class QueryRelaxer:
             elif isinstance(v, (int, float, list)):
                 expr += " {} == {}".format(k, v)
             elif isinstance(v, str):
-                needle = k + ".str.contains('{}') ".format(v)
-                print("Like instance " + needle)
-                expr += needle
-            if k is not last_keys:
+                if "%" in v:
+                    if v.startswith("%") and v.endswith("%"):
+                        expr += k + ".str.contains('{}') ".format(v[1:-1])
+                    elif v.startswith("%"):
+                        expr += k + ".str.endswith('{}') ".format(v[1::])
+                    elif v.endswith("%"):
+                        expr += k + ".str.startswith('{}') ".format(v[:-1])
+                else:
+                    expr += " {} == {}".format(k, v)
+
+            if k is not last_key:
                 expr += " and "
         return expr
 

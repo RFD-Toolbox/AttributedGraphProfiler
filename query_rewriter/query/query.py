@@ -23,9 +23,16 @@ class Query(dict):
             elif isinstance(v, (int, float, list)):
                 expr += " {} == {}".format(k, v)
             elif isinstance(v, str):
-                needle = k + ".str.contains('{}') ".format(v)
-                print("Like instance " + needle)
-                expr += needle
+                if "%" in v:
+                    if v.startswith("%") and v.endswith("%"):
+                        expr += k + ".str.contains('{}') ".format(v[1:-1])
+                    elif v.startswith("%"):
+                        expr += k + ".str.endswith('{}') ".format(v[1::])
+                    elif v.endswith("%"):
+                        expr += k + ".str.startswith('{}') ".format(v[:-1])
+                else:
+                    expr += " {} == {}".format(k, v)
+
             if k is not last_key:
                 expr += " and "
         return expr
