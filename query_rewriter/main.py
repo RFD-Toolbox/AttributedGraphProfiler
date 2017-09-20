@@ -8,6 +8,7 @@ from query_rewriter.io.rfd import store_load_rfds
 import pandas as pd
 import numpy as np
 import json
+from query_rewriter.query.slicer import Slicer
 
 
 def main(args):
@@ -41,7 +42,7 @@ def start_process(arguments):
     rfds_df = csv_io.load(rfds_path)
     # print("RFDs:\n", rfds_df)
 
-    rfds: pd.DataFrame = QueryRelaxer.drop_query_na(rfds_df, query)
+    rfds: pd.DataFrame = QueryRelaxer.drop_query_nan(rfds_df, query)
     # print("Dropped query N/A:\n", rfds)
 
     rfds = QueryRelaxer.drop_query_rhs(rfds, query)
@@ -99,7 +100,16 @@ def start_process(arguments):
         # print("Query Extended Expr: ", query_extended_expr)
 
         query_extended_res_set = data_set_df.query(query_extended_expr)
-        # print("Query Extended Result Set:\n ", query_extended_res_set)
+        print("Query Extended Result Set:\n ", query_extended_res_set)
+
+        # ++++++++++++++++++++++++RELAXING ROW BY ROW+++++++++++++++++++++++++++
+        rows_df_list = Slicer.slice(query_extended_res_set)
+
+        print("\n" + "+" * 35 + "Slices..." + "+" * 35)
+        for sl in rows_df_list:
+            print(sl)
+
+        #exit(-9)
         ################################################
         # @@@@@@@@@@@@__RELAXED QUERY__@@@@@@@@@@@@@@@#
         ################################################
@@ -137,6 +147,7 @@ def start_process(arguments):
                         relaxing_values_extended[attr].append(string)
 
             relaxing_values_extended[attr] = list(set(relaxing_values_extended[attr]))
+            #print("RELAXING VALUES EXTENDED[{}]:".format(attr), relaxing_values_extended[attr])
             relaxing_values_extended[attr].sort()
 
         # print("Relaxing values extended dict: ", relaxing_values_extended)
