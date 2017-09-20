@@ -105,11 +105,41 @@ def start_process(arguments):
         # ++++++++++++++++++++++++RELAXING ROW BY ROW+++++++++++++++++++++++++++
         rows_df_list = Slicer.slice(query_extended_res_set)
 
+        relaxing_attributes = [col for col in list(data_set_df)
+                               if col not in query.keys() and not np.isnan(choosen_rfd[col])]
+        # print("RELAXING ATTRIBUTES:\n", relaxing_attributes)
+
         print("\n" + "+" * 35 + "Slices..." + "+" * 35)
+
+        all_row_values_dict = {}
+
+        current_row = 0
         for sl in rows_df_list:
             print(sl)
+            row_values = QueryRelaxer.extract_value_lists(sl, relaxing_attributes)
 
-        #exit(-9)
+            relaxing_values_extended = {}
+            for attr, lst in row_values.items():
+                relaxing_values_extended[attr] = []
+                threshold = choosen_rfd[attr]
+
+                for val in lst:
+                    if isinstance(val, int) or isinstance(val, float):
+                        for item in range(int(val - threshold), int(val + threshold + 1)):
+                            relaxing_values_extended[attr].append(item)
+                    elif isinstance(val, str):
+                        simil_strings = QueryRelaxer.similar_strings(val, data_set_df, attr, threshold)
+
+                        for string in simil_strings:
+                            relaxing_values_extended[attr].append(string)
+
+                relaxing_values_extended[attr] = list(set(relaxing_values_extended[attr]))
+                # print("RELAXING VALUES EXTENDED[{}]:".format(attr), relaxing_values_extended[attr])
+                relaxing_values_extended[attr].sort()
+
+            all_row_values_dict[current_row] = relaxing_values_extended
+
+        # exit(-9)
         ################################################
         # @@@@@@@@@@@@__RELAXED QUERY__@@@@@@@@@@@@@@@#
         ################################################
@@ -121,34 +151,14 @@ def start_process(arguments):
         # print("#start extracting values")
         # print("\nChoosen RFD:\n", choosen_rfd)
         # print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
-        relaxing_attributes = [col for col in list(data_set_df)
-                               if col not in query.keys() and not np.isnan(choosen_rfd[col])]
-        # print("RELAXING ATTRIBUTES:\n", relaxing_attributes)
 
-        relaxing_values_list = QueryRelaxer.extract_value_lists(query_extended_res_set, relaxing_attributes)
+        # relaxing_values_list = QueryRelaxer.extract_value_lists(query_extended_res_set, relaxing_attributes)
 
         # print("\nRelaxing values list: ", relaxing_values_list)
 
         # print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
 
-        relaxing_values_extended = {}
-        for attr, lst in relaxing_values_list.items():
-            relaxing_values_extended[attr] = []
-            threshold = choosen_rfd[attr]
 
-            for val in lst:
-                if isinstance(val, int) or isinstance(val, float):
-                    for item in range(int(val - threshold), int(val + threshold + 1)):
-                        relaxing_values_extended[attr].append(item)
-                elif isinstance(val, str):
-                    simil_strings = QueryRelaxer.similar_strings(val, data_set_df, attr, threshold)
-
-                    for string in simil_strings:
-                        relaxing_values_extended[attr].append(string)
-
-            relaxing_values_extended[attr] = list(set(relaxing_values_extended[attr]))
-            #print("RELAXING VALUES EXTENDED[{}]:".format(attr), relaxing_values_extended[attr])
-            relaxing_values_extended[attr].sort()
 
         # print("Relaxing values extended dict: ", relaxing_values_extended)
 
