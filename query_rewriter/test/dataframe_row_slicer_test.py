@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from query_rewriter.query.slicer import Slicer
+from query_rewriter.query.relaxer import QueryRelaxer
 
 
 def main():
@@ -21,7 +22,7 @@ def main():
         print(curr_row_df, end="\n\n")
 
     slices = [df[i:i + 1] for i in range(0, rows)]
-    print("#"*10 + "Slices 1 of DF..." + "#"*10)
+    print("#" * 10 + "Slices 1 of DF..." + "#" * 10)
     for slice1 in slices:
         print(slice1, end="\n\n")
 
@@ -29,6 +30,21 @@ def main():
     print("#" * 10 + "Slices 2 of DF..." + "#" * 10)
     for slice2 in slices2:
         print(slice2, end="\n\n")
+
+    t: tuple = (0, 1)
+    print(t)
+    are_all_integers = all(isinstance(n, int) for n in t)
+    print(are_all_integers)
+
+    r = range(0, 10)
+    print(r)
+    print(r[0])
+    print(r[-1])
+
+    print(type(r))
+
+    expr = QueryRelaxer.query_dict_to_expr({"r": r})
+    print("Expression:", expr)
 
 
 if __name__ == '__main__':

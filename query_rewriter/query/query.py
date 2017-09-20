@@ -13,21 +13,21 @@ class Query(dict):
         :return: the string format corresponding to the query dictionary.
         :rtype:
         '''
-        # expr = " and ".join(
-        #     ["{} == {}".format(k, v) if not isinstance(v, str) else "{} == '{}'".format(k, v) for k, v in
-        #      query.items()])
         last_key = list(self.keys())[-1]
         expr = ""
         for k, v in self.items():
-            if isinstance(v, dict):
+            if isinstance(v, range):
+                expr += "{} >= {} and {} <= {}".format(k, v[0], k, v[-1])
+            elif isinstance(v, dict):
                 expr += " {} >= {} and {} <= {}".format(k, v['min'], k, v['max'])
             elif isinstance(v, (int, float, list)):
                 expr += " {} == {}".format(k, v)
             elif isinstance(v, str):
-                expr += k + ".str.contains('{}') ".format(v)
+                needle = k + ".str.contains('{}') ".format(v)
+                print("Like instance " + needle)
+                expr += needle
             if k is not last_key:
                 expr += " and "
-
         return expr
 
 

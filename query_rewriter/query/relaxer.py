@@ -111,7 +111,9 @@ class QueryRelaxer:
         last_keys = list(query.keys())[-1]
         expr = ""
         for k, v in query.items():
-            if isinstance(v, dict):
+            if isinstance(v, range):
+                expr += "{} >= {} and {} <= {}".format(k, v[0], k, v[-1])
+            elif isinstance(v, dict):
                 expr += " {} >= {} and {} <= {}".format(k, v['min'], k, v['max'])
             elif isinstance(v, (int, float, list)):
                 expr += " {} == {}".format(k, v)
@@ -121,7 +123,6 @@ class QueryRelaxer:
                 expr += needle
             if k is not last_keys:
                 expr += " and "
-        print("FIXED expression", expr)
         return expr
 
     @staticmethod
@@ -144,7 +145,7 @@ class QueryRelaxer:
                 if threshold > 0.0:
                     if isinstance(val, int) or isinstance(val, float):
                         val_range = range(int(val - threshold), int(val + threshold + 1))
-                        query[key] = list(val_range)
+                        query[key] = val_range  # list(val_range)
                     elif isinstance(val, str):
                         source = val
                         simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
