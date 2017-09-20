@@ -10,7 +10,7 @@ class QueryRelaxer:
     '''
 
     @staticmethod
-    def drop_query_na(rfds_df: pd.DataFrame, query: dict) -> pd.DataFrame:
+    def drop_query_nan(rfds_df: pd.DataFrame, query: dict) -> pd.DataFrame:
         '''
         Drops the RFDs where an attribute of the query is NaN.
         :param rfds_df: the Relaxed Functional Dependencies DataFrame to drop.

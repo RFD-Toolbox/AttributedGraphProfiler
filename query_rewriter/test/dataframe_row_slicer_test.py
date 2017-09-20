@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from query_rewriter.query.slicer import Slicer
 
 
 def main():
@@ -20,9 +21,14 @@ def main():
         print(curr_row_df, end="\n\n")
 
     slices = [df[i:i + 1] for i in range(0, rows)]
-    print("Slices of DF...")
-    for slice in slices:
-        print(slice, end="\n\n")
+    print("#"*10 + "Slices 1 of DF..." + "#"*10)
+    for slice1 in slices:
+        print(slice1, end="\n\n")
+
+    slices2 = Slicer.slice(df)
+    print("#" * 10 + "Slices 2 of DF..." + "#" * 10)
+    for slice2 in slices2:
+        print(slice2, end="\n\n")
 
 
 if __name__ == '__main__':

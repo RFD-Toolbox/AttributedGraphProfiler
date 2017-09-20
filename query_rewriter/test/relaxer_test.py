@@ -100,7 +100,7 @@ def relax_query(csv_path: str, query: {}, rfds_path, numb_test):
     print("RFDs:\n", rfds_df, end="\n\n")
 
     query_relaxer = QueryRelaxer(query=query, rfds_df=rfds_df, data_set_df=data_set_df)
-    df = query_relaxer.drop_query_na()
+    df = query_relaxer.drop_query_nan()
     print("Dropped query N/A:\n", df, end="\n\n")
 
     df = query_relaxer.drop_query_rhs()
@@ -215,7 +215,7 @@ def main():
     print("RFDs:\n", rfds_df, end="\n\n")
 
     query_relaxer = QueryRelaxer(query=query, rfds_df=rfds_df, data_set_df=data_set_df)
-    df = query_relaxer.drop_query_na()
+    df = query_relaxer.drop_query_nan()
     print("Dropped query N/A:\n", df, end="\n\n")
 
     df = query_relaxer.drop_query_rhs()
