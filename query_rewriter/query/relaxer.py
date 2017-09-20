@@ -10,7 +10,7 @@ class QueryRelaxer:
     '''
 
     @staticmethod
-    def drop_query_na(rfds_df: pd.DataFrame, query: dict) -> pd.DataFrame:
+    def drop_query_nan(rfds_df: pd.DataFrame, query: dict) -> pd.DataFrame:
         '''
         Drops the RFDs where an attribute of the query is NaN.
         :param rfds_df: the Relaxed Functional Dependencies DataFrame to drop.
@@ -92,11 +92,14 @@ class QueryRelaxer:
         :param rfd: the Relaxed Functional Dependency to convert.
         :return: a human readable string representation of the Relaxed Functional Dependency.
         '''
-        string = ""
-        string += "".join(["" if key == "RHS" or key == rfd["RHS"] or np.isnan(val) else "(" + key + " <= " + str(
-            val) + ") " for key, val in rfd.items()])
-        string += "---> ({} <= {})".format(rfd["RHS"], rfd[rfd["RHS"]])
-        return string
+        if rfd is not None:
+            string = ""
+            string += "".join(["" if key == "RHS" or key == rfd["RHS"] or np.isnan(val) else "(" + key + " <= " + str(
+                val) + ") " for key, val in rfd.items()])
+            string += "---> ({} <= {})".format(rfd["RHS"], rfd[rfd["RHS"]])
+            return string
+        else:
+            return "None"
 
     @staticmethod
     def query_dict_to_expr(query: dict) -> str:
@@ -104,24 +107,30 @@ class QueryRelaxer:
         Converts the query dictionary to the string format required by Pandas.DataFrame.Query() method.
         :param query: the Query dictionary to convert.
         :return: the string format corresponding to the query dictionary.
+        :rtype:
         '''
-        # expr = " and ".join(
-        #     ["{} == {}".format(k, v) if not isinstance(v, str) else "{} == '{}'".format(k, v) for k, v in
-        #      query.items()])
-        last_keys = list(query.keys())[-1]
+        last_key = list(query.keys())[-1]
         expr = ""
         for k, v in query.items():
-            if isinstance(v, dict):
+            if isinstance(v, range):
+                expr += "{} >= {} and {} <= {}".format(k, v[0], k, v[-1])
+            elif isinstance(v, dict):
                 expr += " {} >= {} and {} <= {}".format(k, v['min'], k, v['max'])
             elif isinstance(v, (int, float, list)):
                 expr += " {} == {}".format(k, v)
             elif isinstance(v, str):
-                needle = k + ".str.contains('{}') ".format(v)
-                print("Like instance " + needle)
-                expr += needle
-            if k is not last_keys:
+                if "%" in v:
+                    if v.startswith("%") and v.endswith("%"):
+                        expr += k + ".str.contains('{}') ".format(v[1:-1])
+                    elif v.startswith("%"):
+                        expr += k + ".str.endswith('{}') ".format(v[1::])
+                    elif v.endswith("%"):
+                        expr += k + ".str.startswith('{}') ".format(v[:-1])
+                else:
+                    expr += " {} == '{}'".format(k, v)
+
+            if k is not last_key:
                 expr += " and "
-        print("FIXED expression", expr)
         return expr
 
     @staticmethod
@@ -144,12 +153,58 @@ class QueryRelaxer:
                 if threshold > 0.0:
                     if isinstance(val, int) or isinstance(val, float):
                         val_range = range(int(val - threshold), int(val + threshold + 1))
-                        query[key] = list(val_range)
+                        query[key] = val_range  # list(val_range)
+                    elif isinstance(val, dict):
+                        val['min'] -= threshold
+                        val['max'] += threshold
+                        print("MIN MAX", val)
+                        query[key] = val
                     elif isinstance(val, str):
-                        source = val
-                        simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
-                                                                    threshold=threshold)
-                        query[key] = simil_string
+                        if "%" not in val:
+                            source = val
+                            simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
+                                                                        threshold=threshold)
+                            query[key] = simil_string
+                        else:
+                            simil_strings = []
+                            strings_like_this = None
+
+                            if val.startswith("%") and val.endswith("%"):
+                                wanted_string = val[1:-1]
+                                print("WANTED STRING:", wanted_string)
+                                strings_like_this = data_set[data_set[key].str.match('.*' + wanted_string + '.*')][
+                                    key].tolist()
+                                print("STRINGS LIKE THIS:\n", strings_like_this)
+
+                                # print("WANTED STRING:", wanted_string)
+                                # print("STRINGS LIKE THIS:\n", strings_like_this)
+                                # strings_like_this_list = strings_like_this[key].tolist()
+                                # print("STRINGS COLUMN VALUES:\n", strings_like_this_list)
+                                #
+                                # simil_strings = []
+                                # for source in strings_like_this_list:
+                                #     simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
+                                #                                                 threshold=threshold)
+                                #     simil_strings.extend(simil_string)
+                            elif val.startswith("%"):
+                                wanted_string = val[1::]
+                                print("WANTED STRING:", wanted_string)
+                                strings_like_this = data_set[
+                                    data_set[key].str.match('.*' + wanted_string + '.*')][key].tolist()
+                                print("STRINGS LIKE THIS:\n", strings_like_this)
+                            elif val.endswith("%"):
+                                wanted_string = val[:-1]
+                                print("WANTED STRING:", wanted_string)
+                                strings_like_this = data_set[
+                                    data_set[key].str.match('.*' + wanted_string + '.*')][key].tolist()
+                                print("STRINGS LIKE THIS:\n", strings_like_this)
+
+                            for source in strings_like_this:
+                                simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
+                                                                            threshold=threshold)
+                                simil_strings.extend(simil_string)
+
+                            query[key] = simil_strings = list(set(simil_strings))
 
         return query
 
