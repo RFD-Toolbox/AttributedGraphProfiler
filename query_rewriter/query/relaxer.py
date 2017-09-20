@@ -92,11 +92,14 @@ class QueryRelaxer:
         :param rfd: the Relaxed Functional Dependency to convert.
         :return: a human readable string representation of the Relaxed Functional Dependency.
         '''
-        string = ""
-        string += "".join(["" if key == "RHS" or key == rfd["RHS"] or np.isnan(val) else "(" + key + " <= " + str(
-            val) + ") " for key, val in rfd.items()])
-        string += "---> ({} <= {})".format(rfd["RHS"], rfd[rfd["RHS"]])
-        return string
+        if rfd is not None:
+            string = ""
+            string += "".join(["" if key == "RHS" or key == rfd["RHS"] or np.isnan(val) else "(" + key + " <= " + str(
+                val) + ") " for key, val in rfd.items()])
+            string += "---> ({} <= {})".format(rfd["RHS"], rfd[rfd["RHS"]])
+            return string
+        else:
+            return "None"
 
     @staticmethod
     def query_dict_to_expr(query: dict) -> str:
@@ -151,6 +154,11 @@ class QueryRelaxer:
                     if isinstance(val, int) or isinstance(val, float):
                         val_range = range(int(val - threshold), int(val + threshold + 1))
                         query[key] = val_range  # list(val_range)
+                    elif isinstance(val, dict):
+                        val['min'] -= threshold
+                        val['max'] += threshold
+                        print("MIN MAX", val)
+                        query[key] = val
                     elif isinstance(val, str):
                         if "%" not in val:
                             source = val

@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 import json
 from query_rewriter.query.slicer import Slicer
+import copy
 
 
 def main(args):
@@ -95,10 +96,11 @@ def start_process(arguments):
         # print("#" * 200)
         # print("@" * 90 + " __EXTENDED QUERY__ " + "@" * 90)
         # print("#" * 200)
-        query_extended: dict = QueryRelaxer.extend_query_ranges(query, choosen_rfd, data_set_df)
+        query_extended: dict = QueryRelaxer.extend_query_ranges(copy.deepcopy(query), copy.deepcopy(choosen_rfd),
+                                                                data_set_df)
         # print("Query extended: ", query_extended)
         query_extended_expr = QueryRelaxer.query_dict_to_expr(query_extended)
-        # print("Query Extended Expr: ", query_extended_expr)
+        print("Query Extended Expr: ", query_extended_expr)
 
         query_extended_res_set = data_set_df.query(query_extended_expr)
         print("Query Extended Result Set:\n ", query_extended_res_set)
