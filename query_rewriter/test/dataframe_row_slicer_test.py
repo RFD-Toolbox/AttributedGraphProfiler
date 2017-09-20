@@ -46,8 +46,16 @@ def main():
     expr = QueryRelaxer.query_dict_to_expr({"r": r})
     print("Expression:", expr)
 
-    test = "$test$"
+    test = "%test%"
     print(test[:-1])
+
+    if "%" in test:
+        print("We have % inside...")
+    else:
+        print("Oh no, what's wrong?")
+
+    d = None
+    print("Is dictionary EMPTY:", d is not None and not bool(d))
 
 
 if __name__ == '__main__':
