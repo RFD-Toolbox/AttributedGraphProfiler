@@ -158,11 +158,45 @@ class QueryRelaxer:
                                                                         threshold=threshold)
                             query[key] = simil_string
                         else:
-                            if val.startswith("%") and val.endswith("%"):
-                                
-                            elif val.startswith("%"):
+                            simil_strings = []
+                            strings_like_this = None
 
+                            if val.startswith("%") and val.endswith("%"):
+                                wanted_string = val[1:-1]
+                                print("WANTED STRING:", wanted_string)
+                                strings_like_this = data_set[data_set[key].str.match('.*' + wanted_string + '.*')][
+                                    key].tolist()
+                                print("STRINGS LIKE THIS:\n", strings_like_this)
+
+                                # print("WANTED STRING:", wanted_string)
+                                # print("STRINGS LIKE THIS:\n", strings_like_this)
+                                # strings_like_this_list = strings_like_this[key].tolist()
+                                # print("STRINGS COLUMN VALUES:\n", strings_like_this_list)
+                                #
+                                # simil_strings = []
+                                # for source in strings_like_this_list:
+                                #     simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
+                                #                                                 threshold=threshold)
+                                #     simil_strings.extend(simil_string)
+                            elif val.startswith("%"):
+                                wanted_string = val[1::]
+                                print("WANTED STRING:", wanted_string)
+                                strings_like_this = data_set[
+                                    data_set[key].str.match('.*' + wanted_string + '.*')][key].tolist()
+                                print("STRINGS LIKE THIS:\n", strings_like_this)
                             elif val.endswith("%"):
+                                wanted_string = val[:-1]
+                                print("WANTED STRING:", wanted_string)
+                                strings_like_this = data_set[
+                                    data_set[key].str.match('.*' + wanted_string + '.*')][key].tolist()
+                                print("STRINGS LIKE THIS:\n", strings_like_this)
+
+                            for source in strings_like_this:
+                                simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
+                                                                            threshold=threshold)
+                                simil_strings.extend(simil_string)
+
+                            query[key] = simil_strings = list(set(simil_strings))
 
         return query
 
