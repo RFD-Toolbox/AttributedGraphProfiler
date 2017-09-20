@@ -138,7 +138,7 @@ def start_process(arguments):
                 relaxing_values_extended[attr].sort()
 
             all_row_values_dict[current_row] = relaxing_values_extended
-
+        print("ALL ROW VALUES DICT " + str(all_row_values_dict))
         # exit(-9)
         ################################################
         # @@@@@@@@@@@@__RELAXED QUERY__@@@@@@@@@@@@@@@#
@@ -161,15 +161,20 @@ def start_process(arguments):
 
 
         # print("Relaxing values extended dict: ", relaxing_values_extended)
+        final_expr = ""
+        last_keys = list(all_row_values_dict.keys())[-1]
+        for key, values in all_row_values_dict.items():
+            # RELAXED QUERY RHS ONLY
+            relaxed_query = values
 
-        # RELAXED QUERY RHS ONLY
-        relaxed_query = relaxing_values_extended
-
-        # print("Relaxed Query: ", relaxed_query)
-        relaxed_query_expr = QueryRelaxer.query_dict_to_expr(relaxed_query)
-        # print("Relaxed Query expr: ", relaxed_query_expr)
-
-        relaxed_result_set = data_set_df.query(relaxed_query_expr)
+            # print("Relaxed Query: ", relaxed_query)
+            relaxed_query_expr = QueryRelaxer.query_dict_to_expr(relaxed_query)
+            # print("Relaxed Query expr: ", relaxed_query_expr)
+            final_expr += relaxed_query_expr
+            if key is not last_keys:
+                final_expr += " or "
+        print(final_expr)
+        relaxed_result_set = data_set_df.query(final_expr)
         # reset index
         relaxed_result_set.reset_index(inplace=True, level=0, drop=True)
 
