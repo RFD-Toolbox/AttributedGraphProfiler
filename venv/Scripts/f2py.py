@@ -1,4 +1,4 @@
-#!b:\_python_workspace\rfd-discovery-master\venv\scripts\python.exe
+#!b:\_python_workspace\attributedgraphprofiler\venv\scripts\python.exe
 # See http://cens.ioc.ee/projects/f2py2e/
 from __future__ import division, print_function
 
