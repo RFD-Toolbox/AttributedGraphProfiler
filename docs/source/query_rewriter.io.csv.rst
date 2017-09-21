@@ -1,6 +1,11 @@
 query\_rewriter\.io\.csv package
 ================================
 
+.. automodule:: query_rewriter.io.csv
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Submodules
 ----------
 
@@ -21,10 +26,3 @@ query\_rewriter\.io\.csv\.io module
     :show-inheritance:
 
 
-Module contents
----------------
-
-.. automodule:: query_rewriter.io.csv
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -1,6 +1,11 @@
 query\_rewriter\.io\.rfd package
 ================================
 
+.. automodule:: query_rewriter.io.rfd
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Submodules
 ----------
 
@@ -29,10 +34,3 @@ query\_rewriter\.io\.rfd\.store\_load\_rfds module
     :show-inheritance:
 
 
-Module contents
----------------
-
-.. automodule:: query_rewriter.io.rfd
-    :members:
-    :undoc-members:
-    :show-inheritance:

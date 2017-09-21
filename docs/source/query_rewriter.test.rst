@@ -1,6 +1,11 @@
 query\_rewriter\.test package
 =============================
 
+.. automodule:: query_rewriter.test
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Submodules
 ----------
 
@@ -69,10 +74,3 @@ query\_rewriter\.test\.similar\_strings\_test module
     :show-inheritance:
 
 
-Module contents
----------------
-
-.. automodule:: query_rewriter.test
-    :members:
-    :undoc-members:
-    :show-inheritance:

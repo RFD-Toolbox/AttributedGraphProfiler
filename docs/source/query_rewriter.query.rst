@@ -1,6 +1,11 @@
 query\_rewriter\.query package
 ==============================
 
+.. automodule:: query_rewriter.query
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Submodules
 ----------
 
@@ -29,10 +34,3 @@ query\_rewriter\.query\.slicer module
     :show-inheritance:
 
 
-Module contents
----------------
-
-.. automodule:: query_rewriter.query
-    :members:
-    :undoc-members:
-    :show-inheritance:
