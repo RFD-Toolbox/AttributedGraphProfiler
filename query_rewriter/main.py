@@ -27,68 +27,76 @@ def main(args):
 
 
 def start_process(arguments):
+    #############################################################################################
+    # __________________________________________DATA SET________________________________________#
+    #############################################################################################
     csv_io = CSVInputOutput()
-    dataset_path = arguments.path
+    data_set_path = arguments.path
+    data_set_df = csv_io.load(data_set_path)
+    # print("Dataset:\n", data_set_df)
+
+    #############################################################################################
+    # ____________________________________________QUERY_________________________________________#
+    #############################################################################################
+    original_query = ast.literal_eval(arguments.query)
+    print("Query is : ", original_query)
+
+    #############################################################################################
+    # ____________________________________________RFDs__________________________________________#
+    #############################################################################################
     rfds_path = arguments.rfds
     if rfds_path is None:
-        rfds_path = dataset_path.replace(".csv", "_rfds.csv")
+        rfds_path = data_set_path.replace(".csv", "_rfds.csv")
         rfds_path = rfds_path.replace("dataset/", "dataset/rfds/")
-        print(rfds_path)
-        store_load_rfds.search_rfds(dataset_path, rfds_path)
-
-    query = ast.literal_eval(arguments.query)
-    data_set_df = csv_io.load(dataset_path)
-    # print("Dataset:\n", data_set_df)
-    print("Query is : ", query)
+        store_load_rfds.search_rfds(data_set_path, rfds_path)
 
     rfds_df = csv_io.load(rfds_path)
     # print("RFDs:\n", rfds_df)
 
-    rfds: pd.DataFrame = QueryRelaxer.drop_query_nan(rfds_df, query)
+    rfds: pd.DataFrame = QueryRelaxer.drop_query_nan(rfds_df, original_query)
     # print("Dropped query N/A:\n", rfds)
 
-    rfds = QueryRelaxer.drop_query_rhs(rfds, query)
+    rfds = QueryRelaxer.drop_query_rhs(rfds, original_query)
     # print("Dropped query RHS:\n", rfds)
 
-    rfds = QueryRelaxer.sort_by_decresing_nan_incresing_threshold(rfds, query)
+    rfds = QueryRelaxer.sort_by_decresing_nan_incresing_threshold(rfds, original_query)
     # print("Sorted by decreasing NaNs & increasing query threshold attributes:\n", rfds)
 
     rfds_dict_list = rfds.to_dict(orient="records")
 
     #############################################################################################
-    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@RELAX@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+    # __________________________________________RELAX___________________________________________#
     #############################################################################################
 
-    ################################################
-    # @@@@@@@@@@@@__ORIGINAL QUERY__@@@@@@@@@@@@@@@#
-    ################################################
+    #############################################################################################
+    # ______________________________________ORIGINAL QUERY______________________________________#
+    #############################################################################################
     print("#" * 200)
     print("@" * 90 + " __ORIGINAL QUERY__ " + "@" * 90)
     print("#" * 200)
-    print("OriginalQuery: ", query)
-    query_expr = QueryRelaxer.query_dict_to_expr(query)
-    print("OriginalQuery expr: ", query_expr)
-    query_res_set = data_set_df.query(query_expr)
-    print("Original Query Result Set:\n", query_res_set)
+    print("OriginalQuery: ", original_query)
+    original_query_expression = QueryRelaxer.query_dict_to_expr(original_query)
+    print("OriginalQuery expr: ", original_query_expression)
+    original_query_result_set = data_set_df.query(original_query_expression)
+    print("Original Query Result Set:\n", original_query_result_set)
 
-    ORIGINAL_QUERY_DATA_SET = query_res_set
-    ORIGINAL_QUERY_DATA_SET_SIZE = query_res_set.shape[0]
+    ORIGINAL_QUERY_DATA_SET = original_query_result_set
+    ORIGINAL_QUERY_DATA_SET_ROWS \
+        = original_query_result_set.shape[0]
 
     BEST_RFD = None
     BEST_RFD_DATA_SET_SIZE = np.inf
     BEST_RFD_DATA_SET = None
     BEST_RELAXED_QUERY = None
+    number_of_rfds_to_test: int = np.clip(a=arguments.numb_test, a_min=1, a_max=len(rfds_dict_list))
 
-    for i in range(0, abs(min(len(rfds_dict_list), arguments.numb_test))):
+    for i in range(0, number_of_rfds_to_test):
         print("#" * 200)
         print("@" * 90 + " RELAX " + str(i) + " @" * 90)
         print("#" * 200)
-        choosen_rfd = rfds_dict_list[i]
-        print("\nChoosen RFD:\n", choosen_rfd)
-        print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
-
-        rhs_column = choosen_rfd["RHS"]
-        # print("\nRHS column: ", rhs_column)
+        chosen_rfd = rfds_dict_list[i]
+        print("\nChosen RFD:\n", chosen_rfd)
+        print("\nRFD:\n", QueryRelaxer.rfd_to_string(chosen_rfd))
 
         ################################################
         # @@@@@@@@@@@@__EXTENDED QUERY__@@@@@@@@@@@@@@@#
@@ -96,20 +104,21 @@ def start_process(arguments):
         # print("#" * 200)
         # print("@" * 90 + " __EXTENDED QUERY__ " + "@" * 90)
         # print("#" * 200)
-        query_extended: dict = QueryRelaxer.extend_query_ranges(copy.deepcopy(query), copy.deepcopy(choosen_rfd),
+        extended_query: dict = QueryRelaxer.extend_query_ranges(copy.deepcopy(original_query),
+                                                                copy.deepcopy(chosen_rfd),
                                                                 data_set_df)
-        # print("Query extended: ", query_extended)
-        query_extended_expr = QueryRelaxer.query_dict_to_expr(query_extended)
-        print("Query Extended Expr: ", query_extended_expr)
+        # print("Query extended: ", extended_query)
+        extended_query_expression = QueryRelaxer.query_dict_to_expr(extended_query)
+        print("Query Extended Expr: ", extended_query_expression)
 
-        query_extended_res_set = data_set_df.query(query_extended_expr)
+        query_extended_res_set = data_set_df.query(extended_query_expression)
         print("Query Extended Result Set:\n ", query_extended_res_set)
 
         # ++++++++++++++++++++++++RELAXING ROW BY ROW+++++++++++++++++++++++++++
         rows_df_list = Slicer.slice(query_extended_res_set)
 
         relaxing_attributes = [col for col in list(data_set_df)
-                               if col not in query.keys() and not np.isnan(choosen_rfd[col])]
+                               if col not in original_query.keys() and not np.isnan(chosen_rfd[col])]
         # print("RELAXING ATTRIBUTES:\n", relaxing_attributes)
 
         print("\n" + "+" * 35 + "Slices..." + "+" * 35)
@@ -117,13 +126,13 @@ def start_process(arguments):
         all_row_values_dict = {}
 
         current_row = 0
-        for sl in rows_df_list:
-            row_values = QueryRelaxer.extract_value_lists(sl, relaxing_attributes)
+        for row in rows_df_list:
+            row_values = QueryRelaxer.extract_value_lists(row, relaxing_attributes)
 
             relaxing_values_extended = {}
             for attr, lst in row_values.items():
                 relaxing_values_extended[attr] = []
-                threshold = choosen_rfd[attr]
+                threshold = chosen_rfd[attr]
 
                 for val in lst:
                     if isinstance(val, int) or isinstance(val, float):
@@ -147,19 +156,6 @@ def start_process(arguments):
         # print("#" * 200)
         # print("@" * 90 + " __RELAXED QUERY__ " + "@" * 90)
         # print("#" * 200)
-
-        # start extracting values
-        # print("#start extracting values")
-        # print("\nChoosen RFD:\n", choosen_rfd)
-        # print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
-
-        # relaxing_values_list = QueryRelaxer.extract_value_lists(query_extended_res_set, relaxing_attributes)
-
-        # print("\nRelaxing values list: ", relaxing_values_list)
-
-        # print("\nRFD:\n", QueryRelaxer.rfd_to_string(choosen_rfd))
-
-
 
         # print("Relaxing values extended dict: ", relaxing_values_extended)
         final_expr = ""
@@ -186,16 +182,16 @@ def start_process(arguments):
 
             print("\nRelaxed Result Set:\n", relaxed_result_set)
 
-            original_query_result_set_size = query_res_set.shape[0]
+            original_query_result_set_size = original_query_result_set.shape[0]
             relaxed_query_result_set_size = relaxed_result_set.shape[0]
-            full_data_set_size = data_set_df.shape[0]
-            original_to_relaxed_ratio = None
-            if original_query_result_set_size == 0:
-                original_to_relaxed_ratio = 1.0
-            else:
-                original_to_relaxed_ratio = relaxed_query_result_set_size / original_query_result_set_size
-            original_to_relaxed_increment_rate = original_to_relaxed_ratio - 1
-            relaxed_to_full_ratio = relaxed_query_result_set_size / full_data_set_size
+            # full_data_set_size = data_set_df.shape[0]
+            # original_to_relaxed_ratio = None
+            # if original_query_result_set_size == 0:
+            #     original_to_relaxed_ratio = 1.0
+            # else:
+            #     original_to_relaxed_ratio = relaxed_query_result_set_size / original_query_result_set_size
+            # original_to_relaxed_increment_rate = original_to_relaxed_ratio - 1
+            # relaxed_to_full_ratio = relaxed_query_result_set_size / full_data_set_size
 
             # print("original_query_result_set_size:", original_query_result_set_size)
             # print("relaxed_query_result_set_size:", relaxed_query_result_set_size)
@@ -205,8 +201,8 @@ def start_process(arguments):
             # print("original_to_relaxed_increment_rate: +{:.0%}".format(original_to_relaxed_increment_rate))
             # print("relaxed_to_full_ratio: {:.0%}".format(relaxed_to_full_ratio))
 
-            if ORIGINAL_QUERY_DATA_SET_SIZE < relaxed_query_result_set_size < BEST_RFD_DATA_SET_SIZE:
-                BEST_RFD = choosen_rfd
+            if ORIGINAL_QUERY_DATA_SET_ROWS < relaxed_query_result_set_size < BEST_RFD_DATA_SET_SIZE:
+                BEST_RFD = chosen_rfd
                 BEST_RFD_DATA_SET = relaxed_result_set
                 BEST_RELAXED_QUERY = final_expr  # relaxed_query
                 BEST_RFD_DATA_SET_SIZE = relaxed_query_result_set_size
