@@ -10,6 +10,7 @@ import numpy as np
 import json
 from query_rewriter.query.slicer import Slicer
 import copy
+import time
 
 
 def main(args):
@@ -23,6 +24,7 @@ def main(args):
     parser.add_argument("-n", "--numb_test", help="number of tests", default=1, type=int)
     parser.add_argument("-o", "--out", help="query output path", type=str)
     arguments = parser.parse_args()
+
     start_process(arguments)
 
 
@@ -48,8 +50,11 @@ def start_process(arguments):
     if rfds_path is None:
         rfds_path = data_set_path.replace(".csv", "_rfds.csv")
         rfds_path = rfds_path.replace("dataset/", "dataset/rfds/")
+        rfds_search_start_time = time.time()
         store_load_rfds.search_rfds(data_set_path, rfds_path)
-
+        rfds_search_end_time = time.time()
+        print("RFDs search executed in ", int((rfds_search_end_time - rfds_search_start_time) * 1000))
+    init_time = time.time()
     rfds_df = csv_io.load(rfds_path)
     # print("RFDs:\n", rfds_df)
 
@@ -213,7 +218,8 @@ def start_process(arguments):
         print("BEST_RELAXED_QUERY:\n", BEST_RELAXED_QUERY)
         print("BEST_RFD_DATA_SET:\n", BEST_RFD_DATA_SET)
         print("BEST_RFD_DATA_SET_SIZE:\n", BEST_RFD_DATA_SET_SIZE)
-
+    end_time = time.time()
+    print("Query Relaxation executed in ", int((end_time - init_time) * 1000), "ms")
     exit(-100)
     ######JSON###########
     rel_query_json = json.dumps(BEST_RELAXED_QUERY)
