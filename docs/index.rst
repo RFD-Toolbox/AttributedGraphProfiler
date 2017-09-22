@@ -8,8 +8,9 @@ Welcome to Query Rewriter's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
-   :modules
+   :caption: Contents
+   
+   source/modules
 
 
 Indices and tables
