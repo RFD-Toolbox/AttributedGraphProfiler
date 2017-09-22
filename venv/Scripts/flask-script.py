@@ -1,4 +1,4 @@
-#!B:\_Python_Workspace\rfd-discovery-master\venv\Scripts\python.exe
+#!B:\_Python_Workspace\AttributedGraphProfiler\venv\Scripts\python.exe
 # EASY-INSTALL-ENTRY-SCRIPT: 'Flask==0.12.2','console_scripts','flask'
 __requires__ = 'Flask==0.12.2'
 import re
