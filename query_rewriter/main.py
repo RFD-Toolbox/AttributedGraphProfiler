@@ -219,7 +219,8 @@ def start_process(arguments):
         print("BEST_RFD_DATA_SET:\n", BEST_RFD_DATA_SET)
         print("BEST_RFD_DATA_SET_SIZE:\n", BEST_RFD_DATA_SET_SIZE)
     end_time = time.time()
-    print("Query Relaxation executed in ", int((end_time - init_time) * 1000), "ms")
+    timing = int((end_time - init_time) * 1000)
+    print("Query Relaxation executed in ", timing, "ms")
     exit(-100)
     ######JSON###########
     rel_query_json = json.dumps(BEST_RELAXED_QUERY)
@@ -233,6 +234,11 @@ def start_process(arguments):
     if relaxed_query_path is not None:
         with open(relaxed_query_path, 'w') as fp:
             json.dump(BEST_RELAXED_QUERY, fp)
+    with open("test.txt", "a") as fp:
+        fp.write(
+            arguments.path + "    " + arguments.query + "    " + str(arguments.numb_test) + "    " + str(
+                timing) + "ms\n")
+        fp.close()
 
 
 if __name__ == "__main__":
