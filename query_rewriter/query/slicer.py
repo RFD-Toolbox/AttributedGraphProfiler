@@ -2,6 +2,10 @@ import pandas as pd
 
 
 class Slicer:
+    '''
+    Auxiliary class to divide a DataFrame in a list of one-row DataFrames.
+    '''
+
     @staticmethod
     def slice(df: pd.DataFrame) -> list:
         '''
