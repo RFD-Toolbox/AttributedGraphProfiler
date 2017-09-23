@@ -96,12 +96,12 @@ def start_process(arguments):
     number_of_rfds_to_test: int = np.clip(a=arguments.numb_test, a_min=1, a_max=len(rfds_dict_list))
 
     for i in range(0, number_of_rfds_to_test):
-        print("#" * 200)
-        print("@" * 90 + " RELAX " + str(i) + " @" * 90)
-        print("#" * 200)
+        # print("#" * 200)
+        # print("@" * 90 + " RELAX " + str(i) + " @" * 90)
+        # print("#" * 200)
         chosen_rfd = rfds_dict_list[i]
-        print("\nChosen RFD:\n", chosen_rfd)
-        print("\nRFD:\n", QueryRelaxer.rfd_to_string(chosen_rfd))
+        # print("\nChosen RFD:\n", chosen_rfd)
+        # print("\nRFD:\n", QueryRelaxer.rfd_to_string(chosen_rfd))
 
         ################################################
         # @@@@@@@@@@@@__EXTENDED QUERY__@@@@@@@@@@@@@@@#
@@ -114,10 +114,10 @@ def start_process(arguments):
                                                                 data_set_df)
         # print("Query extended: ", extended_query)
         extended_query_expression = QueryRelaxer.query_dict_to_expr(extended_query)
-        print("Query Extended Expr: ", extended_query_expression)
+        # print("Query Extended Expr: ", extended_query_expression)
 
         query_extended_res_set = data_set_df.query(extended_query_expression)
-        print("Query Extended Result Set:\n ", query_extended_res_set)
+        # print("Query Extended Result Set:\n ", query_extended_res_set)
 
         # ++++++++++++++++++++++++RELAXING ROW BY ROW+++++++++++++++++++++++++++
         rows_df_list = Slicer.slice(query_extended_res_set)
@@ -126,7 +126,7 @@ def start_process(arguments):
                                if col not in original_query.keys() and not np.isnan(chosen_rfd[col])]
         # print("RELAXING ATTRIBUTES:\n", relaxing_attributes)
 
-        print("\n" + "+" * 35 + "Slices..." + "+" * 35)
+        # print("\n" + "+" * 35 + "Slices..." + "+" * 35)
 
         all_row_values_dict = {}
 
@@ -180,12 +180,12 @@ def start_process(arguments):
                 if key is not last_key:
                     final_expr += " or "
 
-            print("FINAL EXPRESSION:", final_expr)
+            # print("FINAL EXPRESSION:", final_expr)
             relaxed_result_set = data_set_df.query(final_expr)
             # reset index
             relaxed_result_set.reset_index(inplace=True, level=0, drop=True)
 
-            print("\nRelaxed Result Set:\n", relaxed_result_set)
+            # print("\nRelaxed Result Set:\n", relaxed_result_set)
 
             original_query_result_set_size = original_query_result_set.shape[0]
             relaxed_query_result_set_size = relaxed_result_set.shape[0]
@@ -212,15 +212,16 @@ def start_process(arguments):
                 BEST_RELAXED_QUERY = final_expr  # relaxed_query
                 BEST_RFD_DATA_SET_SIZE = relaxed_query_result_set_size
 
-        print("#" * 50 + "THE WINNER IS:" + "#" * 50)
-        print("BEST_RFD:\n", BEST_RFD)
-        print("BEST_RFD:\n", QueryRelaxer.rfd_to_string(BEST_RFD))
-        print("BEST_RELAXED_QUERY:\n", BEST_RELAXED_QUERY)
-        print("BEST_RFD_DATA_SET:\n", BEST_RFD_DATA_SET)
-        print("BEST_RFD_DATA_SET_SIZE:\n", BEST_RFD_DATA_SET_SIZE)
+
     end_time = time.time()
-    print("Query Relaxation executed in ", int((end_time - init_time) * 1000), "ms")
-    exit(-100)
+    print("#" * 50 + "THE WINNER IS:" + "#" * 50)
+    print("BEST_RFD:\n", BEST_RFD)
+    print("BEST_RFD:\n", QueryRelaxer.rfd_to_string(BEST_RFD))
+    print("BEST_RELAXED_QUERY:\n", BEST_RELAXED_QUERY)
+    print("BEST_RFD_DATA_SET:\n", BEST_RFD_DATA_SET)
+    print("BEST_RFD_DATA_SET_SIZE:\n", BEST_RFD_DATA_SET_SIZE)
+    timing = int((end_time - init_time) * 1000)
+    print("Query Relaxation executed in ", timing, "ms")
     ######JSON###########
     rel_query_json = json.dumps(BEST_RELAXED_QUERY)
     # print("REL_QUERY_JSON:", rel_query_json)
@@ -233,6 +234,11 @@ def start_process(arguments):
     if relaxed_query_path is not None:
         with open(relaxed_query_path, 'w') as fp:
             json.dump(BEST_RELAXED_QUERY, fp)
+    with open("test.txt", "a") as fp:
+        fp.write(
+            arguments.path + "    " + arguments.query + "    " + str(arguments.numb_test) + "    " + str(
+                timing) + "ms\n")
+        fp.close()
 
 
 if __name__ == "__main__":
