@@ -9,6 +9,10 @@ from query_rewriter.io.csv.csv_parser import CSVParser
 
 
 class RFDExtractor:
+    '''
+    Class to extract RFDs from a dataset.
+    '''
+
     args = None
     '''Command-Line arguments.'''
     debug_mode = False
@@ -337,7 +341,13 @@ class RFDExtractor:
             string += "\n"
         print(string)
 
-    def get_rfd_dictionary_list(self):
+    def get_rfd_dictionary_list(self) -> list:
+        '''
+        Returns the list of RFDs, each one represented in the form of a dictionary.
+        :return: the list of RFDs.
+        :rtype:
+        '''
+
         if self.rfd_dictionary_list is None:
             self.rfd_dictionary_list = list()
 
