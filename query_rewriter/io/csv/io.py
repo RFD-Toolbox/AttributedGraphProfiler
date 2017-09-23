@@ -2,6 +2,10 @@ import pandas as pd
 
 
 class CSVInputOutput:
+    '''
+    CSVInputOutput allows to load/store a Pandas.DataFrame from/to a CSV file.
+    '''
+
     sep = ";"
     '''
     CSV fields delimiter symbol.
@@ -24,8 +28,24 @@ class CSVInputOutput:
     '''
 
     def store(self, df: pd.DataFrame, path: str):
-        return df.to_csv(path, sep=self.sep, na_rep=self.na_rep, index=self.index, encoding=self.encoding,
-                         date_format=self.date_format)
+        '''
+        Stores the DataFrame to the given path as a CSV file.
+        :param df: the DataFrame to be stored.
+        :type df: pandas.DataFrame
+        :param path: the path where to store the DataFrame.
+        :type path: str
+        :return:
+        :rtype:
+        '''
+        df.to_csv(path, sep=self.sep, na_rep=self.na_rep, index=self.index, encoding=self.encoding,
+                  date_format=self.date_format)
 
     def load(self, path: str) -> pd.DataFrame:
+        '''
+        Loads the DataFrame from the given CSV file path.
+        :param path: the path where the CSV file is.
+        :type path: str
+        :return: the DataFrame loaded.
+        :rtype:
+        '''
         return pd.read_csv(path, sep=self.sep, na_values=self.na_rep, parse_dates=True, decimal=".")
