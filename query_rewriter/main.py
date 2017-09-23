@@ -212,13 +212,14 @@ def start_process(arguments):
                 BEST_RELAXED_QUERY = final_expr  # relaxed_query
                 BEST_RFD_DATA_SET_SIZE = relaxed_query_result_set_size
 
-        print("#" * 50 + "THE WINNER IS:" + "#" * 50)
-        print("BEST_RFD:\n", BEST_RFD)
-        print("BEST_RFD:\n", QueryRelaxer.rfd_to_string(BEST_RFD))
-        print("BEST_RELAXED_QUERY:\n", BEST_RELAXED_QUERY)
-        print("BEST_RFD_DATA_SET:\n", BEST_RFD_DATA_SET)
-        print("BEST_RFD_DATA_SET_SIZE:\n", BEST_RFD_DATA_SET_SIZE)
+
     end_time = time.time()
+    print("#" * 50 + "THE WINNER IS:" + "#" * 50)
+    print("BEST_RFD:\n", BEST_RFD)
+    print("BEST_RFD:\n", QueryRelaxer.rfd_to_string(BEST_RFD))
+    print("BEST_RELAXED_QUERY:\n", BEST_RELAXED_QUERY)
+    print("BEST_RFD_DATA_SET:\n", BEST_RFD_DATA_SET)
+    print("BEST_RFD_DATA_SET_SIZE:\n", BEST_RFD_DATA_SET_SIZE)
     timing = int((end_time - init_time) * 1000)
     print("Query Relaxation executed in ", timing, "ms")
     ######JSON###########
