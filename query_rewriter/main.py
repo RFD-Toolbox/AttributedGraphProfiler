@@ -14,6 +14,11 @@ import time
 
 
 def main(args):
+    '''
+    This is the main method, the core of our program
+    :param args: some params read by command line
+    :return: None
+    '''
     pd.set_option('display.max_columns', None)
     pd.set_option('display.max_rows', None)
     logging.basicConfig(filemode='w', level=logging.INFO)
@@ -29,6 +34,11 @@ def main(args):
 
 
 def start_process(arguments):
+    '''
+    In this method we encapsulated all process of Query Relaxing
+    :param arguments: arguments passed by command line
+    :return: some control sentence and create some file
+    '''
     #############################################################################################
     # __________________________________________DATA SET________________________________________#
     #############################################################################################
@@ -187,31 +197,13 @@ def start_process(arguments):
 
             # print("\nRelaxed Result Set:\n", relaxed_result_set)
 
-            original_query_result_set_size = original_query_result_set.shape[0]
             relaxed_query_result_set_size = relaxed_result_set.shape[0]
-            # full_data_set_size = data_set_df.shape[0]
-            # original_to_relaxed_ratio = None
-            # if original_query_result_set_size == 0:
-            #     original_to_relaxed_ratio = 1.0
-            # else:
-            #     original_to_relaxed_ratio = relaxed_query_result_set_size / original_query_result_set_size
-            # original_to_relaxed_increment_rate = original_to_relaxed_ratio - 1
-            # relaxed_to_full_ratio = relaxed_query_result_set_size / full_data_set_size
-
-            # print("original_query_result_set_size:", original_query_result_set_size)
-            # print("relaxed_query_result_set_size:", relaxed_query_result_set_size)
-            # print("full_data_set_size:", full_data_set_size)
-            # print("original_to_relaxed_ratio:", original_to_relaxed_ratio)
-            # print("original_to_relaxed_increment_rate:", original_to_relaxed_increment_rate, "%")
-            # print("original_to_relaxed_increment_rate: +{:.0%}".format(original_to_relaxed_increment_rate))
-            # print("relaxed_to_full_ratio: {:.0%}".format(relaxed_to_full_ratio))
 
             if ORIGINAL_QUERY_DATA_SET_ROWS < relaxed_query_result_set_size < BEST_RFD_DATA_SET_SIZE:
                 BEST_RFD = chosen_rfd
                 BEST_RFD_DATA_SET = relaxed_result_set
                 BEST_RELAXED_QUERY = final_expr  # relaxed_query
                 BEST_RFD_DATA_SET_SIZE = relaxed_query_result_set_size
-
 
     end_time = time.time()
     print("#" * 50 + "THE WINNER IS:" + "#" * 50)
@@ -227,8 +219,6 @@ def start_process(arguments):
     # print("REL_QUERY_JSON:", rel_query_json)
 
     loaded_rel_query_dict = json.loads(rel_query_json)
-    # print("Loaded REL query JSON:", loaded_rel_query_dict)
-    # print("Type of Loaded REL query JSON:", type(loaded_rel_query_dict))
 
     relaxed_query_path = arguments.out
     if relaxed_query_path is not None:

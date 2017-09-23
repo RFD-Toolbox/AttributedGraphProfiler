@@ -15,6 +15,12 @@ def diff(list1: list, list2: list):
 
 
 def search_rfds(csvPath,name_rfds_file):
+    '''
+    This method calls algorithm of RFDs Discovery and create a file containing list of RFDs and returning its path
+    :param csvPath: path of Dataset on which call algorithm of RFDD
+    :param name_rfds_file: name of new file containing RFDs list
+    :return: None
+    '''
     print("Store&Load RFDs")
     args = ["-c", csvPath, "--human"]
     rfd_extractor = RFDExtractor(args, False)

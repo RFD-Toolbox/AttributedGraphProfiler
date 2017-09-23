@@ -176,16 +176,6 @@ class QueryRelaxer:
                                     key].tolist()
                                 #print("STRINGS LIKE THIS:\n", strings_like_this)
 
-                                # print("WANTED STRING:", wanted_string)
-                                # print("STRINGS LIKE THIS:\n", strings_like_this)
-                                # strings_like_this_list = strings_like_this[key].tolist()
-                                # print("STRINGS COLUMN VALUES:\n", strings_like_this_list)
-                                #
-                                # simil_strings = []
-                                # for source in strings_like_this_list:
-                                #     simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
-                                #                                                 threshold=threshold)
-                                #     simil_strings.extend(simil_string)
                             elif val.startswith("%"):
                                 wanted_string = val[1::]
                                 #print("WANTED STRING:", wanted_string)
