@@ -360,38 +360,3 @@ class RFDExtractor:
                     self.rfd_dictionary_list.append(rfd_dictionary)
 
         return self.rfd_dictionary_list
-
-    def get_sort_rfd_dictionary_list(self, sort, sort_param):
-        print("Within get sort...")
-
-        if self.rfd_dictionary_list is None:
-            self.rfd_dictionary_list = list()
-            for rfd_data_frame in self.rfd_data_frame_list:
-                diff = lambda l1, l2: [x for x in l1 if x not in l2]
-                rhs_column = diff(self.header, list(rfd_data_frame))
-                print("RHS_column:", rhs_column[0])
-                print("BeforeRename:\n", rfd_data_frame)
-                rfd_data_frame.rename(columns={"RHS": rhs_column[0]}, inplace=True)
-                print("AfterRename:\n", rfd_data_frame)
-                # start save on file
-                df = pd.DataFrame(rfd_data_frame)
-                filename = rhs_column[0] + ".csv"
-                df.to_csv(filename, index=False, encoding='utf-8', na_rep="?",
-                          sep=";")  # Index if we want index for row
-
-                # end save on file
-                if sort:
-                    print("before sorting:\n\n", rfd_data_frame)
-                    # sortedlist = sorted(reader, key=lambda line: (line["age"], line["name"]), reverse=False)
-                    # rfd_data_frame = rfd_data_frame.sort_values(by=sort_param)
-                    print("after sorting:\n\n", rfd_data_frame)
-
-                for _, row in rfd_data_frame.iterrows():
-                    rfd_dictionary = {}
-                    for col in range(0, len(row)):
-                        rfd_dictionary[rfd_data_frame.columns[col]] = round(row[col], ndigits=2)
-
-                    self.rfd_dictionary_list.append(rfd_dictionary)
-
-        print("Exiting get sort...")
-        return self.rfd_dictionary_list
