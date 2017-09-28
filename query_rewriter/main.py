@@ -72,10 +72,10 @@ def start_process(arguments):
     # print("Dropped query N/A:\n", rfds)
 
     rfds = QueryRelaxer.drop_query_rhs(rfds, original_query)
-    # print("Dropped query RHS:\n", rfds)
+    print("Dropped query RHS:\n", rfds)
 
     rfds = QueryRelaxer.sort_by_decresing_nan_incresing_threshold(rfds, original_query)
-    # print("Sorted by decreasing NaNs & increasing query threshold attributes:\n", rfds)
+    print("Sorted by decreasing NaNs & increasing query threshold attributes:\n", rfds)
 
     rfds_dict_list = rfds.to_dict(orient="records")
 
@@ -111,7 +111,7 @@ def start_process(arguments):
         # print("#" * 200)
         chosen_rfd = rfds_dict_list[i]
         # print("\nChosen RFD:\n", chosen_rfd)
-        # print("\nRFD:\n", QueryRelaxer.rfd_to_string(chosen_rfd))
+        print("\nRFD:\n", QueryRelaxer.rfd_to_string(chosen_rfd))
 
         ################################################
         # @@@@@@@@@@@@__EXTENDED QUERY__@@@@@@@@@@@@@@@#
@@ -124,10 +124,10 @@ def start_process(arguments):
                                                                 data_set_df)
         # print("Query extended: ", extended_query)
         extended_query_expression = QueryRelaxer.query_dict_to_expr(extended_query)
-        # print("Query Extended Expr: ", extended_query_expression)
+        print("Query Extended Expr: ", extended_query_expression)
 
         query_extended_res_set = data_set_df.query(extended_query_expression)
-        # print("Query Extended Result Set:\n ", query_extended_res_set)
+        print("Query Extended Result Set:\n ", query_extended_res_set)
 
         # ++++++++++++++++++++++++RELAXING ROW BY ROW+++++++++++++++++++++++++++
         rows_df_list = Slicer.slice(query_extended_res_set)
@@ -185,7 +185,7 @@ def start_process(arguments):
 
                 # print("Relaxed Query: ", relaxed_query)
                 relaxed_query_expr = QueryRelaxer.query_dict_to_expr(relaxed_query)
-                # print("Relaxed Query expr: ", relaxed_query_expr)
+                print("Relaxed Query expr: ", relaxed_query_expr)
                 final_expr += relaxed_query_expr
                 if key is not last_key:
                     final_expr += " or "
@@ -195,7 +195,7 @@ def start_process(arguments):
             # reset index
             relaxed_result_set.reset_index(inplace=True, level=0, drop=True)
 
-            # print("\nRelaxed Result Set:\n", relaxed_result_set)
+            print("\nRelaxed Result Set:\n", relaxed_result_set)
 
             relaxed_query_result_set_size = relaxed_result_set.shape[0]
 
