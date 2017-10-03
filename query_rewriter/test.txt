@@ -2,3 +2,11 @@ dataset/cars_db.csv    {'model':'Focus'}    50    8551ms
 
 dataset/cars_db.csv    {'model':'%Focus%','price':{'min':7500,'max':8500}}    20    3183ms
 dataset/cars_db.csv    {'model':'%Focus%','price':{'min':7500,'max':8500}}    200    75328ms
+dataset/dataset.csv    {'height':169}    1    18ms
+dataset/dataset.csv    {'height':169}    1    27ms
+dataset/dataset.csv    {'height':169}    1    71ms
+dataset/dataset.csv    {'height':169}    1    26ms
+dataset/dataset.csv    {'height':169}    5    61ms
+dataset/dataset.csv    {'height':169}    5    39ms
+dataset/dataset.csv    {'height':169}    5    47ms
+dataset/dataset.csv    {'height':169}    5    58ms
