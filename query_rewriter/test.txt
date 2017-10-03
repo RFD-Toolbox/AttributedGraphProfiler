@@ -10,3 +10,4 @@ dataset/dataset.csv    {'height':169}    5    61ms
 dataset/dataset.csv    {'height':169}    5    39ms
 dataset/dataset.csv    {'height':169}    5    47ms
 dataset/dataset.csv    {'height':169}    5    58ms
+dataset/dataset.csv    {'height':169}    1    28ms
