@@ -1,5 +1,8 @@
 from setuptools import setup
-from pip.req import parse_requirements
+try: # for pip >= 10
+    from pip._internal.req import parse_requirements
+except ImportError: # for pip < 10
+    from pip.req import parse_requirements
 
 """Install the required packages and the lexical database WordNet"""
 
