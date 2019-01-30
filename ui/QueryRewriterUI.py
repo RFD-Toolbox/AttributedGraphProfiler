@@ -23,8 +23,14 @@ class QueryRewriterUI(QMainWindow):
         file_menu = menu_bar.addMenu('&File')
         # Open
         open_file_button = QAction('Open', self)
+        open_file_button.setShortcut("Ctrl+O")
         open_file_button.triggered.connect(self.open_file)
         file_menu.addAction(open_file_button)
+        # Exit
+        exit_button = QAction("Exit", self)
+        exit_button.setShortcut("Ctrl+X")
+        exit_button.triggered.connect(self.close)
+        file_menu.addAction(exit_button)
 
         self.setGeometry(0, 0, 900, 500)
 
