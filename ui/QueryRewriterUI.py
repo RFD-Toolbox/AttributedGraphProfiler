@@ -5,6 +5,8 @@ import csv
 from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFileDialog, QTableWidget, QTableWidgetItem, \
     QDesktopWidget, QVBoxLayout
 
+from ui.TabsWidget import TabsWidget
+
 
 class QueryRewriterUI(QMainWindow):
     def __init__(self):
@@ -38,6 +40,9 @@ class QueryRewriterUI(QMainWindow):
         # top left of rectangle becomes top left of window centering it
         self.move(qr.topLeft())
 
+        self.tabs = TabsWidget(self)
+        self.setCentralWidget(self.tabs)
+
         self.show()
 
     def open_file(self):
@@ -48,7 +53,9 @@ class QueryRewriterUI(QMainWindow):
         print("File Name: " + file_name)
 
         if file_name != "":
-            with open(file_name) as csv_file:
+            self.tabs.init_dataset_tab(file_name)
+            self.tabs.init_query_tab(file_name)
+            '''with open(file_name) as csv_file:
                 sniffer = csv.Sniffer()
                 dialect = sniffer.sniff(csv_file.readline())
                 csv_file.seek(0)
@@ -85,9 +92,10 @@ class QueryRewriterUI(QMainWindow):
                         table.setItem(data_row, col, QTableWidgetItem(row[col]))
                     data_row += 1
 
+                table.setSortingEnabled(True)
                 self.setCentralWidget(table)
                 layout = QVBoxLayout()
-                table.setLayout(layout)
+                table.setLayout(layout)'''
 
 
 if __name__ == '__main__':
