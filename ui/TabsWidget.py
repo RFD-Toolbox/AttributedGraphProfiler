@@ -32,8 +32,8 @@ class TabsWidget(QTabWidget):
         self.addTab(self.relax_tab, "RFDs")
 
     def init_dataset_tab(self, path: str):
-        csv_io: CSVInputOutput = CSVInputOutput()
-        self.data_frame: DataFrame = csv_io.load(path)
+        csv_parser: CSVParser = CSVParser(path)
+        self.data_frame: DataFrame = csv_parser.data_frame
         table = QTableView()
         pandas_model: QAbstractTableModel = PandasTableModel(self.data_frame, self.dataset_tab)
         table.setModel(pandas_model)
