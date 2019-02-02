@@ -1,16 +1,14 @@
-import csv
 import typing
 import copy
 
-from PyQt5.QtCore import QAbstractTableModel
+from PyQt5.QtCore import QAbstractTableModel, Qt
 from pandas import DataFrame
 
 from query_rewriter.io.csv.csv_parser import CSVParser
-from query_rewriter.io.csv.io import CSVInputOutput
 from ui.PandasTableModel import PandasTableModel
 
-from PyQt5.QtWidgets import QTabWidget, QWidget, QTableWidget, QTableWidgetItem, QVBoxLayout, QFormLayout, QLineEdit, \
-    QGroupBox, QLabel, QPushButton, QHBoxLayout, QGridLayout, QComboBox, QTableView
+from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QLineEdit, \
+    QGroupBox, QLabel, QPushButton, QGridLayout, QComboBox, QTableView, QScrollArea
 
 from query_rewriter.query.relaxer import QueryRelaxer
 
@@ -86,9 +84,14 @@ class TabsWidget(QTabWidget):
             combo.setCurrentIndex(1)
             combo.setCurrentIndex(0)
 
-            input_rows_layout.addWidget(self.line_labels[h], row, 0)
-            input_rows_layout.addWidget(self.line_combos[h], row, 1)
-            input_rows_layout.addWidget(self.line_edits[h], row, 2)
+            if row % 2 == 0:
+                input_rows_layout.addWidget(self.line_labels[h], row, 0)
+                input_rows_layout.addWidget(self.line_combos[h], row, 1)
+                input_rows_layout.addWidget(self.line_edits[h], row, 2)
+            else:
+                input_rows_layout.addWidget(self.line_labels[h], row - 1, 3)
+                input_rows_layout.addWidget(self.line_combos[h], row - 1, 4)
+                input_rows_layout.addWidget(self.line_edits[h], row - 1, 5)
 
         tab_layout = self.query_tab.layout()
         for i in reversed(range(tab_layout.count())):
