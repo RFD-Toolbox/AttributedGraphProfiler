@@ -109,28 +109,71 @@ class QueryRelaxer:
         :return: the string format corresponding to the query dictionary.
         :rtype:
         '''
-        last_key = list(query.keys())[-1]
+        first_key = list(query.keys())[0]
         expr = ""
         for k, v in query.items():
-            if isinstance(v, range):
-                expr += "{} >= {} and {} <= {}".format(k, v[0], k, v[-1])
-            elif isinstance(v, dict):
-                expr += " {} >= {} and {} <= {}".format(k, v['min'], k, v['max'])
-            elif isinstance(v, (int, float, list)):
-                expr += " {} == {}".format(k, v)
-            elif isinstance(v, str):
-                if "%" in v:
-                    if v.startswith("%") and v.endswith("%"):
-                        expr += k + ".str.contains('{}') ".format(v[1:-1])
-                    elif v.startswith("%"):
-                        expr += k + ".str.endswith('{}') ".format(v[1::])
-                    elif v.endswith("%"):
-                        expr += k + ".str.startswith('{}') ".format(v[:-1])
-                else:
-                    expr += " {} == '{}'".format(k, v)
-
-            if k is not last_key:
+            if k is not first_key and v:
                 expr += " and "
+            if v:
+                if isinstance(v, range):
+                    expr += "{} >= {} and {} <= {}".format(k, v[0], k, v[-1])
+                elif isinstance(v, dict):
+                    expr += " {} >= {} and {} <= {}".format(k, v['min'], k, v['max'])
+                elif isinstance(v, (int, float, list)):
+                    expr += " {} == {}".format(k, v)
+                elif isinstance(v, str):
+                    if "%" in v:
+                        if v.startswith("%") and v.endswith("%"):
+                            expr += k + ".str.contains('{}') ".format(v[1:-1])
+                        elif v.startswith("%"):
+                            expr += k + ".str.endswith('{}') ".format(v[1::])
+                        elif v.endswith("%"):
+                            expr += k + ".str.startswith('{}') ".format(v[:-1])
+                    else:
+                        expr += " {} == '{}'".format(k, v)
+        return expr
+
+    @staticmethod
+    def query_operator_values_to_expression(operator_values: dict):
+        '''
+        Converts the query operators and values dictionaries to the string format required by Pandas.DataFrame.Query() method.
+        :param operator_values: the Query dictionary of operator and values column ==> (operator, value).
+        :return: the string format corresponding to the query dictionary.
+        :rtype:
+        '''
+
+        operator_values = dict(filter(lambda item: item[1][1] != "", operator_values.items()))
+        print("After filter")
+        print("Keys:")
+        print(operator_values.keys())
+        print("Values:")
+        print(operator_values.values())
+
+        first_key = list(operator_values.keys())[0]
+        expr = ""
+
+        for key, (operator, value) in operator_values.items():
+            if value:  # check if there is a value
+                if key is not first_key:
+                    expr += " and "
+
+                if operator == "=":
+                    expr += " {} == {}".format(key, value)
+                elif operator == "~":
+                    expr += "{}.str.contains('{}') ".format(key, value)
+                elif operator == "∈":
+                    expr += " {} == {}".format(key, value)
+                elif operator == ">":
+                    expr += " {} > {}".format(key, value)
+                elif operator == ">=":
+                    expr += " {} >= {}".format(key, value)
+                elif operator == "<":
+                    expr += " {} < {}".format(key, value)
+                elif operator == "<=":
+                    expr += " {} <= {}".format(key, value)
+                elif operator == "!=":
+                    expr += " {} != {}".format(key, value)
+
         return expr
 
     @staticmethod
@@ -157,7 +200,7 @@ class QueryRelaxer:
                     elif isinstance(val, dict):
                         val['min'] -= threshold
                         val['max'] += threshold
-                        #print("MIN MAX", val)
+                        # print("MIN MAX", val)
                         query[key] = val
                     elif isinstance(val, str):
                         if "%" not in val:
@@ -171,23 +214,23 @@ class QueryRelaxer:
 
                             if val.startswith("%") and val.endswith("%"):
                                 wanted_string = val[1:-1]
-                                #print("WANTED STRING:", wanted_string)
+                                # print("WANTED STRING:", wanted_string)
                                 strings_like_this = data_set[data_set[key].str.match('.*' + wanted_string + '.*')][
                                     key].tolist()
-                                #print("STRINGS LIKE THIS:\n", strings_like_this)
+                                # print("STRINGS LIKE THIS:\n", strings_like_this)
 
                             elif val.startswith("%"):
                                 wanted_string = val[1::]
-                                #print("WANTED STRING:", wanted_string)
+                                # print("WANTED STRING:", wanted_string)
                                 strings_like_this = data_set[
                                     data_set[key].str.match('.*' + wanted_string + '.*')][key].tolist()
-                                #print("STRINGS LIKE THIS:\n", strings_like_this)
+                                # print("STRINGS LIKE THIS:\n", strings_like_this)
                             elif val.endswith("%"):
                                 wanted_string = val[:-1]
-                                #print("WANTED STRING:", wanted_string)
+                                # print("WANTED STRING:", wanted_string)
                                 strings_like_this = data_set[
                                     data_set[key].str.match('.*' + wanted_string + '.*')][key].tolist()
-                                #print("STRINGS LIKE THIS:\n", strings_like_this)
+                                # print("STRINGS LIKE THIS:\n", strings_like_this)
 
                             for source in strings_like_this:
                                 simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,

@@ -123,14 +123,16 @@ class TabsWidget(QTabWidget):
         print("Clicked")
         operators: dict[str, str] = {}
         values: dict[str, str] = {}
+        operator_values: dict[str, (str, str)] = {}
 
         for header, line in self.line_edits.items():
-            operators[header] = self.line_combos[header]
+            operators[header] = self.line_combos[header].currentText()
             values[header] = line.text()
+            operator_values[header] = (operators[header], values[header])
             print(header + " " + self.line_combos[header].currentText() + " " + line.text())
 
         print("OriginalQuery: ", values)
-        original_query_expression = QueryRelaxer.query_dict_to_expr(values)
+        original_query_expression = QueryRelaxer.query_operator_values_to_expression(operator_values)
         print("OriginalQuery expr: ", original_query_expression)
         original_query_result_set: DataFrame = self.csv_parser.data_frame.query(original_query_expression)
         print("Original Query Result Set:\n", original_query_result_set)
