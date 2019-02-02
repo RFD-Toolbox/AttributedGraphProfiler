@@ -36,3 +36,13 @@ class PandasTableModel(QAbstractTableModel):
         self.layoutAboutToBeChanged.emit()
         self._data = self._data.sort_values(self._headers[column], ascending=order == Qt.AscendingOrder)
         self.layoutChanged.emit()
+
+    def update_data(self, data: pd.DataFrame):
+        self.layoutAboutToBeChanged.emit()
+        self._data = data
+        self.layoutChanged.emit()
+        self.dataChanged.emit(self.createIndex(0, 0),
+                              self.createIndex(self.rowCount(0),
+                                               self.columnCount(0)))
+
+
