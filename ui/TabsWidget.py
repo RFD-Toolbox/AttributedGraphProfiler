@@ -8,7 +8,7 @@ from query_rewriter.io.csv.csv_parser import CSVParser
 from ui.PandasTableModel import PandasTableModel
 
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QLineEdit, \
-    QGroupBox, QLabel, QPushButton, QGridLayout, QComboBox, QTableView, QScrollArea, QHBoxLayout
+    QGroupBox, QLabel, QPushButton, QGridLayout, QComboBox, QTableView, QScrollArea
 
 from query_rewriter.query.relaxer import QueryRelaxer
 
@@ -16,18 +16,31 @@ from query_rewriter.query.relaxer import QueryRelaxer
 class TabsWidget(QTabWidget):
     def __init__(self, parent: typing.Optional[QWidget] = ...) -> None:
         super().__init__(parent)
-        self.dataset_tab = QWidget()
-        self.dataset_tab.setLayout(QVBoxLayout())
 
-        self.query_tab = QWidget()
-        self.query_tab.setLayout(QVBoxLayout())
+        # DataSet Tab
+        self.dataset_tab = QScrollArea()
+        self.dataset_tab_content_widget = QWidget()
+        self.dataset_tab.setWidget(self.dataset_tab_content_widget)
+        self.dataset_tab.setWidgetResizable(True)
+        self.dataset_tab_layout = QVBoxLayout(self.dataset_tab_content_widget)
 
-        self.relax_tab = QWidget()
-        self.relax_tab.setLayout(QVBoxLayout())
+        # Query Tab
+        self.query_tab = QScrollArea()
+        self.query_tab_content_widget = QWidget()
+        self.query_tab.setWidget(self.query_tab_content_widget)
+        self.query_tab.setWidgetResizable(True)
+        self.query_tab_layout = QVBoxLayout(self.query_tab_content_widget)
+
+        # RFDs Tab
+        self.rfds_tab = QScrollArea()
+        self.rfds_tab_content_widget = QWidget()
+        self.rfds_tab.setWidget(self.rfds_tab_content_widget)
+        self.rfds_tab.setWidgetResizable(True)
+        self.rfds_tab_layout = QVBoxLayout(self.rfds_tab_content_widget)
 
         self.addTab(self.dataset_tab, "Dataset")
         self.addTab(self.query_tab, "Query")
-        self.addTab(self.relax_tab, "RFDs")
+        self.addTab(self.rfds_tab, "RFDs")
 
     def init_dataset_tab(self, path: str):
         csv_parser: CSVParser = CSVParser(path)
@@ -42,15 +55,10 @@ class TabsWidget(QTabWidget):
         print("DTypes:")
         print(self.data_frame.dtypes)
 
-        layout = QVBoxLayout()
-        table.setLayout(layout)
+        for i in reversed(range(self.dataset_tab_layout.count())):
+            self.dataset_tab_layout.itemAt(i).widget().deleteLater()
 
-        tab_layout = self.dataset_tab.layout()
-
-        for i in reversed(range(tab_layout.count())):
-            tab_layout.itemAt(i).widget().deleteLater()
-
-        tab_layout.addWidget(table)
+        self.dataset_tab_layout.addWidget(table)
 
     def init_query_tab(self, path: str):
         self.csv_parser: CSVParser = CSVParser(path)
@@ -84,6 +92,7 @@ class TabsWidget(QTabWidget):
 
             self.line_combos[h] = combo
             self.line_edits[h] = QLineEdit()
+            self.line_edits[h].returnPressed.connect(lambda: self.query_click())
 
             combo.currentTextChanged.connect(lambda ix, key=h, select=combo: self.combo_changed(select, key))
             combo.setCurrentIndex(1)
@@ -98,24 +107,24 @@ class TabsWidget(QTabWidget):
                 input_rows_layout.addWidget(self.line_combos[h], row - 1, 4)
                 input_rows_layout.addWidget(self.line_edits[h], row - 1, 5)
 
-        tab_layout = self.query_tab.layout()
-        for i in reversed(range(tab_layout.count())):
-            tab_layout.itemAt(i).widget().deleteLater()
+        for i in reversed(range(self.query_tab_layout.count())):
+            self.query_tab_layout.itemAt(i).widget().deleteLater()
 
-        tab_layout.addWidget(groupBox)
+        self.query_tab_layout.addWidget(groupBox)
 
         box2 = QGroupBox()
         grid_layout = QGridLayout()
         box2.setLayout(grid_layout)
 
         query_button = QPushButton("Query")
+        query_button.setAutoDefault(True)
         grid_layout.addWidget(query_button, 0, 0, 1, 1)
-        query_button.clicked.connect(lambda checked: self.query_click())
+        query_button.clicked.connect(lambda: self.query_click())
 
         self.query_label = QLabel("", box2)
         grid_layout.addWidget(self.query_label, 0, 1, 1, 4)
 
-        tab_layout.addWidget(box2)
+        self.query_tab_layout.addWidget(box2)
 
         self._query_data_frame = copy.deepcopy(self.data_frame)
 
@@ -125,13 +134,12 @@ class TabsWidget(QTabWidget):
         table.setSortingEnabled(True)
         table.resizeColumnsToContents()
         table.resizeRowsToContents()
+        table.setMinimumHeight(200)
 
         layout = QVBoxLayout()
         table.setLayout(layout)
 
-        tab_layout = self.query_tab.layout()
-
-        tab_layout.addWidget(table)
+        self.query_tab_layout.addWidget(table)
 
     def query_click(self):
         print("Clicked")
