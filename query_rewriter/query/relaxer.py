@@ -142,7 +142,11 @@ class QueryRelaxer:
         :rtype:
         '''
 
-        operator_values = dict(filter(lambda item: item[1][1] != "", operator_values.items()))
+        operator_values = dict(filter(lambda item: item[1][1], operator_values.items()))
+
+        if not list(operator_values.keys()):
+            return "ilevel_0 in ilevel_0"
+
         print("After filter")
         print("Keys:")
         print(operator_values.keys())
@@ -158,21 +162,32 @@ class QueryRelaxer:
                     expr += " and "
 
                 if operator == "=":
-                    expr += " {} == {}".format(key, value)
+                    if isinstance(value, (int, float)):
+                        expr += " {} == {}".format(key, value)
+                    elif isinstance(value, str):
+                        expr += " {} == '{}'".format(key, value)
                 elif operator == "~":
-                    expr += "{}.str.contains('{}') ".format(key, value)
-                elif operator == "∈":
-                    expr += " {} == {}".format(key, value)
-                elif operator == ">":
-                    expr += " {} > {}".format(key, value)
-                elif operator == ">=":
-                    expr += " {} >= {}".format(key, value)
-                elif operator == "<":
-                    expr += " {} < {}".format(key, value)
-                elif operator == "<=":
-                    expr += " {} <= {}".format(key, value)
+                    if isinstance(value, str):
+                        expr += "{}.str.contains('{}') ".format(key, value)
                 elif operator == "!=":
-                    expr += " {} != {}".format(key, value)
+                    if isinstance(value, (int, float)):
+                        expr += " {} != {}".format(key, value)
+                    elif isinstance(value, str):
+                        expr += " {} != '{}'".format(key, value)
+                elif operator == "∈":
+                    if isinstance(value, list):
+                        expr += " {} in {}".format(key, value)
+                elif operator == "∉":
+                    if isinstance(value, list):
+                        expr += " {} not in {}".format(key, value)
+                elif operator == ">":
+                    expr += " {} > '{}'".format(key, value)
+                elif operator == ">=":
+                    expr += " {} >= '{}'".format(key, value)
+                elif operator == "<":
+                    expr += " {} < '{}'".format(key, value)
+                elif operator == "<=":
+                    expr += " {} <= '{}'".format(key, value)
 
         return expr
 
