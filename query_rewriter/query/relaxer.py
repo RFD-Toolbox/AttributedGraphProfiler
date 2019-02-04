@@ -220,9 +220,9 @@ class QueryRelaxer:
                     elif isinstance(val, str):
                         if "%" not in val:
                             source = val
-                            simil_string = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
+                            simil_strings = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
                                                                         threshold=threshold)
-                            query[key] = simil_string
+                            query[key] = simil_strings
                         else:
                             simil_strings = []
                             strings_like_this = None

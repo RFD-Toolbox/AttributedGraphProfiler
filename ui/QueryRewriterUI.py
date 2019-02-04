@@ -53,14 +53,15 @@ class QueryRewriterUI(QMainWindow):
 
     def open_file(self):
         open_file_dialog = QFileDialog(self)
-        file_name, _filter = open_file_dialog.getOpenFileName(parent=self,
-                                                              directory=os.getenv("HOME"),
-                                                              filter="CSV(*.csv)")
-        print("File Name: " + file_name)
+        csv_path, _filter = open_file_dialog.getOpenFileName(parent=self,
+                                                             directory=os.getenv("HOME"),
+                                                             filter="CSV(*.csv)")
+        print("File Name: " + csv_path)
 
-        if file_name != "":
-            self.tabs.init_dataset_tab(file_name)
-            self.tabs.init_query_tab(file_name)
+        if csv_path != "":
+            self.tabs.init_dataset_tab(csv_path)
+            self.tabs.init_query_tab(csv_path)
+            self.tabs.init_rfds_tab(csv_path)
             '''with open(file_name) as csv_file:
                 sniffer = csv.Sniffer()
                 dialect = sniffer.sniff(csv_file.readline())

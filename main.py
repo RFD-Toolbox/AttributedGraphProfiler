@@ -56,12 +56,12 @@ def main(args):
                                           datetime=has_date_time)
                 else:  # has header
                     distance_matrix = DiffMatrix(csv_file,
-                                          sep=separator_character,
-                                          first_col_header=has_header,
-                                          semantic=semantic,
-                                          index_col=index_column,
-                                          missing=missing,
-                                          datetime=has_date_time)
+                                                 sep=separator_character,
+                                                 first_row_header=has_header,
+                                                 semantic=semantic,
+                                                 index_col=index_column,
+                                                 missing=missing,
+                                                 datetime=has_date_time)
             for combination in half_sides_specifications:
                 combination_distance_matrix = distance_matrix.split_sides(combination)
                 with ut.timeit_context("RFD Discover time for {}".format(str(combination))):

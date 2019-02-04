@@ -6,6 +6,7 @@ from warnings import simplefilter, warn
 
 """This module contain utility code used all over the project"""
 
+
 @contextmanager
 def timeit_context(name):
     """
@@ -40,8 +41,8 @@ def check_sep_n_header(csv_file):
 
 def get_hs_combination(col_len: int) -> list:
     """
-    Given a number of column, it generate all the combination of lhs and rhs
-    :param col_len: column's number
+    Given a number of column, it generate all the combinations of lhs and rhs
+    :param col_len: columns number
     :type col_len: int
     :return: list of dict where each element containing a combination
     :rtype: list
@@ -73,9 +74,11 @@ def deprecated(func):
     :param func: the decorated function
     :type func: function
     """
+
     def new_funct(*args, **kwargs):
         simplefilter('always', DeprecationWarning)
         warn('Call to deprecated function {}'.format(func.__name__), category=DeprecationWarning, stacklevel=2)
         simplefilter('default', DeprecationWarning)
         return func(*args, **kwargs)
+
     return new_funct

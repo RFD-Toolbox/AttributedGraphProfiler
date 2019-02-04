@@ -29,7 +29,7 @@ class RFDExtractor:
     index_column = None
     human_readable = None
     # ==========================================================================
-    half_sides_specifications = None
+    hand_sides_specifications = None
     '''
     A list containing all the possible combinations of LHS & RHS indexes.
     '''
@@ -50,14 +50,14 @@ class RFDExtractor:
         self.args = args
         self.debug_mode = debug_mode
         self.separator_character, self.csv_file, self.has_header, self.semantic, self.has_date_time, self.missing, \
-        self.index_column, self.human_readable, self.half_sides_specifications = self.extract_args(self.args)
+        self.index_column, self.human_readable, self.hand_sides_specifications = self.extract_args(self.args)
 
         self.csv_parser = CSVParser(self.csv_file)
         self.data_frame = self.csv_parser.data_frame
         self.header = self.csv_parser.header
 
         try:
-            self.check_correctness(self.has_date_time, self.half_sides_specifications, self.index_column)
+            self.check_correctness(self.has_date_time, self.hand_sides_specifications, self.index_column)
         except getopt.GetoptError as gex:
             self.usage()
             print(str(gex))
@@ -67,9 +67,9 @@ class RFDExtractor:
             print(str(aex))
             sys.exit(1)
 
-        if self.half_sides_specifications is None:
+        if self.hand_sides_specifications is None:
             self.usage()
-        elif isinstance(self.half_sides_specifications, list):
+        elif isinstance(self.hand_sides_specifications, list):
             if isinstance(self.has_header, int) and not self.has_header:
                 self.distance_matrix = DiffMatrix(self.csv_file,
                                                   sep=self.separator_character,
@@ -80,14 +80,14 @@ class RFDExtractor:
             else:  # has header
                 self.distance_matrix = DiffMatrix(self.csv_file,
                                                   sep=self.separator_character,
-                                                  first_col_header=self.has_header,
+                                                  first_row_header=self.has_header,
                                                   semantic=self.semantic,
                                                   index_col=self.index_column,
                                                   missing=self.missing,
                                                   datetime=self.has_date_time)
 
-            self.rfd_data_frame_list = list()
-            for combination in self.half_sides_specifications:
+            self.rfd_data_frame_list: list[pd.DataFrame] = list()
+            for combination in self.hand_sides_specifications:
                 '''
                 combination is a dictionary containing rhs & lhs as keys,
                 and a list of the corresponding indexes as valus.
@@ -102,7 +102,7 @@ class RFDExtractor:
                 '''with ut.timeit_context("RFD Discover time for Combination {}".format(str(combination))):'''
                 rfd_discovery = RFDDiscovery(combination_distance_matrix)
                 self.rfd_data_frame_list.append(
-                    rfd_discovery.get_rfds(rfd_discovery.standard_algorithm, combination))
+                    rfd_discovery.get_rfds(rfd_discovery.standard_algorithm(), combination))
 
                 if self.debug_mode:
                     print("\nCombination:", combination)
@@ -143,9 +143,10 @@ class RFDExtractor:
             # Default values
             c_sep, has_header, semantic, has_dt, missing, ic, human = '', 0, True, False, "?", False, False
             csv_file = ''
-            left_half_side = []
-            right_half_side = []
+            left_hand_side = []
+            right_hand_side = []
             options, args = getopt.getopt(args, "c:r:l:s:hm:d:vi:", ["semantic", "help", "human"])
+
             for option, arg in options:
                 if option == '-v':
                     print("rdf-discovery version 0.0.1")
@@ -153,12 +154,12 @@ class RFDExtractor:
                 if option == '-c':
                     csv_file = arg
                 elif option == '-r':
-                    right_half_side = [int(arg)]
-                    if len(right_half_side) > 1:
+                    right_hand_side = [int(arg)]
+                    if len(right_hand_side) > 1:
                         print("You can specify at most 1 RHS attribute")
                         sys.exit(-1)
                 elif option == '-l':
-                    left_half_side = [int(_) for _ in arg.split(',')]
+                    left_hand_side = [int(_) for _ in arg.split(',')]
                 elif option == '-s':
                     c_sep = arg
                 elif option == '-h':
@@ -195,14 +196,15 @@ class RFDExtractor:
                 c_sep = c_sep_
             if has_header is None:
                 has_header = has_header_
-            cols_count = ut.get_cols_count(csv_file, c_sep)
-            half_sides_specifications = self.extract_hss(cols_count, left_half_side, right_half_side)
+            cols_count: int = ut.get_cols_count(csv_file, c_sep)
+            hand_sides_specifications: list = self.extract_hss(cols_count, left_hand_side, right_hand_side)
         except Exception as ex:
             print("Error while trying to understand arguments: {}".format(str(ex)))
             sys.exit(-1)
-        return c_sep, csv_file, has_header, semantic, has_dt, missing, ic, human, half_sides_specifications
+        return c_sep, csv_file, has_header, semantic, has_dt, missing, ic, human, hand_sides_specifications
 
-    def extract_hss(self, cols_count, lhs, rhs):
+    @staticmethod
+    def extract_hss(cols_count, lhs=[], rhs=[]) -> list:
         # You cannot have len(rhs) > 1, don't check it
         """
         Given the lhs and rhs from the command line parameters, and the column's number of the dataset,
@@ -221,21 +223,21 @@ class RFDExtractor:
         :rtype: list
         """
         if rhs == [] and lhs == []:  # each combination case
-            hss = ut.get_hs_combination(cols_count)
+            hand_sides_specs = ut.get_hs_combination(cols_count)
         elif rhs == [] and not lhs == []:  # error case
             print("You have to specify at least one RHS attribute")
             sys.exit(-1)
         elif not rhs == [] and lhs == []:  # only rhs specified case
-            cols_index = list(range(cols_count))
-            if not rhs[0] in cols_index:
+            cols_indexes = list(range(cols_count))
+            if not rhs[0] in cols_indexes:
                 print("RHS index is out of bound. Specify a valid value")
                 sys.exit(-1)
-            hss = list()
-            hss.append({'rhs': rhs, 'lhs': cols_index[:rhs[0]] + cols_index[rhs[0] + 1:]})
+            hand_sides_specs: list[dict] = list()
+            hand_sides_specs.append({'rhs': rhs, 'lhs': cols_indexes[:rhs[0]] + cols_indexes[rhs[0] + 1:]})
         else:
-            hss = list()
-            hss.append({'rhs': rhs, 'lhs': lhs})
-        return hss
+            hand_sides_specs = list()
+            hand_sides_specs.append({'rhs': rhs, 'lhs': lhs})
+        return hand_sides_specs
 
     def extract_sep_n_header(self, c_sep, csv_file, has_header):
         """

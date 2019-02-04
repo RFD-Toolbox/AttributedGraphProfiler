@@ -98,7 +98,7 @@ class MyTestCase(unittest.TestCase):
         start_time_dist = time.time()
         logging.info("Creating class DiffMatrix")
         logging.info("Class DiffMatrix created. Now loading file...")
-        diff_matrix = DiffMatrix(current_ds, sep=c_sep, first_col_header=has_header)
+        diff_matrix = DiffMatrix(current_ds, sep=c_sep, first_row_header=has_header)
         logging.info("File loaded. Now computing distance matrix...")
         logging.info("Computing distance matrix finish. Let's do the true work")
         end_time_dist = time.time()

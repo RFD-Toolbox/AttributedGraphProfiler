@@ -1,4 +1,5 @@
 import pandas as pd
+from pandas import DataFrame
 
 from query_rewriter.io.csv.io import CSVInputOutput
 from query_rewriter.io.rfd.rfd_extractor import RFDExtractor
@@ -14,7 +15,7 @@ def diff(list1: list, list2: list):
     return [item for item in list1 if item not in list2]
 
 
-def search_rfds(csvPath,name_rfds_file):
+def discover_rfds(csvPath, name_rfds_file):
     '''
     This method calls algorithm of RFDs Discovery and create a file containing list of RFDs and returning its path
     :param csvPath: path of Dataset on which call algorithm of RFDD
@@ -24,7 +25,7 @@ def search_rfds(csvPath,name_rfds_file):
     print("Store&Load RFDs")
     args = ["-c", csvPath, "--human"]
     rfd_extractor = RFDExtractor(args, False)
-    rfds_df_list = rfd_extractor.rfd_data_frame_list
+    rfds_df_list: list[DataFrame] = rfd_extractor.rfd_data_frame_list
     csv_main_header = rfd_extractor.header
     print("CSV Main Header:", csv_main_header, end="\n\n")
     ad_hoc_rfds_df_list = list()
@@ -55,7 +56,7 @@ def search_rfds(csvPath,name_rfds_file):
     for rfd_df in ad_hoc_rfds_df_list:
         print(rfd_df, end="\n\n")
 
-    ad_hoc_all_rfds_df: pd.DataFrame = pd.concat([rfd_df for rfd_df in ad_hoc_rfds_df_list], axis=0, ignore_index=True)
+    ad_hoc_all_rfds_df: DataFrame = pd.concat([rfd_df for rfd_df in ad_hoc_rfds_df_list], axis=0, ignore_index=True)
     # ad_hoc_all_rfds_df.reset_index(drop=True, inplace=True)
     ad_hoc_all_rfds_df = ad_hoc_all_rfds_df.round(decimals=2)
     print("Ad hoc all rfds df")
@@ -72,7 +73,7 @@ def search_rfds(csvPath,name_rfds_file):
 
 def main():
     print("Store&Load RFDs")
-    args = ["-c", "../../dataset/cora.csv", "--human"]
+    args = ["-c", "../../dataset/dataset.csv", "--human"]
     rfd_extractor = RFDExtractor(args, False)
     rfds_df_list = rfd_extractor.rfd_data_frame_list
     csv_main_header = rfd_extractor.header
@@ -105,7 +106,7 @@ def main():
     for rfd_df in ad_hoc_rfds_df_list:
         print(rfd_df, end="\n\n")
 
-    ad_hoc_all_rfds_df: pd.DataFrame = pd.concat([rfd_df for rfd_df in ad_hoc_rfds_df_list], axis=0, ignore_index=True)
+    ad_hoc_all_rfds_df: DataFrame = pd.concat([rfd_df for rfd_df in ad_hoc_rfds_df_list], axis=0, ignore_index=True, sort=True)
     # ad_hoc_all_rfds_df.reset_index(drop=True, inplace=True)
     ad_hoc_all_rfds_df = ad_hoc_all_rfds_df.round(decimals=2)
     print("Ad hoc all rfds df")
