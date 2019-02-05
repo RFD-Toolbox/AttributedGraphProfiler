@@ -8,6 +8,7 @@ from dominance.dominance_tools import RFDDiscovery
 from loader.distance_mtr import DiffMatrix
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.io.rfd.rfd_extractor import RFDExtractor
+from query_rewriter.utils.Transformer import Transformer
 from ui.PandasTableModel import PandasTableModel
 
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QLineEdit, \
@@ -317,3 +318,5 @@ class TabsWidget(QTabWidget):
         for df in self.rfd_data_frame_list:
             print("\n")
             print(df)
+            print("\n")
+            rfds = Transformer.rfd_data_frame_to_rfd_list(df, self.header)

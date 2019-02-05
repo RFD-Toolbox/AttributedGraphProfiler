@@ -1,8 +1,11 @@
+from numpy import NaN
+
+
 class RFD(dict):
     def __init__(self, lhs: dict = {}, rhs: dict = {}) -> None:
         super().__init__()
-        self["LHS"]: dict[str, float] = lhs
-        self["RHS"]: dict[str, float] = rhs
+        self["LHS"]: dict[str, float | NaN] = lhs
+        self["RHS"]: dict[str, float | NaN] = rhs
 
     def get_left_hand_side(self) -> dict:
         return self["LHS"]
