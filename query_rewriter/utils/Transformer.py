@@ -1,4 +1,4 @@
-from numpy import diff
+from numpy import diff, NaN, isnan
 from pandas import DataFrame
 from query_rewriter.io.rfd.store_load_rfds import diff
 
@@ -12,24 +12,17 @@ class Transformer:
 
         rfd_df_header = list(rfd_df)
         rhs_column = diff(header, rfd_df_header)[0]
-        print("RHS COLUMN: " + rhs_column)
 
         lhs_columns = diff(header, rhs_column)
-        print("LHS COLUMNS: " + str(lhs_columns))
 
         rfd_df.rename(columns={"RHS": rhs_column}, inplace=True)
 
         for index, row in rfd_df.iterrows():
-            print("ROW:")
-            print(row.to_frame().T)
 
-            lhs: list[dict] = {key: row[key] for key in lhs_columns}
+            lhs: list[dict] = {key: row[key] for key in lhs_columns if not isnan(row[key])}
             rhs: list[dict] = {rhs_column: row[rhs_column]}
 
             rfd = RFD(lhs, rhs)
-
-            print("RFD:")
-            print(rfd)
 
             rfds.append(rfd)
 

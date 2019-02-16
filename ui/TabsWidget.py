@@ -12,7 +12,7 @@ from query_rewriter.utils.Transformer import Transformer
 from ui.PandasTableModel import PandasTableModel
 
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QLineEdit, \
-    QGroupBox, QLabel, QPushButton, QGridLayout, QComboBox, QTableView, QScrollArea, QHBoxLayout
+    QGroupBox, QLabel, QPushButton, QGridLayout, QComboBox, QTableView, QScrollArea, QHBoxLayout, QListWidget
 
 from query_rewriter.query.relaxer import QueryRelaxer
 
@@ -46,10 +46,13 @@ class TabsWidget(QTabWidget):
         self.addTab(self.query_tab, "Query")
         self.addTab(self.rfds_tab, "RFDs")
 
+        self.rfds: list = []
+
     def init_dataset_tab(self, path: str):
         self.path = path
         csv_parser: CSVParser = CSVParser(path)
         self.data_frame: DataFrame = csv_parser.data_frame
+        (self.rows_count, self.columns_count) = self.data_frame.shape
         self.header = csv_parser.header
         table = QTableView()
         pandas_model: QAbstractTableModel = PandasTableModel(self.data_frame, self.dataset_tab)
@@ -245,9 +248,11 @@ class TabsWidget(QTabWidget):
             self.line_edits[key].setValidator(input_validator)
 
     def init_rfds_tab(self, path: str):
-        # Cleaning
         for i in reversed(range(self.rfds_tab_layout.count())):
             self.rfds_tab_layout.itemAt(i).widget().deleteLater()
+
+        self.rfds_list_wrapper = QGroupBox()
+        self.rfds_list_wrapper_layout = QVBoxLayout(self.rfds_list_wrapper)
 
         self.path = path
         group = QGroupBox()
@@ -275,11 +280,17 @@ class TabsWidget(QTabWidget):
         print("Loading RFDs")
 
     def discover_rfds(self):
+        # Cleaning
+        for i in reversed(range(self.rfds_list_wrapper_layout.count())):
+            self.rfds_list_wrapper_layout.itemAt(i).widget().deleteLater()
+
+        self.rfds = []
         print("Discovering RFDs")
         print("Header: " + str(self.header))
 
-        columns_count = len(self.header)
-        print("Columns count: " + str(columns_count))
+        columns_count = self.columns_count
+        print("Columns count: " + str(self.columns_count))
+        print("Rows count: " + str(self.rows_count))
 
         print("Separator: " + str(self.separator))
 
@@ -313,10 +324,18 @@ class TabsWidget(QTabWidget):
             self.rfd_data_frame_list.append(
                 rfd_discovery.get_rfds(rfd_discovery.standard_algorithm, combination))
 
-        print("\nRFDs list: ")
-
         for df in self.rfd_data_frame_list:
-            print("\n")
-            print(df)
-            print("\n")
-            rfds = Transformer.rfd_data_frame_to_rfd_list(df, self.header)
+            # print("\n")
+            # print(df)
+            # print("\n")
+            self.rfds.extend(Transformer.rfd_data_frame_to_rfd_list(df, self.header))
+
+        list_widget = QListWidget()
+
+        print("\nRFDs list: ")
+        for rfd in self.rfds:
+            print(rfd)
+            list_widget.addItem(str(rfd).replace("{", "(").replace("}", ")"))
+
+            self.rfds_list_wrapper_layout.addWidget(list_widget)
+            self.rfds_tab_layout.addWidget(self.rfds_list_wrapper)
