@@ -1,5 +1,7 @@
 import typing
 import copy
+
+from PyQt5 import QtCore
 from PyQt5.QtCore import QAbstractTableModel, Qt, QRegExp
 from PyQt5.QtGui import QRegExpValidator
 from pandas import DataFrame
@@ -8,11 +10,13 @@ from dominance.dominance_tools import RFDDiscovery
 from loader.distance_mtr import DiffMatrix
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.io.rfd.rfd_extractor import RFDExtractor
+from query_rewriter.model.RFD import RFD
 from query_rewriter.utils.Transformer import Transformer
 from ui.PandasTableModel import PandasTableModel
 
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QLineEdit, \
-    QGroupBox, QLabel, QPushButton, QGridLayout, QComboBox, QTableView, QScrollArea, QHBoxLayout, QListWidget
+    QGroupBox, QLabel, QPushButton, QGridLayout, QComboBox, QTableView, QScrollArea, QHBoxLayout, QListWidget, \
+    QListWidgetItem
 
 from query_rewriter.query.relaxer import QueryRelaxer
 
@@ -330,12 +334,31 @@ class TabsWidget(QTabWidget):
             # print("\n")
             self.rfds.extend(Transformer.rfd_data_frame_to_rfd_list(df, self.header))
 
-        list_widget = QListWidget()
+        self.list_widget = QListWidget()
 
         print("\nRFDs list: ")
         for rfd in self.rfds:
             print(rfd)
-            list_widget.addItem(str(rfd).replace("{", "(").replace("}", ")"))
 
-            self.rfds_list_wrapper_layout.addWidget(list_widget)
+            item = QListWidgetItem()
+            item.setText(str(rfd).replace("{", "(").replace("}", ")"))
+            item.setData(QtCore.Qt.UserRole, rfd)
+
+            self.list_widget.addItem(item)
+
+            #list_widget.addItem(str(rfd).replace("{", "(").replace("}", ")"))
+
+            self.rfds_list_wrapper_layout.addWidget(self.list_widget)
             self.rfds_tab_layout.addWidget(self.rfds_list_wrapper)
+
+        #combo.currentTextChanged.connect(lambda ix, key=h, select=combo: self.combo_changed(select, key))
+        self.list_widget.currentItemChanged.connect(self.rfd_selected)
+
+    def rfd_selected(self, current: QListWidgetItem, previous: QListWidgetItem):
+        print("RFD selected")
+
+        if previous:
+            print("Previous: " + str(previous.data(QtCore.Qt.UserRole)))
+
+        if current:
+            print("Current: " + str(current.data(QtCore.Qt.UserRole)))
