@@ -1,10 +1,10 @@
 import typing
 import copy
-
 from PyQt5.QtCore import QAbstractTableModel, Qt, QRegExp
 from PyQt5.QtGui import QRegExpValidator
-from pandas import DataFrame
+from pandas import DataFrame, Series
 import networkx as nx
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy import ndarray
 from pandas.compat import reduce
@@ -428,7 +428,9 @@ class TabsWidget(QTabWidget):
 
             graph = nx.from_numpy_matrix(adjacency_matrix)
 
-            df = self.data_frame.loc[sorted(nx.connected_components(graph), key=len)[-1], :]
+            max_clique = max(nx.clique.find_cliques(graph), key=len)
+            df = self.data_frame.loc[max_clique, :]
 
+            print("RFD: " + str(rfd))
             print("RFD Subset:")
             print(df)
