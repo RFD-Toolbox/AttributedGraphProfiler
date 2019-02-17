@@ -293,7 +293,7 @@ class TabsWidget(QTabWidget):
         self.rfd_data_set_table = QTableView()
         self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.rfds_tab_layout)
         self.rfd_data_set_table.setModel(self.pandas_model)
-        self.rfd_data_set_table.setSortingEnabled(True)
+        self.rfd_data_set_table.setSortingEnabled(False)
         self.rfd_data_set_table.resizeColumnsToContents()
         self.rfd_data_set_table.resizeRowsToContents()
         self.rfd_data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
