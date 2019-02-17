@@ -1,10 +1,13 @@
 import typing
 import copy
 
-from PyQt5 import QtCore
 from PyQt5.QtCore import QAbstractTableModel, Qt, QRegExp
 from PyQt5.QtGui import QRegExpValidator
 from pandas import DataFrame
+import networkx as nx
+import numpy as np
+from numpy import ndarray
+from pandas.compat import reduce
 
 from dominance.dominance_tools import RFDDiscovery
 from loader.distance_mtr import DiffMatrix
@@ -64,6 +67,9 @@ class TabsWidget(QTabWidget):
         table.setSortingEnabled(True)
         table.resizeColumnsToContents()
         table.resizeRowsToContents()
+
+        print("DataFrame:")
+        print(self.data_frame)
 
         print("DTypes:")
         print(self.data_frame.dtypes)
@@ -342,23 +348,87 @@ class TabsWidget(QTabWidget):
 
             item = QListWidgetItem()
             item.setText(str(rfd).replace("{", "(").replace("}", ")"))
-            item.setData(QtCore.Qt.UserRole, rfd)
+            item.setData(Qt.UserRole, rfd)
 
             self.list_widget.addItem(item)
 
-            #list_widget.addItem(str(rfd).replace("{", "(").replace("}", ")"))
+            # list_widget.addItem(str(rfd).replace("{", "(").replace("}", ")"))
 
             self.rfds_list_wrapper_layout.addWidget(self.list_widget)
             self.rfds_tab_layout.addWidget(self.rfds_list_wrapper)
 
-        #combo.currentTextChanged.connect(lambda ix, key=h, select=combo: self.combo_changed(select, key))
+        # combo.currentTextChanged.connect(lambda ix, key=h, select=combo: self.combo_changed(select, key))
         self.list_widget.currentItemChanged.connect(self.rfd_selected)
 
     def rfd_selected(self, current: QListWidgetItem, previous: QListWidgetItem):
         print("RFD selected")
 
         if previous:
-            print("Previous: " + str(previous.data(QtCore.Qt.UserRole)))
+            print("Previous: " + str(previous.data(Qt.UserRole)))
 
         if current:
-            print("Current: " + str(current.data(QtCore.Qt.UserRole)))
+            rfd: RFD = current.data(Qt.UserRole)
+            print("Current: " + str(rfd))
+
+            # https://stackoverflow.com/questions/38987/how-to-merge-two-dictionaries-in-a-single-expression#26853961
+            rfd_thresholds: dict = {**rfd.get_left_hand_side(), **rfd.get_right_hand_side()}
+            print("RFD thresholds:")
+            print(rfd_thresholds)
+
+            lhs = rfd.get_left_hand_side()
+            rhs = rfd.get_right_hand_side()
+
+            lhs_keys = lhs.keys()
+            rhs_keys = rhs.keys()
+
+            print("LHS Keys: " + str(lhs_keys))
+            print("RHS Keys: " + str(rhs_keys))
+
+            # https://stackoverflow.com/questions/1720421/how-to-concatenate-two-lists-in-python#answer-35631185
+            rfd_columns = [*lhs_keys, *rhs_keys]
+            print("RFD Columns:")
+            print(rfd_columns)
+
+            rfd_columns_index: dict = {value: position for (position, value) in enumerate(rfd_columns)}
+
+            print("RFD Columns index:")
+            print(rfd_columns_index)
+
+            # Start by isolating the columns that are involved in the RFD calculation:
+            values: ndarray = self.data_frame[rfd_columns].values
+
+            print("Values:")
+            print(values)
+
+            # Calculate all possible differences.
+            # This is an O(N^2) operation and may be costly in terms of time and memory.
+            dist: ndarray = np.abs(values[:, None] - values)
+
+            print("Dist:")
+            print(dist)
+
+            # Identify the suitable pairs of rows:
+            # im: ndarray = (dist[:, :, 0] <= 2) & (dist[:, :, 1] <= 0) & (dist[:, :, 2] <= 1)
+            # print("IM:")
+            # print(im)
+
+            conditions_arrays: ndarray = [(dist[:, :, rfd_columns_index[column]] <= rfd_thresholds[column])
+                                          for column in rfd_columns]
+
+            print("Conditions Array:")
+            print(conditions_arrays)
+
+            adjacency_matrix: ndarray = np.array(reduce(lambda a, b: np.bitwise_and(a, b), conditions_arrays))
+            print("Adjacency Matrix:")
+            print(adjacency_matrix)
+
+            # Use them as an adjacency matrix and construct a graph.
+            # The graph nodes represent rows in the original dataframe.
+            # The nodes are connected if the corresponding rows are in the RFD:
+
+            graph = nx.from_numpy_matrix(adjacency_matrix)
+
+            df = self.data_frame.loc[sorted(nx.connected_components(graph), key=len)[-1], :]
+
+            print("RFD Subset:")
+            print(df)
