@@ -19,7 +19,7 @@ from ui.PandasTableModel import PandasTableModel
 
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QLineEdit, \
     QGroupBox, QLabel, QPushButton, QGridLayout, QComboBox, QTableView, QScrollArea, QHBoxLayout, QListWidget, \
-    QListWidgetItem
+    QListWidgetItem, QAbstractItemView
 
 from query_rewriter.query.relaxer import QueryRelaxer
 
@@ -265,11 +265,17 @@ class TabsWidget(QTabWidget):
         self.rfds_list_wrapper_layout = QVBoxLayout(self.rfds_list_wrapper)
 
         self.path = path
-        group = QGroupBox()
+        main_group = QGroupBox()
+        group_vertical_layout = QVBoxLayout()
+        main_group.setLayout(group_vertical_layout)
+
+        buttons_group_box = QGroupBox()
         buttons_horizontal_layout = QHBoxLayout()
         buttons_horizontal_layout.setAlignment(Qt.AlignLeft)
         buttons_horizontal_layout.setAlignment(Qt.AlignTop)
-        group.setLayout(buttons_horizontal_layout)
+        buttons_group_box.setLayout(buttons_horizontal_layout)
+
+        group_vertical_layout.addWidget(buttons_group_box)
 
         discover_rfds_button = QPushButton("Discover RFDs")
         width = discover_rfds_button.fontMetrics().boundingRect(discover_rfds_button.text()).width() + 20
@@ -284,7 +290,17 @@ class TabsWidget(QTabWidget):
         buttons_horizontal_layout.addWidget(discover_rfds_button)
         buttons_horizontal_layout.addWidget(load_rfds_button)
 
-        self.rfds_tab_layout.addWidget(group)
+        self.rfd_data_set_table = QTableView()
+        self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.rfds_tab_layout)
+        self.rfd_data_set_table.setModel(self.pandas_model)
+        self.rfd_data_set_table.setSortingEnabled(True)
+        self.rfd_data_set_table.resizeColumnsToContents()
+        self.rfd_data_set_table.resizeRowsToContents()
+        self.rfd_data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
+
+        group_vertical_layout.addWidget(self.rfd_data_set_table)
+
+        self.rfds_tab_layout.addWidget(main_group)
 
     def load_rfds(self):
         print("Loading RFDs")
@@ -429,8 +445,21 @@ class TabsWidget(QTabWidget):
             graph = nx.from_numpy_matrix(adjacency_matrix)
 
             max_clique = max(nx.clique.find_cliques(graph), key=len)
-            df = self.data_frame.loc[max_clique, :]
+            df: DataFrame = self.data_frame.loc[max_clique, :]
+
+            print("DataFrame:")
+            print(self.data_frame)
 
             print("RFD: " + str(rfd))
             print("RFD Subset:")
             print(df)
+
+            print("Indexes:")
+            df_indexes = df.index.values.tolist()
+            print(df_indexes)
+
+            self.pandas_model.update_data(self.data_frame)
+
+            self.rfd_data_set_table.clearSelection()
+            for index in df_indexes:
+                self.rfd_data_set_table.selectRow(index)
