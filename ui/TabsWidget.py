@@ -1,10 +1,13 @@
+import pandas as pd
+
+import editdistance
 import typing
 import copy
 from PyQt5.QtCore import QAbstractTableModel, Qt, QRegExp
 from PyQt5.QtGui import QRegExpValidator
 from pandas import DataFrame, Series
 import networkx as nx
-import matplotlib.pyplot as plt
+from nltk.corpus import wordnet as wn
 import numpy as np
 from numpy import ndarray
 from pandas.compat import reduce
@@ -14,6 +17,7 @@ from loader.distance_mtr import DiffMatrix
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.io.rfd.rfd_extractor import RFDExtractor
 from query_rewriter.model.RFD import RFD
+from query_rewriter.utils.DiffDataFrame import DiffDataFrame
 from query_rewriter.utils.Transformer import Transformer
 from ui.PandasTableModel import PandasTableModel
 
@@ -411,15 +415,27 @@ class TabsWidget(QTabWidget):
             print(rfd_columns_index)
 
             # Start by isolating the columns that are involved in the RFD calculation:
-            values: ndarray = self.data_frame[rfd_columns].values
+            rfd_columns_data: ndarray = self.data_frame[rfd_columns].values
 
-            print("Values:")
-            print(values)
+            print("RFD Columns DATA:")
+            print(rfd_columns_data)
+
+            rows, columns = self.data_frame.shape
 
             # Calculate all possible differences.
             # This is an O(N^2) operation and may be costly in terms of time and memory.
-            dist: ndarray = np.abs(values[:, None] - values)
+            # dist: ndarray = np.abs(rfd_columns_data[:, None] - rfd_columns_data)
 
+            reduced_dist = DiffMatrix(self.path).distance_df[rfd_columns].values
+            print("Reduced Dist:")
+            print(reduced_dist)
+
+            full_dist = DiffDataFrame.full_diff(self.data_frame[rfd_columns])
+            print("Full Dist:")
+            print(full_dist)
+
+            dist: ndarray = np.array(
+                [[full_dist.iloc[row1 + row2] for row2 in range(0, rows)] for row1 in range(0, rows)])
             print("Dist:")
             print(dist)
 
