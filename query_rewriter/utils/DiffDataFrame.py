@@ -28,8 +28,8 @@ class DiffDataFrame:
             for j in range(0, rows):  # iterate on each pair of rows
                 if i == j:
                     diff_ij = [0 for _ in range(0, columns)]
-                    # distance_df.iloc[k] = diff_ij
-                    # k += 1
+                elif i > j:  # diff_ij = diff_ji
+                    diff_ij = distance_df.iloc[j * rows + i]
                 else:
                     row_j: Series = data_frame.iloc[j]
                     diff_ij = [np.absolute(diff_function(a, b)) for a, b, diff_function in
