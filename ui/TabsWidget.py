@@ -426,10 +426,6 @@ class TabsWidget(QTabWidget):
             # This is an O(N^2) operation and may be costly in terms of time and memory.
             # dist: ndarray = np.abs(rfd_columns_data[:, None] - rfd_columns_data)
 
-            reduced_dist = DiffMatrix(self.path).distance_df[rfd_columns].values
-            print("Reduced Dist:")
-            print(reduced_dist)
-
             full_dist = DiffDataFrame.full_diff(self.data_frame[rfd_columns])
             print("Full Dist:")
             print(full_dist)
