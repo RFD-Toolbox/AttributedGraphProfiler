@@ -435,7 +435,7 @@ class TabsWidget(QTabWidget):
             print(full_dist)
 
             dist: ndarray = np.array(
-                [[full_dist.iloc[row1 + row2] for row2 in range(0, rows)] for row1 in range(0, rows)])
+                [[full_dist.iloc[row1 * rows + row2] for row2 in range(0, rows)] for row1 in range(0, rows)])
             print("Dist:")
             print(dist)
 
