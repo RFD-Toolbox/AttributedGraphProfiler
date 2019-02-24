@@ -1,13 +1,11 @@
-import pandas as pd
-
-import editdistance
+import time
 import typing
 import copy
+
 from PyQt5.QtCore import QAbstractTableModel, Qt, QRegExp
-from PyQt5.QtGui import QRegExpValidator
+from PyQt5.QtGui import QRegExpValidator, QStandardItemModel, QStandardItem
 from pandas import DataFrame, Series
 import networkx as nx
-from nltk.corpus import wordnet as wn
 import numpy as np
 from numpy import ndarray
 from pandas.compat import reduce
@@ -22,13 +20,15 @@ from query_rewriter.utils.Transformer import Transformer
 from ui.PandasTableModel import PandasTableModel
 
 from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QLineEdit, \
-    QGroupBox, QLabel, QPushButton, QGridLayout, QComboBox, QTableView, QScrollArea, QHBoxLayout, QListWidget, \
-    QListWidgetItem, QAbstractItemView
+    QGroupBox, QLabel, QPushButton, QGridLayout, QComboBox, QTableView, QScrollArea, QHBoxLayout, QAbstractItemView, \
+    QTreeWidget, QTreeWidgetItem, QHeaderView
 
 from query_rewriter.query.relaxer import QueryRelaxer
 
 
 class TabsWidget(QTabWidget):
+    RFD, EXTENT, TIME = range(3)
+
     def __init__(self, parent: typing.Optional[QWidget] = ...) -> None:
         super().__init__(parent)
 
@@ -53,9 +53,17 @@ class TabsWidget(QTabWidget):
         self.rfds_tab.setWidgetResizable(True)
         self.rfds_tab_layout = QVBoxLayout(self.rfds_tab_content_widget)
 
+        # Rewrite
+        self.rewrite_tab = QScrollArea()
+        self.rewrite_tab_content_widget = QWidget()
+        self.rewrite_tab.setWidget(self.rewrite_tab_content_widget)
+        self.rewrite_tab.setWidgetResizable(True)
+        self.rewrite_tab_layout = QVBoxLayout(self.rewrite_tab_content_widget)
+
         self.addTab(self.dataset_tab, "Dataset")
         self.addTab(self.query_tab, "Query")
         self.addTab(self.rfds_tab, "RFDs")
+        self.addTab(self.rewrite_tab, "Rewrite")
 
         self.rfds: list = []
 
@@ -63,7 +71,7 @@ class TabsWidget(QTabWidget):
         self.path = path
         csv_parser: CSVParser = CSVParser(path)
         self.data_frame: DataFrame = csv_parser.data_frame
-        (self.rows_count, self.columns_count) = self.data_frame.shape
+        self.rows_count, self.columns_count = self.data_frame.shape
         self.header = csv_parser.header
         table = QTableView()
         pandas_model: QAbstractTableModel = PandasTableModel(self.data_frame, self.dataset_tab)
@@ -265,8 +273,8 @@ class TabsWidget(QTabWidget):
         for i in reversed(range(self.rfds_tab_layout.count())):
             self.rfds_tab_layout.itemAt(i).widget().deleteLater()
 
-        self.rfds_list_wrapper = QGroupBox()
-        self.rfds_list_wrapper_layout = QVBoxLayout(self.rfds_list_wrapper)
+        self.rfds_tree_wrapper = QGroupBox()
+        self.rfds_tree_wrapper_layout = QVBoxLayout(self.rfds_tree_wrapper)
 
         self.path = path
         main_group = QGroupBox()
@@ -311,8 +319,8 @@ class TabsWidget(QTabWidget):
 
     def discover_rfds(self):
         # Cleaning
-        for i in reversed(range(self.rfds_list_wrapper_layout.count())):
-            self.rfds_list_wrapper_layout.itemAt(i).widget().deleteLater()
+        for i in reversed(range(self.rfds_tree_wrapper_layout.count())):
+            self.rfds_tree_wrapper_layout.itemAt(i).widget().deleteLater()
 
         self.rfds = []
         print("Discovering RFDs")
@@ -360,34 +368,43 @@ class TabsWidget(QTabWidget):
             # print("\n")
             self.rfds.extend(Transformer.rfd_data_frame_to_rfd_list(df, self.header))
 
-        self.list_widget = QListWidget()
+        self.tree_header = QTreeWidgetItem()
+        self.tree_header.setText(self.RFD, "RFD")
+        self.tree_header.setText(self.EXTENT, "Extent")
+        self.tree_header.setText(self.TIME, "Time")
+
+        self.tree_widget = QTreeWidget()
+        self.tree_widget.setHeaderItem(self.tree_header)
+
+        self.tree_widget.header().setSectionResizeMode(QHeaderView.ResizeToContents)
 
         print("\nRFDs list: ")
         for rfd in self.rfds:
             print(rfd)
 
-            item = QListWidgetItem()
-            item.setText(str(rfd).replace("{", "(").replace("}", ")"))
-            item.setData(Qt.UserRole, rfd)
+            item = QTreeWidgetItem()
+            item.setText(self.RFD, str(rfd).replace("{", "(").replace("}", ")"))
+            item.setData(self.RFD, Qt.UserRole, rfd)
+            item.setText(self.EXTENT, "")
 
-            self.list_widget.addItem(item)
+            self.tree_widget.addTopLevelItem(item)
 
-            # list_widget.addItem(str(rfd).replace("{", "(").replace("}", ")"))
-
-            self.rfds_list_wrapper_layout.addWidget(self.list_widget)
-            self.rfds_tab_layout.addWidget(self.rfds_list_wrapper)
+        self.rfds_tree_wrapper_layout.addWidget(self.tree_widget)
+        self.rfds_tab_layout.addWidget(self.rfds_tree_wrapper)
 
         # combo.currentTextChanged.connect(lambda ix, key=h, select=combo: self.combo_changed(select, key))
-        self.list_widget.currentItemChanged.connect(self.rfd_selected)
+        # self.tree_view.currentItemChanged.connect(self.rfd_selected)
+        self.tree_widget.currentItemChanged.connect(self.rfd_selected)
 
-    def rfd_selected(self, current: QListWidgetItem, previous: QListWidgetItem):
+    def rfd_selected(self, current: QTreeWidgetItem, previous: QTreeWidgetItem):
         print("RFD selected")
 
-        if previous:
-            print("Previous: " + str(previous.data(Qt.UserRole)))
-
         if current:
-            rfd: RFD = current.data(Qt.UserRole)
+            t0 = time.time()
+
+            print("Current:")
+            print(current)
+            rfd: RFD = current.data(self.RFD, Qt.UserRole)
             print("Current: " + str(rfd))
 
             # https://stackoverflow.com/questions/38987/how-to-merge-two-dictionaries-in-a-single-expression#26853961
@@ -413,12 +430,6 @@ class TabsWidget(QTabWidget):
 
             print("RFD Columns index:")
             print(rfd_columns_index)
-
-            # Start by isolating the columns that are involved in the RFD calculation:
-            rfd_columns_data: ndarray = self.data_frame[rfd_columns].values
-
-            print("RFD Columns DATA:")
-            print(rfd_columns_data)
 
             rows, columns = self.data_frame.shape
 
@@ -458,6 +469,12 @@ class TabsWidget(QTabWidget):
 
             max_clique = max(nx.clique.find_cliques(graph), key=len)
             df: DataFrame = self.data_frame.loc[max_clique, :]
+            t1 = time.time()
+
+            seconds = t1 - t0
+            current.setText(self.TIME, str(seconds) + "''")
+
+            print("Time: " + str(seconds))
 
             print("DataFrame:")
             print(self.data_frame)
@@ -465,6 +482,10 @@ class TabsWidget(QTabWidget):
             print("RFD: " + str(rfd))
             print("RFD Subset:")
             print(df)
+
+            percentage = round((df.shape[0] / self.rows_count) * 100)
+            print("Percentage: " + str(percentage))
+            current.setText(self.EXTENT, str(percentage) + "%")
 
             print("Indexes:")
             df_indexes = df.index.values.tolist()
