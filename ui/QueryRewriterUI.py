@@ -62,6 +62,7 @@ class QueryRewriterUI(QMainWindow):
             self.tabs.init_dataset_tab(csv_path)
             self.tabs.init_query_tab(csv_path)
             self.tabs.init_rfds_tab(csv_path)
+            self.tabs.init_rewrite_tab()
             '''with open(file_name) as csv_file:
                 sniffer = csv.Sniffer()
                 dialect = sniffer.sniff(csv_file.readline())

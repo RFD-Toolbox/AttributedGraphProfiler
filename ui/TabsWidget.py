@@ -1,6 +1,7 @@
 import time
 import typing
 import copy
+import rx
 
 from PyQt5.QtCore import QAbstractTableModel, Qt, QRegExp
 from PyQt5.QtGui import QRegExpValidator, QStandardItemModel, QStandardItem
@@ -9,6 +10,7 @@ import networkx as nx
 import numpy as np
 from numpy import ndarray
 from pandas.compat import reduce
+from rx.subjects import Subject
 
 from dominance.dominance_tools import RFDDiscovery
 from loader.distance_mtr import DiffMatrix
@@ -60,10 +62,10 @@ class TabsWidget(QTabWidget):
         self.rewrite_tab.setWidgetResizable(True)
         self.rewrite_tab_layout = QVBoxLayout(self.rewrite_tab_content_widget)
 
-        self.addTab(self.dataset_tab, "Dataset")
-        self.addTab(self.query_tab, "Query")
-        self.addTab(self.rfds_tab, "RFDs")
-        self.addTab(self.rewrite_tab, "Rewrite")
+        # self.addTab(self.dataset_tab, "Dataset")
+        # self.addTab(self.query_tab, "Query")
+        # self.addTab(self.rfds_tab, "RFDs")
+        # self.addTab(self.rewrite_tab, "Rewrite")
 
         self.rfds: list = []
 
@@ -90,12 +92,15 @@ class TabsWidget(QTabWidget):
             self.dataset_tab_layout.itemAt(i).widget().deleteLater()
 
         self.dataset_tab_layout.addWidget(table)
+        self.addTab(self.dataset_tab, "Dataset")
+        self.addTab(self.query_tab, "Query")
 
     def init_query_tab(self, path: str):
         self.path = path
         self.csv_parser: CSVParser = CSVParser(path)
         self.header = self.csv_parser.header
         self.separator = self.csv_parser.delimiter
+        self.query_subject = Subject()
 
         groupBox = QGroupBox()
         input_rows_layout = QGridLayout()
@@ -206,12 +211,15 @@ class TabsWidget(QTabWidget):
                 print(header + " " + self.line_combos[header].currentText() + " " + line.text())
 
         print("OriginalQuery: ", operator_values)
+        self.query_subject.on_next(operator_values)
+
         self.original_query_expression = QueryRelaxer.query_operator_values_to_expression(operator_values)
         self.query_label.setText(self.original_query_expression)
         print("OriginalQuery expr: ", self.original_query_expression)
         original_query_result_set: DataFrame = self.csv_parser.data_frame.query(self.original_query_expression)
         print("Original Query Result Set:\n", original_query_result_set)
         self._query_data_model.update_data(original_query_result_set)
+        self.addTab(self.rfds_tab, "RFDs")
 
     def combo_changed(self, combo: QComboBox, key: str):
         if combo.currentText() == "=":
@@ -270,6 +278,8 @@ class TabsWidget(QTabWidget):
             self.line_edits[key].setValidator(input_validator)
 
     def init_rfds_tab(self, path: str):
+        self.rfds_subject = Subject()
+
         for i in reversed(range(self.rfds_tab_layout.count())):
             self.rfds_tab_layout.itemAt(i).widget().deleteLater()
 
@@ -368,6 +378,8 @@ class TabsWidget(QTabWidget):
             # print("\n")
             self.rfds.extend(Transformer.rfd_data_frame_to_rfd_list(df, self.header))
 
+        self.rfds_subject.on_next(self.rfds)
+
         self.tree_header = QTreeWidgetItem()
         self.tree_header.setText(self.RFD, "RFD")
         self.tree_header.setText(self.EXTENT, "Extent")
@@ -394,9 +406,11 @@ class TabsWidget(QTabWidget):
 
         # combo.currentTextChanged.connect(lambda ix, key=h, select=combo: self.combo_changed(select, key))
         # self.tree_view.currentItemChanged.connect(self.rfd_selected)
-        self.tree_widget.currentItemChanged.connect(self.rfd_selected)
+        self.tree_widget.currentItemChanged.connect(self.rfd_selected_to_max_clique)
 
-    def rfd_selected(self, current: QTreeWidgetItem, previous: QTreeWidgetItem):
+        self.addTab(self.rewrite_tab, "Rewrite")
+
+    def rfd_selected_to_max_clique(self, current: QTreeWidgetItem, previous: QTreeWidgetItem):
         print("RFD selected")
 
         if current:
@@ -496,3 +510,79 @@ class TabsWidget(QTabWidget):
             self.rfd_data_set_table.clearSelection()
             for index in df_indexes:
                 self.rfd_data_set_table.selectRow(index)
+
+    def rfd_selected_to_relaxed_query(self, current: QTreeWidgetItem, previous: QTreeWidgetItem):
+        print("RFD selected to relaxed query...")
+        current_rfd: RFD = current.data(self.RFD, Qt.UserRole)
+        print("Current RFD: " + str(current_rfd))
+
+    def init_rewrite_tab(self):
+        self.query_subject.subscribe(
+            on_next=lambda ov: self.update_query(ov)
+        )
+
+        self.rfds_subject.subscribe(
+            on_next=lambda rfds: self.show_rewrite_rfds(rfds)
+        )
+
+        self.rewrite_query_label = QLabel("")
+        self.rewrite_tab_layout.addWidget(self.rewrite_query_label)
+
+    def update_query(self, operator_values: dict):
+        self.original_query_operator_values = operator_values
+        self.rewrite_query_label.setText(
+            QueryRelaxer.query_operator_values_to_expression(self.original_query_operator_values))
+
+    def show_rewrite_rfds(self, rfds: list):
+        print("Show rewrite RFDs")
+        print("Size: " + str(len(rfds)))
+
+        self.rewrite_tree_header = QTreeWidgetItem()
+        self.rewrite_tree_header.setText(self.RFD, "RFD")
+        self.rewrite_tree_header.setText(self.EXTENT, "Extent")
+        self.rewrite_tree_header.setText(self.TIME, "Time")
+
+        self.rewrite_tree_widget = QTreeWidget()
+        self.rewrite_tree_widget.setHeaderItem(self.rewrite_tree_header)
+        self.rewrite_tree_wrapper = QGroupBox()
+        self.rewrite_tree_wrapper_layout = QVBoxLayout(self.rewrite_tree_wrapper)
+
+        self.rewrite_tree_widget.header().setSectionResizeMode(QHeaderView.ResizeToContents)
+
+        print("Operator Values: ")
+        print(self.original_query_operator_values)
+
+        filteredRFDs = []
+
+        for rfd in rfds:
+            # https://stackoverflow.com/questions/38987/how-to-merge-two-dictionaries-in-a-single-expression#26853961
+            rfd_thresholds: dict = {**rfd.get_left_hand_side(), **rfd.get_right_hand_side()}
+
+            # keep only the RFDs with all the fields of the Query
+            if all(field in rfd_thresholds.keys() for field in self.original_query_operator_values.keys()):
+
+                # remove the RFDs having a filed of the query in the RHS
+                if not any(field in rfd.get_right_hand_side().keys() for field in
+                           self.original_query_operator_values.keys()):
+                    filteredRFDs.extend([rfd])
+
+        # TODO sort RFDs by non decreasing order of the Query's fields thresholds
+
+        print("Filtered RFDs:")
+        print("Size: " + str(len(filteredRFDs)))
+
+        print("*" * 100)
+        for rfd in filteredRFDs:
+            print(rfd)
+
+            item = QTreeWidgetItem()
+            item.setText(self.RFD, str(rfd).replace("{", "(").replace("}", ")"))
+            item.setData(self.RFD, Qt.UserRole, rfd)
+            item.setText(self.EXTENT, "")
+
+            self.rewrite_tree_widget.addTopLevelItem(item)
+
+        self.rewrite_tree_wrapper_layout.addWidget(self.rewrite_tree_widget)
+        self.rewrite_tab_layout.addWidget(self.rewrite_tree_wrapper)
+
+        self.rewrite_tree_widget.currentItemChanged.connect(self.rfd_selected_to_relaxed_query)

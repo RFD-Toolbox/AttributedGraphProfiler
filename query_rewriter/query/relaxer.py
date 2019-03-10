@@ -142,6 +142,12 @@ class QueryRelaxer:
         :rtype:
         '''
 
+        '''
+        ' item[0]-->key or column
+        ' item[1]-->tuple (operator, value)
+        ' item[1][1]-->value
+        ' Keep only the item having a value.
+        '''
         operator_values = dict(filter(lambda item: item[1][1], operator_values.items()))
 
         if not list(operator_values.keys()):
@@ -221,7 +227,7 @@ class QueryRelaxer:
                         if "%" not in val:
                             source = val
                             simil_strings = QueryRelaxer.similar_strings(source=source, data=data_set, col=key,
-                                                                        threshold=threshold)
+                                                                         threshold=threshold)
                             query[key] = simil_strings
                         else:
                             simil_strings = []
