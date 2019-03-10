@@ -14,7 +14,13 @@ class RFD(dict):
         return self["RHS"]
 
     def __getitem__(self, k: str) -> dict:
-        return super().__getitem__(k)
+        try:
+            return super().__getitem__(k)
+        except KeyError:
+            try:
+                return self.get_left_hand_side()[k]
+            except KeyError:
+                return self.get_right_hand_side()[k]
 
     def __str__(self) -> str:
         return str(self["LHS"]) + " ==> " + str(self["RHS"])

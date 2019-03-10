@@ -3,6 +3,8 @@ import numpy as np
 import editdistance
 from random import shuffle
 
+from query_rewriter.model.RFD import RFD
+
 
 class QueryRelaxer:
     '''
@@ -84,6 +86,11 @@ class QueryRelaxer:
         return rfds_df.sort_values(by=sorting_attributes,
                                    ascending=ascending,
                                    na_position="last").reset_index(drop=True)
+
+    @staticmethod
+    def sort_by_increasing_threshold(rfds: list, columns: list) -> list:
+        sorted_rfds = sorted(rfds, key=lambda item: [item[col] for col in columns])
+        return sorted_rfds
 
     @staticmethod
     def rfd_to_string(rfd: dict) -> str:

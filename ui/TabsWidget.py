@@ -566,7 +566,9 @@ class TabsWidget(QTabWidget):
                            self.original_query_operator_values.keys()):
                     filteredRFDs.extend([rfd])
 
-        # TODO sort RFDs by non decreasing order of the Query's fields thresholds
+        # sort RFDs by non decreasing order of the Query's fields thresholds
+        filteredRFDs = QueryRelaxer.sort_by_increasing_threshold(filteredRFDs,
+                                                                 list(self.original_query_operator_values.keys()))
 
         print("Filtered RFDs:")
         print("Size: " + str(len(filteredRFDs)))
