@@ -1,0 +1,10 @@
+class Operator:
+    EQUAL = "="
+    SIMILAR = "~"
+    DIFFERENT = "!="
+    BELONGING = "∈"
+    NOT_BELONGING = "∉"
+    GREATER = ">"
+    GREATER_EQUAL = ">="
+    LESS = "<"
+    LESS_EQUAL = "<="

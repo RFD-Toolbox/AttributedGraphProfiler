@@ -521,22 +521,44 @@ class TabsWidget(QTabWidget):
         current_rfd: RFD = current.data(self.RFD, Qt.UserRole)
         print("Current RFD: " + str(current_rfd))
 
+        # TODO extend the Query
+        extended_query = QueryRelaxer.extend_query_operator_values_ranges(self.original_query_operator_values, current_rfd, self.data_frame)
+        print("Extended Query: ")
+        print(extended_query)
+
+        extended_expression = QueryRelaxer.query_operator_values_to_expression(extended_query)
+        print("Extended expression: ")
+        print(extended_expression)
+        self.update_extended_query(extended_query)
+
+        extended_result_set: DataFrame = self.data_frame.query(extended_expression)
+        print("Extended result set:")
+        print(extended_result_set)
+
     def init_rewrite_tab(self):
         self.query_subject.subscribe(
-            on_next=lambda ov: self.update_query(ov)
+            on_next=lambda ov: self.update_original_query(ov)
         )
 
         self.rfds_subject.subscribe(
             on_next=lambda rfds: self.show_rewrite_rfds(rfds)
         )
 
-        self.rewrite_query_label = QLabel("")
-        self.rewrite_tab_layout.addWidget(self.rewrite_query_label)
+        self.rewrite_original_query_label = QLabel("")
+        self.rewrite_tab_layout.addWidget(self.rewrite_original_query_label)
 
-    def update_query(self, operator_values: dict):
+        self.rewrite_extended_query_label = QLabel("")
+        self.rewrite_tab_layout.addWidget(self.rewrite_extended_query_label)
+
+    def update_original_query(self, operator_values: dict):
         self.original_query_operator_values = operator_values
-        self.rewrite_query_label.setText(
+        self.rewrite_original_query_label.setText(
             QueryRelaxer.query_operator_values_to_expression(self.original_query_operator_values))
+
+    def update_extended_query(self, extended_operator_values: dict):
+        self.extended_query_operator_values = extended_operator_values
+        self.rewrite_extended_query_label.setText(
+            QueryRelaxer.query_operator_values_to_expression(self.extended_query_operator_values))
 
     def show_rewrite_rfds(self, rfds: list):
         print("Show rewrite RFDs")

@@ -1,8 +1,10 @@
-import pandas as pd
 import numpy as np
 import editdistance
 from random import shuffle
+from pandas import DataFrame
+import copy
 
+from query_rewriter.model.Operator import Operator
 from query_rewriter.model.RFD import RFD
 
 
@@ -12,7 +14,7 @@ class QueryRelaxer:
     '''
 
     @staticmethod
-    def drop_query_nan(rfds_df: pd.DataFrame, query: dict) -> pd.DataFrame:
+    def drop_query_nan(rfds_df: DataFrame, query: dict) -> DataFrame:
         '''
         Drops the RFDs where an attribute of the query is NaN.
         :param rfds_df: the Relaxed Functional Dependencies DataFrame to drop.
@@ -24,7 +26,7 @@ class QueryRelaxer:
         return rfds
 
     @staticmethod
-    def drop_query_rhs(rfds_df: pd.DataFrame, query: dict) -> pd.DataFrame:
+    def drop_query_rhs(rfds_df: DataFrame, query: dict) -> DataFrame:
         '''
         Drops the RFDs where the RHS attribute is part of the query.
         :param rfds_df: the Relaxed Functional Dependencies DataFrame to drop.
@@ -36,7 +38,7 @@ class QueryRelaxer:
         return rfds
 
     @staticmethod
-    def sort_by_decresing_nan_incresing_threshold(rfds_df: pd.DataFrame, query: dict) -> pd.DataFrame:
+    def sort_by_decresing_nan_incresing_threshold(rfds_df: DataFrame, query: dict) -> DataFrame:
         '''
         Sorts the RFDs DataFrame by decreasing number of NaNs and increasing threshold values of query attributes.
         :param rfds_df: the Relaxed Functional Dependencies DataFrame to sort.
@@ -61,7 +63,7 @@ class QueryRelaxer:
         return rfds
 
     @staticmethod
-    def sort_by_increasing_threshold(rfds_df: pd.DataFrame, data_set: pd.DataFrame, query: dict) -> pd.DataFrame:
+    def sort_by_increasing_threshold(rfds_df: DataFrame, data_set: DataFrame, query: dict) -> DataFrame:
         '''
         Sorts the Relaxed Functional Dependencies DataFrame
         by increasing threshold value of the query and non-query attributes.
@@ -205,7 +207,7 @@ class QueryRelaxer:
         return expr
 
     @staticmethod
-    def extend_query_ranges(query: dict, rfd: dict, data_set: pd.DataFrame = None) -> dict:
+    def extend_query_ranges(query: dict, rfd: dict, data_set: DataFrame = None) -> dict:
         '''
         Given a query and an RFD, extends the query attributes range
         by the corresponding threshold contained in the RFD.
@@ -270,33 +272,100 @@ class QueryRelaxer:
         return query
 
     @staticmethod
-    def similar_strings(source: str, data: pd.DataFrame, col: str, threshold: int) -> list:
+    def extend_query_operator_values_ranges(query_operator_values: dict, rfd: RFD, data_set: DataFrame) -> dict:
         '''
-        Returns a list of strings, from the column col of data DataFrame,
-        that are similar to the source string with an edit distance of at most threshold.
-        :param source: the string against which to compute the edit distances.
-        :param data: the DataFrame containing the string values.
-        :param col: the DataFrame column containing the string values.
-        :param threshold: the maximum edit distance between source and another string.
-        :return: the list of strings similar to source.
+        Given a Query and an RFD, extends the Query attributes range by the corresponding threshold of the RFD.
+        :param query_operator_values:
+        :param rfd:
+        :param data_set:
+        :return:
         '''
 
-        return data[data[col].apply(lambda word: int(editdistance.eval(source, word)) <= threshold)][
-            col].tolist()
-
-    @staticmethod
-    def extract_value_lists(df: pd.DataFrame, columns: list):
         '''
-        Extracts values of given columns from thd DataFrane and returns them as a
-        Dictionary of value lists.
-        :param df: The DataFrame from which to extract values.
-        :param columns: The columns we are interested in extracting values.
-        :return: A Dictionary of lists containing the values for the corresponding columns.
+        OperatorValues
+        ' item[0]-->key or column
+        ' item[1]-->tuple (operator, value)
+        ' item[1][1]-->value
+        ' Keep only the item having a value.
         '''
-        dictionary = {}
-        for col in columns:
-            # duplicates removed too.
-            dictionary[col] = list(set(df[col].tolist()))
-            dictionary[col].sort()
 
-        return dictionary
+        print("Extend query operator values...")
+
+        query: dict = copy.deepcopy(query_operator_values)
+        extended_query: dict = {}
+        column_types: dict = data_set.dtypes.to_dict()
+        print("DTypes: " + str(column_types))
+
+        for key, (operator, value) in query.items():
+            if value:  # check if there is a value
+                print("Key: " + key)
+
+                threshold = rfd[key]
+                print("Threshold: " + str(threshold))
+
+                column_type = column_types.get(key)  # get the type of this column of the DataFrame
+
+                if operator == Operator.EQUAL:
+                    print("It is equal")
+
+                    if column_type == np.int64 or column_type == np.float64:
+                        print("Column type is int64 or float64")
+                        if threshold > 0:  # once extended it will turn into a belonging
+                            extended_value = list(range(int(value - threshold), int(value + threshold + 1)))
+                            extended_query[key] = (Operator.BELONGING, extended_value)
+                        elif threshold == 0:  # nothing to extend
+                            extended_value = value
+                            extended_query[key] = (Operator.EQUAL, extended_value)
+
+                elif operator == Operator.SIMILAR:
+                    print("Its similar")
+                elif operator == Operator.DIFFERENT:
+                    print("Its different")
+                elif operator == Operator.BELONGING:
+                    print("Its belonging")
+                elif operator == Operator.NOT_BELONGING:
+                    print("Its NOT belonging")
+                elif operator == Operator.GREATER:
+                    print("Its Greater")
+                elif operator == Operator.GREATER_EQUAL:
+                    print("Its Greater equal")
+                elif operator == Operator.LESS:
+                    print("Its Less")
+                elif operator == Operator.LESS_EQUAL:
+                    print("Its Less equal")
+
+        return extended_query
+
+
+@staticmethod
+def similar_strings(source: str, data: DataFrame, col: str, threshold: int) -> list:
+    '''
+    Returns a list of strings, from the column col of data DataFrame,
+    that are similar to the source string with an edit distance of at most threshold.
+    :param source: the string against which to compute the edit distances.
+    :param data: the DataFrame containing the string values.
+    :param col: the DataFrame column containing the string values.
+    :param threshold: the maximum edit distance between source and another string.
+    :return: the list of strings similar to source.
+    '''
+
+    return data[data[col].apply(lambda word: int(editdistance.eval(source, word)) <= threshold)][
+        col].tolist()
+
+
+@staticmethod
+def extract_columns_value_list(df: DataFrame, columns: list):
+    '''
+    Extracts values of given columns from thd DataFrane and returns them as a
+    Dictionary of value lists.
+    :param df: The DataFrame from which to extract values.
+    :param columns: The columns we are interested in extracting values.
+    :return: A Dictionary of lists containing the values for the corresponding columns.
+    '''
+    dictionary = {}
+    for col in columns:
+        # duplicates removed too.
+        dictionary[col] = list(set(df[col].tolist()))
+        dictionary[col].sort()
+
+    return dictionary
