@@ -79,8 +79,8 @@ class TabsWidget(QTabWidget):
         pandas_model: QAbstractTableModel = PandasTableModel(self.data_frame, self.dataset_tab)
         table.setModel(pandas_model)
         table.setSortingEnabled(True)
-        table.resizeColumnsToContents()
         table.resizeRowsToContents()
+        table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
 
         print("DataFrame:")
         print(self.data_frame)
@@ -172,9 +172,10 @@ class TabsWidget(QTabWidget):
         self._query_data_model: PandasTableModel = PandasTableModel(self._query_data_frame, self.query_tab)
         table.setModel(self._query_data_model)
         table.setSortingEnabled(True)
-        table.resizeColumnsToContents()
         table.resizeRowsToContents()
         table.setMinimumHeight(200)
+        # ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+        table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
 
         layout = QVBoxLayout()
         table.setLayout(layout)
@@ -316,8 +317,8 @@ class TabsWidget(QTabWidget):
         self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.rfds_tab_layout)
         self.rfd_data_set_table.setModel(self.pandas_model)
         self.rfd_data_set_table.setSortingEnabled(False)
-        self.rfd_data_set_table.resizeColumnsToContents()
         self.rfd_data_set_table.resizeRowsToContents()
+        self.rfd_data_set_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
         self.rfd_data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
 
         group_vertical_layout.addWidget(self.rfd_data_set_table)
