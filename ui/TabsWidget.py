@@ -327,14 +327,18 @@ class TabsWidget(QTabWidget):
 
     def load_rfds(self):
         print("Loading RFDs")
+        # Cleaning
+        self.rfd_data_set_table.clearSelection()
 
     def discover_rfds(self):
+        print("Discovering RFDs")
         # Cleaning
+        self.rfd_data_set_table.clearSelection()
+
         for i in reversed(range(self.rfds_tree_wrapper_layout.count())):
             self.rfds_tree_wrapper_layout.itemAt(i).widget().deleteLater()
 
         self.rfds = []
-        print("Discovering RFDs")
         print("Header: " + str(self.header))
 
         columns_count = self.columns_count
