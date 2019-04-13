@@ -1,7 +1,6 @@
 import time
 import typing
 import copy
-import rx
 
 from PyQt5.QtCore import QAbstractTableModel, Qt, QRegExp
 from PyQt5.QtGui import QRegExpValidator, QStandardItemModel, QStandardItem
@@ -26,6 +25,7 @@ from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, QLineEdit, \
     QTreeWidget, QTreeWidgetItem, QHeaderView
 
 from query_rewriter.query.relaxer import QueryRelaxer
+from ui.tabs.DataTab import DataTab
 
 
 class TabsWidget(QTabWidget):
@@ -34,12 +34,9 @@ class TabsWidget(QTabWidget):
     def __init__(self, parent: typing.Optional[QWidget] = ...) -> None:
         super().__init__(parent)
 
-        # DataSet Tab
-        self.dataset_tab = QScrollArea()
-        self.dataset_tab_content_widget = QWidget()
-        self.dataset_tab.setWidget(self.dataset_tab_content_widget)
-        self.dataset_tab.setWidgetResizable(True)
-        self.dataset_tab_layout = QVBoxLayout(self.dataset_tab_content_widget)
+        # Data Tab
+        self.data_tab: DataTab = DataTab()
+        self.addTab(self.data_tab, "Data")
 
         # Query Tab
         self.query_tab = QScrollArea()
@@ -69,31 +66,8 @@ class TabsWidget(QTabWidget):
 
         self.rfds: list = []
 
-    def init_dataset_tab(self, path: str):
-        self.path = path
-        csv_parser: CSVParser = CSVParser(path)
-        self.data_frame: DataFrame = csv_parser.data_frame
-        self.rows_count, self.columns_count = self.data_frame.shape
-        self.header = csv_parser.header
-        table = QTableView()
-        pandas_model: QAbstractTableModel = PandasTableModel(self.data_frame, self.dataset_tab)
-        table.setModel(pandas_model)
-        table.setSortingEnabled(True)
-        table.resizeRowsToContents()
-        table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
-
-        print("DataFrame:")
-        print(self.data_frame)
-
-        print("DTypes:")
-        print(self.data_frame.dtypes)
-
-        for i in reversed(range(self.dataset_tab_layout.count())):
-            self.dataset_tab_layout.itemAt(i).widget().deleteLater()
-
-        self.dataset_tab_layout.addWidget(table)
-        self.addTab(self.dataset_tab, "Dataset")
-        self.addTab(self.query_tab, "Query")
+    def init_data_tab(self, path: str):
+        self.data_tab.display(path)
 
     def init_query_tab(self, path: str):
         self.path = path
@@ -522,7 +496,8 @@ class TabsWidget(QTabWidget):
         print("Current RFD: " + str(current_rfd))
 
         # TODO extend the Query
-        extended_query = QueryRelaxer.extend_query_operator_values_ranges(self.original_query_operator_values, current_rfd, self.data_frame)
+        extended_query = QueryRelaxer.extend_query_operator_values_ranges(self.original_query_operator_values,
+                                                                          current_rfd, self.data_frame)
         print("Extended Query: ")
         print(extended_query)
 

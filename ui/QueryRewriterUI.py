@@ -1,11 +1,9 @@
 import sys
 import os
-import csv
 
-from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFileDialog, QTableWidget, QTableWidgetItem, \
-    QDesktopWidget, QVBoxLayout
+from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFileDialog, QDesktopWidget
 
-from ui.TabsWidget import TabsWidget
+from ui.tabs.TabsWidget import TabsWidget
 
 
 class QueryRewriterUI(QMainWindow):
@@ -59,10 +57,10 @@ class QueryRewriterUI(QMainWindow):
         print("File Name: " + csv_path)
 
         if csv_path != "":
-            self.tabs.init_dataset_tab(csv_path)
-            self.tabs.init_query_tab(csv_path)
-            self.tabs.init_rfds_tab(csv_path)
-            self.tabs.init_rewrite_tab()
+            self.tabs.init_data_tab(csv_path)
+            # self.tabs.init_query_tab(csv_path)
+            # self.tabs.init_rfds_tab(csv_path)
+            # self.tabs.init_rewrite_tab()
             '''with open(file_name) as csv_file:
                 sniffer = csv.Sniffer()
                 dialect = sniffer.sniff(csv_file.readline())
