@@ -9,7 +9,7 @@ from rx.subjects import Subject
 
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Operator import Operator
-from query_rewriter.query.relaxer import QueryRelaxer
+from query_rewriter.model.Query import Query
 from ui.PandasTableModel import PandasTableModel
 
 
@@ -36,8 +36,8 @@ class QueryTab(QScrollArea):
         groupBox.setLayout(input_rows_layout)
 
         self.line_labels: dict[str, QLabel] = {}
-        self.line_combos: dict[str, QComboBox] = {}
-        self.line_edits: dict[str, QLineEdit] = {}
+        self.query_operators: dict[str, QComboBox] = {}
+        self.query_items: dict[str, QLineEdit] = {}
 
         rows = self.header.__len__()
 
@@ -56,9 +56,9 @@ class QueryTab(QScrollArea):
             operatorsComboBox.addItem(Operator.LESS)
             operatorsComboBox.addItem(Operator.LESS_EQUAL)
 
-            self.line_combos[h] = operatorsComboBox
-            self.line_edits[h] = QLineEdit()
-            self.line_edits[h].returnPressed.connect(lambda: self.execute_query())
+            self.query_operators[h] = operatorsComboBox
+            self.query_items[h] = QLineEdit()
+            self.query_items[h].returnPressed.connect(lambda: self.execute_query())
 
             operatorsComboBox.currentTextChanged.connect(
                 lambda ix, key=h, select=operatorsComboBox: self.combo_changed(select, key))
@@ -67,12 +67,12 @@ class QueryTab(QScrollArea):
 
             if row % 2 == 0:
                 input_rows_layout.addWidget(self.line_labels[h], row, 0)
-                input_rows_layout.addWidget(self.line_combos[h], row, 1)
-                input_rows_layout.addWidget(self.line_edits[h], row, 2)
+                input_rows_layout.addWidget(self.query_operators[h], row, 1)
+                input_rows_layout.addWidget(self.query_items[h], row, 2)
             else:
                 input_rows_layout.addWidget(self.line_labels[h], row - 1, 3)
-                input_rows_layout.addWidget(self.line_combos[h], row - 1, 4)
-                input_rows_layout.addWidget(self.line_edits[h], row - 1, 5)
+                input_rows_layout.addWidget(self.query_operators[h], row - 1, 4)
+                input_rows_layout.addWidget(self.query_items[h], row - 1, 5)
 
         for i in reversed(range(self.layout().count())):
             self.layout().itemAt(i).widget().deleteLater()
@@ -111,41 +111,43 @@ class QueryTab(QScrollArea):
 
         self.layout().addWidget(table)
 
-    def execute_query(self):
-        print("Clicked")
-        operators: dict[str, str] = {}
-        values: dict[str, object] = {}
-        operator_values: dict[str, (str, object)] = {}
+    def build_query(self) -> Query:
+        query: Query = Query()
 
-        for header, line in self.line_edits.items():
-            print("Header: " + header)
-            operators[header] = self.line_combos[header].currentText()
-            print("Operator: " + operators[header])
+        for column, line in self.query_items.items():
+            print("Column: " + column)
 
-            if operators[header] == Operator.EQUAL \
-                    or operators[header] == Operator.NOT_EQUAL \
-                    or operators[header] == Operator.GREATER \
-                    or operators[header] == Operator.GREATER_EQUAL \
-                    or operators[header] == Operator.LESS \
-                    or operators[header] == Operator.LESS_EQUAL:
+            operator = self.query_operators[column].currentText()
+            print("Operator: " + operator)
+
+            if operator == Operator.EQUAL \
+                    or operator == Operator.NOT_EQUAL \
+                    or operator == Operator.GREATER \
+                    or operator == Operator.GREATER_EQUAL \
+                    or operator == Operator.LESS \
+                    or operator == Operator.LESS_EQUAL:
                 try:
-                    values[header] = int(line.text())
+                    value = int(line.text())
                 except ValueError:
                     try:
-                        values[header] = float(line.text())
+                        value = float(line.text())
                     except ValueError:
-                        values[header] = line.text()
-            elif operators[header] == Operator.BELONGING or operators[header] == Operator.NOT_BELONGING:
-                values[header] = line.text().replace("[", "").replace("]", "").split(",")
+                        value = line.text()
+            elif operator == Operator.BELONGING or operator == Operator.NOT_BELONGING:
+                value = line.text().replace("[", "").replace("]", "").split(",")
 
-            if header in operators and header in values and values[header]:
-                operator_values[header] = (operators[header], values[header])
-                print(header + " " + self.line_combos[header].currentText() + " " + line.text())
+            if operator and value:
+                query.add_operator_value(column, operator, value)
 
-        print("OriginalQuery: ", operator_values)
-        self.query_subject.on_next(operator_values)
+        return query
 
-        self.original_query_expression = QueryRelaxer.query_operator_values_to_expression(operator_values)
+    def execute_query(self):
+        print("Clicked")
+
+        query: Query = self.build_query()
+        self.original_query_expression = query.to_expression()
+
+        #self.original_query_expression = QueryRelaxer.query_operator_values_to_expression(operator_values)
         self.query_label.setText(self.original_query_expression)
         print("OriginalQuery expr: ", self.original_query_expression)
         original_query_result_set: DataFrame = self.csv_parser.data_frame.query(self.original_query_expression)
@@ -154,50 +156,50 @@ class QueryTab(QScrollArea):
 
     def combo_changed(self, combo: QComboBox, key: str):
         if combo.currentText() == Operator.EQUAL:
-            self.line_edits[key].setText("")
-            self.line_edits[key].setPlaceholderText("The exact value of this property")
+            self.query_items[key].setText("")
+            self.query_items[key].setPlaceholderText("The exact value of this property")
             reg_ex = QRegExp("^[a-zA-Z0-9_\\.-\\s]+$")
-            input_validator = QRegExpValidator(reg_ex, self.line_edits[key])
-            self.line_edits[key].setValidator(input_validator)
+            input_validator = QRegExpValidator(reg_ex, self.query_items[key])
+            self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.BELONGING:
-            self.line_edits[key].setText("")
-            self.line_edits[key].setPlaceholderText("A list of values for this property.")
+            self.query_items[key].setText("")
+            self.query_items[key].setPlaceholderText("A list of values for this property.")
             reg_ex = QRegExp("^\\[([a-zA-Z0-9_\\.-\\s]+(,)?)*\\]$")
-            input_validator = QRegExpValidator(reg_ex, self.line_edits[key])
-            self.line_edits[key].setValidator(input_validator)
+            input_validator = QRegExpValidator(reg_ex, self.query_items[key])
+            self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.NOT_BELONGING:
-            self.line_edits[key].setText("")
-            self.line_edits[key].setPlaceholderText("A list of values to exclude for this property.")
+            self.query_items[key].setText("")
+            self.query_items[key].setPlaceholderText("A list of values to exclude for this property.")
             reg_ex = QRegExp("^\\[([a-zA-Z0-9_\\.-\\s]+(,)?)*\\]$")
-            input_validator = QRegExpValidator(reg_ex, self.line_edits[key])
-            self.line_edits[key].setValidator(input_validator)
+            input_validator = QRegExpValidator(reg_ex, self.query_items[key])
+            self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.GREATER:
-            self.line_edits[key].setText("")
-            self.line_edits[key].setPlaceholderText("A minimum value of this property (value excluded)")
+            self.query_items[key].setText("")
+            self.query_items[key].setPlaceholderText("A minimum value of this property (value excluded)")
             reg_ex = QRegExp("^[a-zA-Z0-9_\\.-\\s]+$")
-            input_validator = QRegExpValidator(reg_ex, self.line_edits[key])
-            self.line_edits[key].setValidator(input_validator)
+            input_validator = QRegExpValidator(reg_ex, self.query_items[key])
+            self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.GREATER_EQUAL:
-            self.line_edits[key].setText("")
-            self.line_edits[key].setPlaceholderText("A minimum value of this property (value included)")
+            self.query_items[key].setText("")
+            self.query_items[key].setPlaceholderText("A minimum value of this property (value included)")
             reg_ex = QRegExp("^[a-zA-Z0-9_\\.-\\s]+$")
-            input_validator = QRegExpValidator(reg_ex, self.line_edits[key])
-            self.line_edits[key].setValidator(input_validator)
+            input_validator = QRegExpValidator(reg_ex, self.query_items[key])
+            self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.LESS:
-            self.line_edits[key].setText("")
-            self.line_edits[key].setPlaceholderText("A maximum value of this property (value excluded)")
+            self.query_items[key].setText("")
+            self.query_items[key].setPlaceholderText("A maximum value of this property (value excluded)")
             reg_ex = QRegExp("^[a-zA-Z0-9_\\.-\\s]+$")
-            input_validator = QRegExpValidator(reg_ex, self.line_edits[key])
-            self.line_edits[key].setValidator(input_validator)
+            input_validator = QRegExpValidator(reg_ex, self.query_items[key])
+            self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.LESS_EQUAL:
-            self.line_edits[key].setText("")
-            self.line_edits[key].setPlaceholderText("A maximum value of this property (value included)")
+            self.query_items[key].setText("")
+            self.query_items[key].setPlaceholderText("A maximum value of this property (value included)")
             reg_ex = QRegExp("^[a-zA-Z0-9_\\.-\\s]+$")
-            input_validator = QRegExpValidator(reg_ex, self.line_edits[key])
-            self.line_edits[key].setValidator(input_validator)
+            input_validator = QRegExpValidator(reg_ex, self.query_items[key])
+            self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.NOT_EQUAL:
-            self.line_edits[key].setText("")
-            self.line_edits[key].setPlaceholderText("A value not admitted for this property")
+            self.query_items[key].setText("")
+            self.query_items[key].setPlaceholderText("A value not admitted for this property")
             reg_ex = QRegExp("^[a-zA-Z0-9_\\.-\\s]+$")
-            input_validator = QRegExpValidator(reg_ex, self.line_edits[key])
-            self.line_edits[key].setValidator(input_validator)
+            input_validator = QRegExpValidator(reg_ex, self.query_items[key])
+            self.query_items[key].setValidator(input_validator)

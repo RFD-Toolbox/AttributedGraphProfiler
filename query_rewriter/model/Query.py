@@ -18,6 +18,66 @@ class Query(dict):
         self[OPERATORS]: dict[str, str] = operators
         self[VALUES]: dict[str, int | float | str | list] = values
 
+    def add_operator_value(self, key: str, operator: str, value):
+        self.get_operators()[key] = operator
+        self.get_values()[key] = value
+
+    def to_expression(self) -> str:
+        '''
+                ' item[0]-->key or column
+                ' item[1]-->tuple (operator, value)
+                ' item[1][1]-->value
+                ' Keep only the item having a value.
+                '''
+        operator_values = dict(filter(lambda item: item[1][1], self.items()))
+
+        if not list(operator_values.keys()):
+            return "ilevel_0 in ilevel_0"
+
+        print("After filter")
+        print("Keys:")
+        print(operator_values.keys())
+        print("Values:")
+        print(operator_values.values())
+
+        first_key = list(operator_values.keys())[0]
+        expr = ""
+
+        for key, (operator, value) in operator_values.items():
+            if value:  # check if there is a value
+                if key is not first_key:
+                    expr += " and "
+
+                if operator == "=":
+                    if isinstance(value, (int, float)):
+                        expr += " {} == {}".format(key, value)
+                    elif isinstance(value, str):
+                        expr += " {} == '{}'".format(key, value)
+                elif operator == "~":
+                    if isinstance(value, str):
+                        expr += "{}.str.contains('{}') ".format(key, value)
+                elif operator == "!=":
+                    if isinstance(value, (int, float)):
+                        expr += " {} != {}".format(key, value)
+                    elif isinstance(value, str):
+                        expr += " {} != '{}'".format(key, value)
+                elif operator == "∈":
+                    if isinstance(value, list):
+                        expr += " {} in {}".format(key, value)
+                elif operator == "∉":
+                    if isinstance(value, list):
+                        expr += " {} not in {}".format(key, value)
+                elif operator == ">":
+                    expr += " {} > '{}'".format(key, value)
+                elif operator == ">=":
+                    expr += " {} >= '{}'".format(key, value)
+                elif operator == "<":
+                    expr += " {} < '{}'".format(key, value)
+                elif operator == "<=":
+                    expr += " {} <= '{}'".format(key, value)
+
+        return expr
+
     def get_fields(self) -> list:
         return self[OPERATORS].keys()
 
