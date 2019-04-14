@@ -58,7 +58,7 @@ class QueryRewriterUI(QMainWindow):
 
         if csv_path != "":
             self.tabs.init_data_tab(csv_path)
-            # self.tabs.init_query_tab(csv_path)
+            self.tabs.init_query_tab(csv_path)
             # self.tabs.init_rfds_tab(csv_path)
             # self.tabs.init_rewrite_tab()
             '''with open(file_name) as csv_file:
