@@ -1,7 +1,6 @@
 class Operator:
     EQUAL = "="
-    SIMILAR = "~"
-    DIFFERENT = "!="
+    NOT_EQUAL = "!="
     BELONGING = "∈"
     NOT_BELONGING = "∉"
     GREATER = ">"

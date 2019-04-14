@@ -317,9 +317,7 @@ class QueryRelaxer:
                             extended_value = value
                             extended_query[key] = (Operator.EQUAL, extended_value)
 
-                elif operator == Operator.SIMILAR:
-                    print("Its similar")
-                elif operator == Operator.DIFFERENT:
+                elif operator == Operator.NOT_EQUAL:
                     print("Its different")
                 elif operator == Operator.BELONGING:
                     print("Its belonging")
