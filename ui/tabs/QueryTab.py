@@ -16,6 +16,7 @@ from ui.PandasTableModel import PandasTableModel
 class QueryTab(QScrollArea):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.query_subject = Subject()
 
         self.content_widget = QWidget()
         self.setWidget(self.content_widget)
@@ -29,7 +30,6 @@ class QueryTab(QScrollArea):
         self.data_frame: DataFrame = self.csv_parser.data_frame
         self.header = self.csv_parser.header
         self.separator = self.csv_parser.delimiter
-        self.query_subject = Subject()
 
         groupBox = QGroupBox()
         input_rows_layout = QGridLayout()
@@ -145,6 +145,7 @@ class QueryTab(QScrollArea):
         print("Clicked")
 
         query: Query = self.build_query()
+        self.query_subject.on_next(query)
         self.original_query_expression = query.to_expression()
 
         #self.original_query_expression = QueryRelaxer.query_operator_values_to_expression(operator_values)
@@ -203,3 +204,6 @@ class QueryTab(QScrollArea):
             reg_ex = QRegExp("^[a-zA-Z0-9_\\.-\\s]+$")
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
+
+    def get_query_subject(self):
+        return self.query_subject

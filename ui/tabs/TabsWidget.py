@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QTabWidget, QWidget, QVBoxLayout, \
 
 from query_rewriter.query.relaxer import QueryRelaxer
 from ui.tabs.DataTab import DataTab
+from ui.tabs.ExtensionTab import ExtensionTab
 from ui.tabs.QueryTab import QueryTab
 from ui.tabs.RFDsTab import RFDsTab
 
@@ -33,17 +34,16 @@ class TabsWidget(QTabWidget):
         self.rfds_tab: RFDsTab = RFDsTab()
         self.addTab(self.rfds_tab, "RFDs")
 
+        # Extension Tab
+        self.extension_tab: ExtensionTab = ExtensionTab()
+        self.addTab(self.extension_tab, "Extension")
+
         # Rewrite
         self.rewrite_tab = QScrollArea()
         self.rewrite_tab_content_widget = QWidget()
         self.rewrite_tab.setWidget(self.rewrite_tab_content_widget)
         self.rewrite_tab.setWidgetResizable(True)
         self.rewrite_tab_layout = QVBoxLayout(self.rewrite_tab_content_widget)
-
-        # self.addTab(self.dataset_tab, "Dataset")
-        # self.addTab(self.query_tab, "Query")
-        # self.addTab(self.rfds_tab, "RFDs")
-        # self.addTab(self.rewrite_tab, "Rewrite")
 
         self.rfds: list = []
 
@@ -55,6 +55,9 @@ class TabsWidget(QTabWidget):
 
     def init_rfds_tab(self, path: str):
         self.rfds_tab.display(path)
+
+    def init_extension_tab(self, path: str):
+        self.extension_tab.display(path)
 
     def rfd_selected_to_relaxed_query(self, current: QTreeWidgetItem, previous: QTreeWidgetItem):
         print("RFD selected to relaxed query...")

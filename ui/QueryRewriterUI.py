@@ -60,6 +60,11 @@ class QueryRewriterUI(QMainWindow):
             self.tabs.init_data_tab(csv_path)
             self.tabs.init_query_tab(csv_path)
             self.tabs.init_rfds_tab(csv_path)
+            self.tabs.init_extension_tab(csv_path)
+
+            self.tabs.extension_tab.set_query_subject(self.tabs.query_tab.get_query_subject())
+            self.tabs.extension_tab.set_rfd_subject(self.tabs.rfds_tab.get_rfd_subject())
+
             # self.tabs.init_rewrite_tab()
             '''with open(file_name) as csv_file:
                 sniffer = csv.Sniffer()

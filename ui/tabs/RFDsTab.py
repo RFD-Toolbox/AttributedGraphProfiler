@@ -26,6 +26,8 @@ class RFDsTab(QScrollArea):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.rfd_subject = Subject()
+
         self.content_widget = QWidget()
         self.setWidget(self.content_widget)
         self.setWidgetResizable(True)
@@ -40,8 +42,6 @@ class RFDsTab(QScrollArea):
         self.separator = self.csv_parser.delimiter
         self.columns_count = self.csv_parser.columns_count
         self.rows_count = self.csv_parser.rows_count
-
-        self.rfds_subject = Subject()
 
         for i in reversed(range(self.layout().count())):
             self.layout().itemAt(i).widget().deleteLater()
@@ -144,8 +144,6 @@ class RFDsTab(QScrollArea):
             # print("\n")
             self.rfds.extend(Transformer.rfd_data_frame_to_rfd_list(df, self.header))
 
-        self.rfds_subject.on_next(self.rfds)
-
         self.tree_header = QTreeWidgetItem()
         self.tree_header.setText(self.RFD, "RFD")
         self.tree_header.setText(self.EXTENT, "Extent")
@@ -184,6 +182,7 @@ class RFDsTab(QScrollArea):
             print(current)
             rfd: RFD = current.data(self.RFD, Qt.UserRole)
             print("Current: " + str(rfd))
+            self.rfd_subject.on_next(rfd)
 
             # https://stackoverflow.com/questions/38987/how-to-merge-two-dictionaries-in-a-single-expression#26853961
             rfd_thresholds: dict = {**rfd.get_left_hand_side(), **rfd.get_right_hand_side()}
@@ -219,7 +218,7 @@ class RFDsTab(QScrollArea):
             print("Full Dist:")
             print(full_dist)
 
-            dist: ndarray = np.array(
+            dist: np.ndarray = np.array(
                 [[full_dist.iloc[row1 * rows + row2] for row2 in range(0, rows)] for row1 in range(0, rows)])
             print("Dist:")
             print(dist)
@@ -229,8 +228,8 @@ class RFDsTab(QScrollArea):
             # print("IM:")
             # print(im)
 
-            conditions_arrays: ndarray = [(dist[:, :, rfd_columns_index[column]] <= rfd_thresholds[column])
-                                          for column in rfd_columns]
+            conditions_arrays: np.ndarray = [(dist[:, :, rfd_columns_index[column]] <= rfd_thresholds[column])
+                                             for column in rfd_columns]
 
             print("Conditions Array:")
             print(conditions_arrays)
@@ -274,3 +273,6 @@ class RFDsTab(QScrollArea):
             self.rfd_data_set_table.clearSelection()
             for index in df_indexes:
                 self.rfd_data_set_table.selectRow(index)
+
+    def get_rfd_subject(self):
+        return self.rfd_subject
