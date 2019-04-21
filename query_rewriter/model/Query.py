@@ -93,7 +93,7 @@ class Query(dict):
             if item_value:  # check if there is a value
                 # print("Key: " + item_key)
 
-                if rfd.__contains__(item_key):
+                if rfd.__contains__(item_key):  # extend its range
                     threshold: float = rfd[item_key]
                     # print("Threshold: " + str(threshold))
 
@@ -125,6 +125,8 @@ class Query(dict):
                         print("Its Less")
                     elif item_operator == Operator.LESS_EQUAL:
                         print("Its Less equal")
+                else:  # use the initial range
+                    extended_query.add_operator_value(item_key, item_operator, item_value)
 
         if extended_query.__len__() == 0:
             return self
