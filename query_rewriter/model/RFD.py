@@ -22,6 +22,13 @@ class RFD(dict):
             except KeyError:
                 return self.get_right_hand_side()[k]
 
+    def __contains__(self, o: object) -> bool:
+        return super().__contains__(o) \
+               or \
+               self.get_left_hand_side().__contains__(o) \
+               or \
+               self.get_right_hand_side().__contains__(o)
+
     def __str__(self) -> str:
         return str(self["LHS"]) + " ==> " + str(self["RHS"])
 

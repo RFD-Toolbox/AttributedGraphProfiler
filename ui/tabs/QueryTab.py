@@ -115,10 +115,10 @@ class QueryTab(QScrollArea):
         query: Query = Query()
 
         for column, line in self.query_items.items():
-            print("Column: " + column)
+            # print("Column: " + column)
 
             operator = self.query_operators[column].currentText()
-            print("Operator: " + operator)
+            # print("Operator: " + operator)
 
             if operator == Operator.EQUAL \
                     or operator == Operator.NOT_EQUAL \
@@ -142,7 +142,7 @@ class QueryTab(QScrollArea):
         return query
 
     def execute_query(self):
-        print("Clicked")
+        # print("Clicked")
 
         query: Query = self.build_query()
         self.query_subject.on_next(query)
@@ -150,9 +150,9 @@ class QueryTab(QScrollArea):
 
         #self.original_query_expression = QueryRelaxer.query_operator_values_to_expression(operator_values)
         self.query_label.setText(self.original_query_expression)
-        print("OriginalQuery expr: ", self.original_query_expression)
+        # print("OriginalQuery expr: ", self.original_query_expression)
         original_query_result_set: DataFrame = self.csv_parser.data_frame.query(self.original_query_expression)
-        print("Original Query Result Set:\n", original_query_result_set)
+        # print("Original Query Result Set:\n", original_query_result_set)
         self._query_data_model.update_data(original_query_result_set)
 
     def combo_changed(self, combo: QComboBox, key: str):

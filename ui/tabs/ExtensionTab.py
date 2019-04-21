@@ -1,8 +1,10 @@
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel, QLayout
+from pandas import DataFrame
 from rx.subjects import Subject
 
+from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Query import Query
 from query_rewriter.model.RFD import RFD
 
@@ -15,9 +17,13 @@ class ExtensionTab(QScrollArea):
         self.setWidgetResizable(True)
         self.setLayout(QVBoxLayout(self.content_widget))
         self.layout().setAlignment(Qt.AlignTop)
+        self.query: Query = None
+        self.rfd: RFD = None
 
     def display(self, path: str):
         self.path = path
+        self.csv_parser: CSVParser = CSVParser(path)
+        self.data_frame: DataFrame = self.csv_parser.data_frame
 
         for i in reversed(range(self.layout().count())):
             self.layout().itemAt(i).widget().deleteLater()
@@ -42,22 +48,49 @@ class ExtensionTab(QScrollArea):
         self.extended_query_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
         self.layout().addWidget(self.extended_query_title)
 
+        self.extended_query_value = QLabel("")
+        self.extended_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
+        self.layout().addWidget(self.extended_query_value)
+
     def set_query_subject(self, query_subject: Subject):
         self.query_subject: Subject = query_subject
         self.query_subject.subscribe(
-            on_next=lambda ov: self.update_initial_query(ov)
+            on_next=lambda query:
+            (
+                self.update_initial_query(query),
+                self.extend_query()
+            )
         )
 
     def update_initial_query(self, query: Query):
         self.query: Query = query
+        print("Query changed...")
+        print(self.query)
         self.initial_query_value.setText(self.query.to_expression())
 
     def set_rfd_subject(self, rfd_subject: Subject):
         self.rfd_subject: Subject = rfd_subject
         self.rfd_subject.subscribe(
-            on_next=lambda rfd: self.update_rfd_label(rfd)
+            on_next=lambda rfd: (
+                self.update_selected_rfd(rfd),
+                self.extend_query()
+            )
         )
 
-    def update_rfd_label(self, rfd: RFD):
+    def update_selected_rfd(self, rfd: RFD):
         self.rfd: RFD = rfd
+        print("RFD changed...")
+        print(self.rfd)
         self.rfd_value.setText(self.rfd.__str__())
+
+    def extend_query(self):
+        if self.query and self.rfd:
+            print("Extending query")
+
+            print("Initial Query:")
+            print(self.query.to_expression())
+            self.extended_query = self.query.extend_ranges(self.rfd, self.data_frame)
+
+            print("Extended query:")
+            print(self.extended_query.to_expression())
+            self.extended_query_value.setText(self.extended_query.to_expression())
