@@ -66,18 +66,28 @@ class Query(dict):
                         expr += " {} != '{}'".format(key, value)
                 elif operator == Operator.BELONGING:
                     if isinstance(value, list):
-                        expr += " {} in {}".format(key, value)
+                        if all(isinstance(item, (int, float)) for item in value):
+                            expr += " {} in {}".format(key, value)
+                        elif all(isinstance(item, str) for item in value):
+                            expr += " {} in {}".format(key, value)
                 elif operator == Operator.NOT_BELONGING:
                     if isinstance(value, list):
-                        expr += " {} not in {}".format(key, value)
+                        if all(isinstance(item, (int, float)) for item in value):
+                            expr += " {} not in {}".format(key, value)
+                        elif all(isinstance(item, str) for item in value):
+                            expr += " {} not in {}".format(key, value)
                 elif operator == Operator.GREATER:
-                    expr += " {} > '{}'".format(key, value)
+                    if isinstance(value, (int, float)):
+                        expr += " {} > {}".format(key, value)
                 elif operator == Operator.GREATER_EQUAL:
-                    expr += " {} >= '{}'".format(key, value)
+                    if isinstance(value, (int, float)):
+                        expr += " {} >= {}".format(key, value)
                 elif operator == Operator.LESS:
-                    expr += " {} < '{}'".format(key, value)
+                    if isinstance(value, (int, float)):
+                        expr += " {} < {}".format(key, value)
                 elif operator == Operator.LESS_EQUAL:
-                    expr += " {} <= '{}'".format(key, value)
+                    if isinstance(value, (int, float)):
+                        expr += " {} <= {}".format(key, value)
 
         return expr
 
@@ -166,14 +176,44 @@ class Query(dict):
                             extended_query.add_operator_value(item_key, Operator.BELONGING, item_value)
                     elif item_operator == Operator.NOT_BELONGING:
                         print("It's NOT belonging")
+                        #  TODO think for improvements
+                        extended_query.add_operator_value(item_key, Operator.NOT_BELONGING, item_value)
                     elif item_operator == Operator.GREATER:
                         print("It's Greater")
+                        # reduce the lower bound
+                        if isinstance(item_value, (int, float)):
+                            extended_value = item_value - threshold
+                        else:
+                            extended_value = item_value
+
+                        extended_query.add_operator_value(item_key, Operator.GREATER, extended_value)
                     elif item_operator == Operator.GREATER_EQUAL:
                         print("It's Greater equal")
+                        # reduce the lower bound
+                        if isinstance(item_value, (int, float)):
+                            extended_value = item_value - threshold
+                        else:
+                            extended_value = item_value
+
+                        extended_query.add_operator_value(item_key, Operator.GREATER_EQUAL, extended_value)
                     elif item_operator == Operator.LESS:
                         print("It's Less")
+                        # increase the upper bound
+                        if isinstance(item_value, (int, float)):
+                            extended_value = item_value + threshold
+                        else:
+                            extended_value = item_value
+
+                        extended_query.add_operator_value(item_key, Operator.LESS, extended_value)
                     elif item_operator == Operator.LESS_EQUAL:
                         print("It's Less equal")
+                        # increase the upper bound
+                        if isinstance(item_value, (int, float)):
+                            extended_value = item_value + threshold
+                        else:
+                            extended_value = item_value
+
+                        extended_query.add_operator_value(item_key, Operator.LESS_EQUAL, extended_value)
                 else:  # use the initial range
                     extended_query.add_operator_value(item_key, item_operator, item_value)
 
