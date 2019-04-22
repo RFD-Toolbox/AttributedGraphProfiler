@@ -135,7 +135,15 @@ class QueryTab(QScrollArea):
                     except ValueError:
                         value = line.text()
             elif operator == Operator.BELONGING or operator == Operator.NOT_BELONGING:
-                value = ast.literal_eval(line.text())
+                print("Line text list:")
+                print(line.text())
+                try:
+                    value: list = [int(item) for item in line.text().replace('[', '').replace(']', '').split(',')]
+                except ValueError:
+                    try:
+                        value: list = [float(item) for item in line.text().replace('[', '').replace(']', '').split(',')]
+                    except ValueError:
+                        value: list = [str(item) for item in line.text().replace('[', '').replace(']', '').split(',')]
 
             if operator and value:
                 query.add_operator_value(column, operator, value)
@@ -148,8 +156,10 @@ class QueryTab(QScrollArea):
         query: Query = self.build_query()
         self.query_subject.on_next(query)
         self.original_query_expression = query.to_expression()
+        print("Original Query expression:")
+        print(self.original_query_expression)
 
-        #self.original_query_expression = QueryRelaxer.query_operator_values_to_expression(operator_values)
+        # self.original_query_expression = QueryRelaxer.query_operator_values_to_expression(operator_values)
         self.query_label.setText(self.original_query_expression)
         # print("OriginalQuery expr: ", self.original_query_expression)
         original_query_result_set: DataFrame = self.csv_parser.data_frame.query(self.original_query_expression)
