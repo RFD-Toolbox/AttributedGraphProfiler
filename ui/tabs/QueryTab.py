@@ -1,3 +1,4 @@
+import ast
 import copy
 
 from PyQt5.QtCore import QRegExp
@@ -134,7 +135,7 @@ class QueryTab(QScrollArea):
                     except ValueError:
                         value = line.text()
             elif operator == Operator.BELONGING or operator == Operator.NOT_BELONGING:
-                value = line.text().replace("[", "").replace("]", "").split(",")
+                value = ast.literal_eval(line.text())
 
             if operator and value:
                 query.add_operator_value(column, operator, value)
