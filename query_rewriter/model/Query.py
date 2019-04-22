@@ -54,32 +54,29 @@ class Query(dict):
                 if key is not first_key:
                     expr += " and "
 
-                if operator == "=":
+                if operator == Operator.EQUAL:
                     if isinstance(value, (int, float)):
                         expr += " {} == {}".format(key, value)
                     elif isinstance(value, str):
                         expr += " {} == '{}'".format(key, value)
-                elif operator == "~":
-                    if isinstance(value, str):
-                        expr += "{}.str.contains('{}') ".format(key, value)
-                elif operator == "!=":
+                elif operator == Operator.NOT_EQUAL:
                     if isinstance(value, (int, float)):
                         expr += " {} != {}".format(key, value)
                     elif isinstance(value, str):
                         expr += " {} != '{}'".format(key, value)
-                elif operator == "∈":
+                elif operator == Operator.BELONGING:
                     if isinstance(value, list):
                         expr += " {} in {}".format(key, value)
-                elif operator == "∉":
+                elif operator == Operator.NOT_BELONGING:
                     if isinstance(value, list):
                         expr += " {} not in {}".format(key, value)
-                elif operator == ">":
+                elif operator == Operator.GREATER:
                     expr += " {} > '{}'".format(key, value)
-                elif operator == ">=":
+                elif operator == Operator.GREATER_EQUAL:
                     expr += " {} >= '{}'".format(key, value)
-                elif operator == "<":
+                elif operator == Operator.LESS:
                     expr += " {} < '{}'".format(key, value)
-                elif operator == "<=":
+                elif operator == Operator.LESS_EQUAL:
                     expr += " {} <= '{}'".format(key, value)
 
         return expr
