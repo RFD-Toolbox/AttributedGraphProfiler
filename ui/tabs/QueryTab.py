@@ -1,4 +1,3 @@
-import ast
 import copy
 
 from PyQt5.QtCore import QRegExp
@@ -6,6 +5,7 @@ from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QGroupBox, QGridLayout, QLabel, QLineEdit, QComboBox, \
     QPushButton, QTableView, QHeaderView
 from pandas import DataFrame
+import numpy as np
 from rx.subjects import Subject
 
 from query_rewriter.io.csv.csv_parser import CSVParser
@@ -29,6 +29,7 @@ class QueryTab(QScrollArea):
         self.path = path
         self.csv_parser: CSVParser = CSVParser(path)
         self.data_frame: DataFrame = self.csv_parser.data_frame
+        self.column_types: dict = self.data_frame.dtypes.to_dict()
         self.header = self.csv_parser.header
         self.separator = self.csv_parser.delimiter
 
@@ -52,10 +53,17 @@ class QueryTab(QScrollArea):
             operatorsComboBox.addItem(Operator.NOT_EQUAL)
             operatorsComboBox.addItem(Operator.BELONGING)
             operatorsComboBox.addItem(Operator.NOT_BELONGING)
-            operatorsComboBox.addItem(Operator.GREATER)
-            operatorsComboBox.addItem(Operator.GREATER_EQUAL)
-            operatorsComboBox.addItem(Operator.LESS)
-            operatorsComboBox.addItem(Operator.LESS_EQUAL)
+
+            # TODO check for column type
+            column_type = self.column_types[self.header[row]]
+            print("Column " + self.header[row] + " is of Type:")
+            print(column_type)
+
+            if column_type == np.int64 or column_type == np.float64:
+                operatorsComboBox.addItem(Operator.GREATER)
+                operatorsComboBox.addItem(Operator.GREATER_EQUAL)
+                operatorsComboBox.addItem(Operator.LESS)
+                operatorsComboBox.addItem(Operator.LESS_EQUAL)
 
             self.query_operators[h] = operatorsComboBox
             self.query_items[h] = QLineEdit()
