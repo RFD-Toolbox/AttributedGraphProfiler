@@ -109,6 +109,7 @@ class Query(dict):
                             if threshold > 0:  # once extended it will turn into a belonging
                                 extended_value = list(
                                     range(int(item_value - threshold), int(item_value + threshold + 1)))
+                                extended_value.sort()
                                 extended_query.add_operator_value(item_key, Operator.BELONGING, extended_value)
                             elif threshold == 0:  # nothing to extend
                                 extended_value = item_value
@@ -120,6 +121,7 @@ class Query(dict):
                                                                                                    data=data_set,
                                                                                                    col=item_key,
                                                                                                    threshold=threshold)))
+                                similar_strings.sort()
                                 print("Similar strings:")
                                 print(similar_strings)
 
@@ -127,19 +129,51 @@ class Query(dict):
                             elif threshold == 0:
                                 extended_query.add_operator_value(item_key, Operator.EQUAL, item_value)
                     elif item_operator == Operator.NOT_EQUAL:
-                        print("Its different")
+                        print("It's different")
+                        #  TODO think for improvements
+                        extended_query.add_operator_value(item_key, Operator.NOT_EQUAL, item_value)
                     elif item_operator == Operator.BELONGING:
-                        print("Its belonging")
+                        print("It's belonging")
+                        if threshold > 0:
+                            if isinstance(item_value, list) \
+                                    and all(isinstance(element, str) for element in item_value):
+                                print("It's a list of strings")
+
+                                extended_value: list = []
+
+                                for item in item_value:
+                                    extended_value.extend(list(set(QueryRelaxer.similar_strings(source=item,
+                                                                                                data=data_set,
+                                                                                                col=item_key,
+                                                                                                threshold=threshold))))
+                                extended_value = list(set(extended_value))
+                                extended_value.sort()
+                                extended_query.add_operator_value(item_key, Operator.BELONGING, extended_value)
+
+                            elif isinstance(item_value, list) and all(
+                                    isinstance(element, (int, float)) for element in item_value):
+                                print("It's a list of numbers")
+
+                                extended_value: list = []
+
+                                for item in item_value:
+                                    extended_value.extend(list(range(int(item - threshold), int(item + threshold + 1))))
+
+                                extended_value = list(set(extended_value))
+                                extended_value.sort()
+                                extended_query.add_operator_value(item_key, Operator.BELONGING, extended_value)
+                        elif threshold == 0:
+                            extended_query.add_operator_value(item_key, Operator.BELONGING, item_value)
                     elif item_operator == Operator.NOT_BELONGING:
-                        print("Its NOT belonging")
+                        print("It's NOT belonging")
                     elif item_operator == Operator.GREATER:
-                        print("Its Greater")
+                        print("It's Greater")
                     elif item_operator == Operator.GREATER_EQUAL:
-                        print("Its Greater equal")
+                        print("It's Greater equal")
                     elif item_operator == Operator.LESS:
-                        print("Its Less")
+                        print("It's Less")
                     elif item_operator == Operator.LESS_EQUAL:
-                        print("Its Less equal")
+                        print("It's Less equal")
                 else:  # use the initial range
                     extended_query.add_operator_value(item_key, item_operator, item_value)
 
