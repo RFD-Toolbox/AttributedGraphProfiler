@@ -334,36 +334,34 @@ class QueryRelaxer:
 
         return extended_query
 
+    @staticmethod
+    def similar_strings(source: str, data: DataFrame, col: str, threshold: int) -> list:
+        '''
+        Returns a list of strings, from the column col of data DataFrame,
+        that are similar to the source string with an edit distance of at most threshold.
+        :param source: the string against which to compute the edit distances.
+        :param data: the DataFrame containing the string values.
+        :param col: the DataFrame column containing the string values.
+        :param threshold: the maximum edit distance between source and another string.
+        :return: the list of strings similar to source.
+        '''
 
-@staticmethod
-def similar_strings(source: str, data: DataFrame, col: str, threshold: int) -> list:
-    '''
-    Returns a list of strings, from the column col of data DataFrame,
-    that are similar to the source string with an edit distance of at most threshold.
-    :param source: the string against which to compute the edit distances.
-    :param data: the DataFrame containing the string values.
-    :param col: the DataFrame column containing the string values.
-    :param threshold: the maximum edit distance between source and another string.
-    :return: the list of strings similar to source.
-    '''
+        return data[data[col].apply(lambda word: int(editdistance.eval(source, word)) <= threshold)][
+            col].tolist()
 
-    return data[data[col].apply(lambda word: int(editdistance.eval(source, word)) <= threshold)][
-        col].tolist()
+    @staticmethod
+    def extract_columns_value_list(df: DataFrame, columns: list):
+        '''
+        Extracts values of given columns from thd DataFrane and returns them as a
+        Dictionary of value lists.
+        :param df: The DataFrame from which to extract values.
+        :param columns: The columns we are interested in extracting values.
+        :return: A Dictionary of lists containing the values for the corresponding columns.
+        '''
+        dictionary = {}
+        for col in columns:
+            # duplicates removed too.
+            dictionary[col] = list(set(df[col].tolist()))
+            dictionary[col].sort()
 
-
-@staticmethod
-def extract_columns_value_list(df: DataFrame, columns: list):
-    '''
-    Extracts values of given columns from thd DataFrane and returns them as a
-    Dictionary of value lists.
-    :param df: The DataFrame from which to extract values.
-    :param columns: The columns we are interested in extracting values.
-    :return: A Dictionary of lists containing the values for the corresponding columns.
-    '''
-    dictionary = {}
-    for col in columns:
-        # duplicates removed too.
-        dictionary[col] = list(set(df[col].tolist()))
-        dictionary[col].sort()
-
-    return dictionary
+        return dictionary

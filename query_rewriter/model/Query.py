@@ -4,6 +4,7 @@ from pandas import DataFrame, np
 
 from query_rewriter.model.Operator import Operator
 from query_rewriter.model.RFD import RFD
+from query_rewriter.query.relaxer import QueryRelaxer
 
 VALUES = "VALUES"
 OPERATORS = "OPERATORS"
@@ -85,6 +86,8 @@ class Query(dict):
 
     def extend_ranges(self, rfd: RFD, data_set: DataFrame):
         column_types: dict = data_set.dtypes.to_dict()
+        print("Column Types:")
+        print(column_types)
         extended_query = Query()
         print("BLANK Extended query:")
         print(extended_query)
@@ -98,6 +101,8 @@ class Query(dict):
                     # print("Threshold: " + str(threshold))
 
                     column_type = column_types.get(item_key)  # get the type of this column of the DataFrame
+                    print("Column Type:")
+                    print(column_type)
 
                     if item_operator == Operator.EQUAL:
                         # print("It is equal")
@@ -111,6 +116,19 @@ class Query(dict):
                             elif threshold == 0:  # nothing to extend
                                 extended_value = item_value
                                 extended_query.add_operator_value(item_key, Operator.EQUAL, extended_value)
+                        elif column_type == np.object:
+                            print("It's string")
+                            if threshold > 0:
+                                similar_strings: list[str] = list(set(QueryRelaxer.similar_strings(source=item_value,
+                                                                                                   data=data_set,
+                                                                                                   col=item_key,
+                                                                                                   threshold=threshold)))
+                                print("Similar strings:")
+                                print(similar_strings)
+
+                                extended_query.add_operator_value(item_key, Operator.BELONGING, similar_strings)
+                            elif threshold == 0:
+                                extended_query.add_operator_value(item_key, Operator.EQUAL, item_value)
                     elif item_operator == Operator.NOT_EQUAL:
                         print("Its different")
                     elif item_operator == Operator.BELONGING:
