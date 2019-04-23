@@ -38,13 +38,6 @@ class TabsWidget(QTabWidget):
         self.extension_tab: ExtensionTab = ExtensionTab()
         self.addTab(self.extension_tab, "Extension")
 
-        # Rewrite
-        self.rewrite_tab = QScrollArea()
-        self.rewrite_tab_content_widget = QWidget()
-        self.rewrite_tab.setWidget(self.rewrite_tab_content_widget)
-        self.rewrite_tab.setWidgetResizable(True)
-        self.rewrite_tab_layout = QVBoxLayout(self.rewrite_tab_content_widget)
-
         self.rfds: list = []
 
     def init_data_tab(self, path: str):
@@ -78,26 +71,6 @@ class TabsWidget(QTabWidget):
         extended_result_set: DataFrame = self.data_frame.query(extended_expression)
         print("Extended result set:")
         print(extended_result_set)
-
-    def init_rewrite_tab(self):
-        self.query_subject.subscribe(
-            on_next=lambda ov: self.update_original_query(ov)
-        )
-
-        self.rfds_subject.subscribe(
-            on_next=lambda rfds: self.show_rewrite_rfds(rfds)
-        )
-
-        self.rewrite_original_query_label = QLabel("")
-        self.rewrite_tab_layout.addWidget(self.rewrite_original_query_label)
-
-        self.rewrite_extended_query_label = QLabel("")
-        self.rewrite_tab_layout.addWidget(self.rewrite_extended_query_label)
-
-    def update_original_query(self, operator_values: dict):
-        self.original_query_operator_values = operator_values
-        self.rewrite_original_query_label.setText(
-            QueryRelaxer.query_operator_values_to_expression(self.original_query_operator_values))
 
     def update_extended_query(self, extended_operator_values: dict):
         self.extended_query_operator_values = extended_operator_values
