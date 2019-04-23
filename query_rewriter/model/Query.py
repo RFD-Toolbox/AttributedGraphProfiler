@@ -222,6 +222,65 @@ class Query(dict):
         else:
             return extended_query
 
+    def relax_constraints(self, rfd: RFD, data_set: DataFrame):
+        '''
+        Relaxes this Query
+        :param rfd: The RFD to use for relaxing this Query
+        :param data_set: The full data set
+        :return: the Relaxed Query
+        '''
+
+        print("Query.Relax constraints...")
+        extended_result_set: DataFrame = data_set.query(self.to_expression())
+        print("Query.Extended Result Set:")
+        print(extended_result_set)
+
+        # List containing only the columns/attributes that will be in the Relaxed Query
+        relaxing_columns: list = [col for col in list(extended_result_set)
+                                  if col not in self.keys() and col in rfd]
+
+        print("Query.Relaxing columns:")
+        print(relaxing_columns)
+
+        relaxed_query: Query = Query()
+
+        # These columns are not part of the query, hence we can use a simple belonging operator
+        for col in relaxing_columns:
+            print("Col: " + col)
+            extended_column_values: list = extended_result_set[col].tolist()
+            print(extended_column_values)
+
+            threshold: float = rfd[col]
+            print("Threshold:")
+            print(threshold)
+
+            relaxed_column_values: list = []
+
+            if threshold > 0:
+                for colulmn_value in extended_column_values:
+                    # relax the values
+                    if isinstance(colulmn_value, (int, float)):
+                        relaxed_column_values.extend(
+                            list(range(int(colulmn_value - threshold), int(colulmn_value + threshold + 1))))
+                    elif isinstance(colulmn_value, str):
+                        similar_strings: list[str] = list(set(QueryRelaxer.similar_strings(source=colulmn_value,
+                                                                                           data=data_set,
+                                                                                           col=col,
+                                                                                           threshold=threshold)))
+                        relaxed_column_values.extend(similar_strings)
+            else:
+                # keep the extended values
+                relaxed_column_values.extend(extended_column_values)
+
+            # Remove duplicates
+            relaxed_column_values = list(set(relaxed_column_values))
+            # Sort values
+            relaxed_column_values.sort()
+
+            relaxed_query.add_operator_value(col, Operator.BELONGING, relaxed_column_values)
+
+        return relaxed_query
+
     def get_fields(self) -> list:
         return self[OPERATORS].keys()
 

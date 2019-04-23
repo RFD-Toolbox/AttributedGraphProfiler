@@ -1,12 +1,13 @@
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel, QTableView, QHeaderView, QAbstractItemView
 from pandas import DataFrame
 from rx.subjects import Subject
 
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Query import Query
 from query_rewriter.model.RFD import RFD
+from ui.PandasTableModel import PandasTableModel
 
 
 class RelaxTab(QScrollArea):
@@ -54,12 +55,31 @@ class RelaxTab(QScrollArea):
         self.extended_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
         self.layout().addWidget(self.extended_query_value)
 
+        self.relaxed_query_title = QLabel("Relaxed Query")
+        self.relaxed_query_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
+        self.layout().addWidget(self.relaxed_query_title)
+
+        self.relaxed_query_value = QLabel("")
+        self.relaxed_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
+        self.layout().addWidget(self.relaxed_query_value)
+
+        self.data_set_table = QTableView()
+        self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.layout())
+        self.data_set_table.setModel(self.pandas_model)
+        self.data_set_table.setSortingEnabled(False)
+        self.data_set_table.resizeRowsToContents()
+        self.data_set_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
+        self.data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
+
+        self.layout().addWidget(self.data_set_table)
+
     def set_initial_query_subject(self, query_subject: Subject):
         self.query_subject: Subject = query_subject
         self.query_subject.subscribe(
             on_next=lambda query:
             (
-                self.update_initial_query(query)
+                self.update_initial_query(query),
+                self.relax_query()
             )
         )
 
@@ -74,12 +94,14 @@ class RelaxTab(QScrollArea):
         self.extended_query_subject.subscribe(
             on_next=lambda query:
             (
-                self.update_extended_query(query)
+                self.update_extended_query(query),
+                self.relax_query()
             )
         )
 
     def update_extended_query(self, query: Query):
         self.extended_query: Query = query
+        self.extended_result_set: DataFrame = self.data_frame.query(self.extended_query.to_expression())
         print("Extended Query changed...")
         print(self.extended_query)
         self.extended_query_value.setText(self.extended_query.to_expression())
@@ -88,7 +110,8 @@ class RelaxTab(QScrollArea):
         self.rfd_subject: Subject = rfd_subject
         self.rfd_subject.subscribe(
             on_next=lambda rfd: (
-                self.update_selected_rfd(rfd)
+                self.update_selected_rfd(rfd),
+                self.relax_query()
             )
         )
 
@@ -98,3 +121,19 @@ class RelaxTab(QScrollArea):
         print(self.rfd)
         self.rfd_value.setText(self.rfd.__str__())
 
+    def relax_query(self):
+        if self.initial_query and self.extended_query and self.extended_result_set is not None and self.rfd:
+            print("RelaxTab.Relaxing Query")
+            self.relaxed_query: Query = self.extended_query.relax_constraints(self.rfd, self.data_frame)
+
+            print("RelaxTab.Relaxed Query:")
+            print(self.relaxed_query.to_expression())
+            self.relaxed_query_value.setText(self.relaxed_query.to_expression())
+
+            relaxed_result_set: DataFrame = self.data_frame.query(self.relaxed_query.to_expression())
+
+            df_indexes = relaxed_result_set.index.values.tolist()
+
+            self.data_set_table.clearSelection()
+            for index in df_indexes:
+                self.data_set_table.selectRow(index)

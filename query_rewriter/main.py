@@ -143,7 +143,8 @@ def start_process(arguments):
 
         current_row = 0
         for row in rows_df_list:
-            row_values = QueryRelaxer.extract_columns_value_list(row, relaxing_attributes)
+            # Values of the row in dictionary form: column --> values
+            row_values: dict = QueryRelaxer.extract_columns_value_list(row, relaxing_attributes)
 
             relaxing_values_extended = {}
             for attr, lst in row_values.items():
