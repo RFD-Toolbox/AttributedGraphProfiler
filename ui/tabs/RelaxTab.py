@@ -31,30 +31,6 @@ class RelaxTab(QScrollArea):
         for i in reversed(range(self.layout().count())):
             self.layout().itemAt(i).widget().deleteLater()
 
-        self.initial_query_title = QLabel("Initial Query")
-        self.initial_query_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
-        self.layout().addWidget(self.initial_query_title)
-
-        self.initial_query_value = QLabel("")
-        self.initial_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
-        self.layout().addWidget(self.initial_query_value)
-
-        self.rfd_title = QLabel("RFD")
-        self.rfd_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
-        self.layout().addWidget(self.rfd_title)
-
-        self.rfd_value = QLabel("")
-        self.rfd_value.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Cursive))
-        self.layout().addWidget(self.rfd_value)
-
-        self.extended_query_title = QLabel("Extended Query")
-        self.extended_query_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
-        self.layout().addWidget(self.extended_query_title)
-
-        self.extended_query_value = QLabel("")
-        self.extended_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
-        self.layout().addWidget(self.extended_query_value)
-
         self.relaxed_query_title = QLabel("Relaxed Query")
         self.relaxed_query_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
         self.layout().addWidget(self.relaxed_query_title)
@@ -87,7 +63,6 @@ class RelaxTab(QScrollArea):
         self.initial_query: Query = query
         print("Initial Query changed...")
         print(self.initial_query)
-        self.initial_query_value.setText(self.initial_query.to_expression())
 
     def set_extended_query_subject(self, query_subject: Subject):
         self.extended_query_subject: Subject = query_subject
@@ -104,7 +79,6 @@ class RelaxTab(QScrollArea):
         self.extended_result_set: DataFrame = self.data_frame.query(self.extended_query.to_expression())
         print("Extended Query changed...")
         print(self.extended_query)
-        self.extended_query_value.setText(self.extended_query.to_expression())
 
     def set_rfd_subject(self, rfd_subject: Subject):
         self.rfd_subject: Subject = rfd_subject
@@ -119,7 +93,6 @@ class RelaxTab(QScrollArea):
         self.rfd: RFD = rfd
         print("RFD changed...")
         print(self.rfd)
-        self.rfd_value.setText(self.rfd.__str__())
 
     def relax_query(self):
         if self.initial_query and self.extended_query and self.extended_result_set is not None and self.rfd:
