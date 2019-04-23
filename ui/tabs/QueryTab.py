@@ -224,5 +224,5 @@ class QueryTab(QScrollArea):
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
 
-    def get_query_subject(self):
+    def get_initial_query_subject(self):
         return self.query_subject

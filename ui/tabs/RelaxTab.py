@@ -1,27 +1,26 @@
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel, QTableView, QHeaderView, \
-    QAbstractItemView
+from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel
 from pandas import DataFrame
 from rx.subjects import Subject
 
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Query import Query
 from query_rewriter.model.RFD import RFD
-from ui.PandasTableModel import PandasTableModel
 
 
-class ExtensionTab(QScrollArea):
+class RelaxTab(QScrollArea):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.extended_query_subject = Subject()
         self.content_widget = QWidget()
         self.setWidget(self.content_widget)
         self.setWidgetResizable(True)
         self.setLayout(QVBoxLayout(self.content_widget))
         self.layout().setAlignment(Qt.AlignTop)
+
         self.initial_query: Query = None
         self.rfd: RFD = None
+        self.extended_query: Query = None
 
     def display(self, path: str):
         self.path = path
@@ -55,38 +54,41 @@ class ExtensionTab(QScrollArea):
         self.extended_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
         self.layout().addWidget(self.extended_query_value)
 
-        self.data_set_table = QTableView()
-        self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.layout())
-        self.data_set_table.setModel(self.pandas_model)
-        self.data_set_table.setSortingEnabled(False)
-        self.data_set_table.resizeRowsToContents()
-        self.data_set_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
-        self.data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
-
-        self.layout().addWidget(self.data_set_table)
-
     def set_initial_query_subject(self, query_subject: Subject):
-        self.initial_query_subject: Subject = query_subject
-        self.initial_query_subject.subscribe(
+        self.query_subject: Subject = query_subject
+        self.query_subject.subscribe(
             on_next=lambda query:
             (
-                self.update_initial_query(query),
-                self.extend_query()
+                self.update_initial_query(query)
             )
         )
 
     def update_initial_query(self, query: Query):
         self.initial_query: Query = query
-        print("Query changed...")
+        print("Initial Query changed...")
         print(self.initial_query)
         self.initial_query_value.setText(self.initial_query.to_expression())
+
+    def set_extended_query_subject(self, query_subject: Subject):
+        self.extended_query_subject: Subject = query_subject
+        self.extended_query_subject.subscribe(
+            on_next=lambda query:
+            (
+                self.update_extended_query(query)
+            )
+        )
+
+    def update_extended_query(self, query: Query):
+        self.extended_query: Query = query
+        print("Extended Query changed...")
+        print(self.extended_query)
+        self.extended_query_value.setText(self.extended_query.to_expression())
 
     def set_rfd_subject(self, rfd_subject: Subject):
         self.rfd_subject: Subject = rfd_subject
         self.rfd_subject.subscribe(
             on_next=lambda rfd: (
-                self.update_selected_rfd(rfd),
-                self.extend_query()
+                self.update_selected_rfd(rfd)
             )
         )
 
@@ -96,26 +98,3 @@ class ExtensionTab(QScrollArea):
         print(self.rfd)
         self.rfd_value.setText(self.rfd.__str__())
 
-    def extend_query(self):
-        if self.initial_query and self.rfd:
-            print("Extending query")
-
-            print("Initial Query:")
-            print(self.initial_query.to_expression())
-            self.extended_query = self.initial_query.extend_ranges(self.rfd, self.data_frame)
-            self.extended_query_subject.on_next(self.extended_query)
-
-            print("Extended query:")
-            print(self.extended_query.to_expression())
-            self.extended_query_value.setText(self.extended_query.to_expression())
-
-            extended_result_set: DataFrame = self.data_frame.query(self.extended_query.to_expression())
-
-            df_indexes = extended_result_set.index.values.tolist()
-
-            self.data_set_table.clearSelection()
-            for index in df_indexes:
-                self.data_set_table.selectRow(index)
-
-    def get_extended_query_subject(self) -> Subject:
-        return self.extended_query_subject

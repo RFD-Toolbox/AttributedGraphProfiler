@@ -5,6 +5,7 @@ from ui.tabs.DataTab import DataTab
 from ui.tabs.ExtensionTab import ExtensionTab
 from ui.tabs.QueryTab import QueryTab
 from ui.tabs.RFDsTab import RFDsTab
+from ui.tabs.RelaxTab import RelaxTab
 
 
 class TabsWidget(QTabWidget):
@@ -29,6 +30,10 @@ class TabsWidget(QTabWidget):
         self.extension_tab: ExtensionTab = ExtensionTab()
         self.addTab(self.extension_tab, "Extension")
 
+        # Relax Tab
+        self.relax_tab: RelaxTab = RelaxTab()
+        self.addTab(self.relax_tab, "Relax")
+
         self.rfds: list = []
 
     def init_data_tab(self, path: str):
@@ -42,3 +47,6 @@ class TabsWidget(QTabWidget):
 
     def init_extension_tab(self, path: str):
         self.extension_tab.display(path)
+
+    def init_relax_tab(self, path: str):
+        self.relax_tab.display(path)
