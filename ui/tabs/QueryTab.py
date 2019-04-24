@@ -44,9 +44,9 @@ class QueryTab(QScrollArea):
         rows = self.header.__len__()
 
         for row in range(0, rows):
-            h = self.header[row]
+            h: str = self.header[row]
 
-            self.line_labels[h] = QLabel(h)
+            self.line_labels[h] = QLabel(h.title().replace("_", " "))
 
             operatorsComboBox = QComboBox()
             operatorsComboBox.addItem(Operator.EQUAL)
