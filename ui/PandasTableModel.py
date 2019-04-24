@@ -28,7 +28,7 @@ class PandasTableModel(QAbstractTableModel):
     def headerData(self, col, orientation=Qt.Horizontal, role=Qt.DisplayRole):
         if orientation == Qt.Horizontal:
             if role == Qt.DisplayRole:
-                return self._data.columns[col]
+                return self._data.columns[col].title().replace("_", " ")
         return None
 
     def sort(self, column: int, order: Qt.SortOrder = ...) -> None:
