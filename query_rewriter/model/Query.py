@@ -91,6 +91,24 @@ class Query(dict):
 
         return expr
 
+    def to_pretty_expression(self) -> str:
+        operator_values = dict(filter(lambda item: item[1][1], self.items()))
+
+        if not list(operator_values.keys()):
+            return "All"
+
+        first_key = list(operator_values.keys())[0]
+        pretty_expr = ""
+
+        for key, (operator, value) in operator_values.items():
+            if value:  # check if there is a value
+                if key is not first_key:
+                    pretty_expr += " AND "
+
+                pretty_expr += "{} {} {}".format(str(key).title().replace("_", " "), operator, value)
+
+        return pretty_expr
+
     def extend_ranges(self, rfd: RFD, data_set: DataFrame):
         column_types: dict = data_set.dtypes.to_dict()
         print("Column Types:")

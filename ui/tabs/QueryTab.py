@@ -168,7 +168,7 @@ class QueryTab(QScrollArea):
         print(self.original_query_expression)
 
         # self.original_query_expression = QueryRelaxer.query_operator_values_to_expression(operator_values)
-        self.query_label.setText(self.original_query_expression)
+        self.query_label.setText(query.to_pretty_expression())
         # print("OriginalQuery expr: ", self.original_query_expression)
         original_query_result_set: DataFrame = self.csv_parser.data_frame.query(self.original_query_expression)
         # print("Original Query Result Set:\n", original_query_result_set)
