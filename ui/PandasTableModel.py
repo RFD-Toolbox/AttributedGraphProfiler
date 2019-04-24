@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtCore import Qt
-import pandas as pd
+from pandas import DataFrame
 
 
 class PandasTableModel(QAbstractTableModel):
@@ -8,9 +8,9 @@ class PandasTableModel(QAbstractTableModel):
     Class to populate a table view with a pandas dataframe
     """
 
-    def __init__(self, data: pd.DataFrame, parent=None):
+    def __init__(self, data: DataFrame, parent=None):
         QAbstractTableModel.__init__(self, parent)
-        self._data = data
+        self._data: DataFrame = data
         self._headers = list(self._data)
 
     def rowCount(self, parent=None):
@@ -37,12 +37,11 @@ class PandasTableModel(QAbstractTableModel):
         self._data = self._data.sort_values(self._headers[column], ascending=order == Qt.AscendingOrder)
         self.layoutChanged.emit()
 
-    def update_data(self, data: pd.DataFrame):
+    def update_data(self, data: DataFrame):
         self.layoutAboutToBeChanged.emit()
         self._data = data
+        self._headers = [column.title() for column in list(self._data)]
         self.layoutChanged.emit()
         self.dataChanged.emit(self.createIndex(0, 0),
                               self.createIndex(self.rowCount(0),
                                                self.columnCount(0)))
-
-
