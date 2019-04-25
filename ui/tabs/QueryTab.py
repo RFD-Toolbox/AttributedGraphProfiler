@@ -6,11 +6,13 @@ from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QGroupBox, QGridL
     QPushButton, QTableView, QHeaderView
 from pandas import DataFrame
 import numpy as np
+from numpy import dtype
 from rx.subjects import Subject
 
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Operator import Operator
 from query_rewriter.model.Query import Query
+from query_rewriter.model.RegularExpression import RegularExpression
 from ui.PandasTableModel import PandasTableModel
 
 
@@ -55,7 +57,7 @@ class QueryTab(QScrollArea):
             operatorsComboBox.addItem(Operator.NOT_BELONGING)
 
             # TODO check for column type
-            column_type = self.column_types[self.header[row]]
+            column_type: dtype = self.column_types[self.header[row]]
             print("Column " + self.header[row] + " is of Type:")
             print(column_type)
 
@@ -70,7 +72,7 @@ class QueryTab(QScrollArea):
             self.query_items[h].returnPressed.connect(lambda: self.execute_query())
 
             operatorsComboBox.currentTextChanged.connect(
-                lambda ix, key=h, select=operatorsComboBox: self.combo_changed(select, key))
+                lambda ix, key=h, select=operatorsComboBox: self.combo_changed(select, key, column_type))
             operatorsComboBox.setCurrentIndex(1)
             operatorsComboBox.setCurrentIndex(0)
 
@@ -174,53 +176,115 @@ class QueryTab(QScrollArea):
         # print("Original Query Result Set:\n", original_query_result_set)
         self._query_data_model.update_data(original_query_result_set)
 
-    def combo_changed(self, combo: QComboBox, key: str):
+    def combo_changed(self, combo: QComboBox, key: str, column_type: dtype):
         if combo.currentText() == Operator.EQUAL:
             self.query_items[key].setText("")
-            self.query_items[key].setPlaceholderText("The exact value of this property")
-            reg_ex = QRegExp("^[a-zA-Z0-9_\\.-\\s]+$")
+            self.query_items[key].setPlaceholderText("The exact value of this property ({})".format(column_type))
+
+            if column_type == np.int64:
+                reg_ex = RegularExpression.INTEGER
+            elif column_type == np.float64:
+                reg_ex = RegularExpression.DECIMAL
+            elif column_type == np.object or column_type == np.unicode:
+                reg_ex = RegularExpression.STRING
+            else:
+                reg_ex = RegularExpression.ANYTHING
+
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.BELONGING:
             self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText("A list of values for this property.")
-            reg_ex = QRegExp("^\\[([a-zA-Z0-9_\\.-\\s]+(,)?)*\\]$")
+
+            if column_type == np.int64:
+                reg_ex = RegularExpression.INTEGER_LIST
+            elif column_type == np.float64:
+                reg_ex = RegularExpression.DECIMAL_LIST
+            elif column_type == np.object or column_type == np.unicode:
+                reg_ex = RegularExpression.STRING_LIST
+            else:
+                reg_ex = RegularExpression.ANYTHING_LIST
+
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.NOT_BELONGING:
             self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText("A list of values to exclude for this property.")
-            reg_ex = QRegExp("^\\[([a-zA-Z0-9_\\.-\\s]+(,)?)*\\]$")
+
+            if column_type == np.int64:
+                reg_ex = RegularExpression.INTEGER_LIST
+            elif column_type == np.float64:
+                reg_ex = RegularExpression.DECIMAL_LIST
+            elif column_type == np.object or column_type == np.unicode:
+                reg_ex = RegularExpression.STRING_LIST
+            else:
+                reg_ex = RegularExpression.ANYTHING_LIST
+
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.GREATER:
             self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText("A minimum value of this property (value excluded)")
-            reg_ex = QRegExp("^[a-zA-Z0-9_\\.-\\s]+$")
+
+            if column_type == np.int64:
+                reg_ex = RegularExpression.INTEGER
+            elif column_type == np.float64:
+                reg_ex = RegularExpression.DECIMAL
+            else:
+                reg_ex = RegularExpression.ANYTHING
+
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.GREATER_EQUAL:
             self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText("A minimum value of this property (value included)")
-            reg_ex = QRegExp("^[a-zA-Z0-9_\\.-\\s]+$")
+
+            if column_type == np.int64:
+                reg_ex = RegularExpression.INTEGER
+            elif column_type == np.float64:
+                reg_ex = RegularExpression.DECIMAL
+            else:
+                reg_ex = RegularExpression.ANYTHING
+
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.LESS:
             self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText("A maximum value of this property (value excluded)")
-            reg_ex = QRegExp("^[a-zA-Z0-9_\\.-\\s]+$")
+
+            if column_type == np.int64:
+                reg_ex = RegularExpression.INTEGER
+            elif column_type == np.float64:
+                reg_ex = RegularExpression.DECIMAL
+            else:
+                reg_ex = RegularExpression.ANYTHING
+
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.LESS_EQUAL:
             self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText("A maximum value of this property (value included)")
-            reg_ex = QRegExp("^[a-zA-Z0-9_\\.-\\s]+$")
+
+            if column_type == np.int64:
+                reg_ex = RegularExpression.INTEGER
+            elif column_type == np.float64:
+                reg_ex = RegularExpression.DECIMAL
+            else:
+                reg_ex = RegularExpression.ANYTHING
+
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.NOT_EQUAL:
             self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText("A value not admitted for this property")
-            reg_ex = QRegExp("^[a-zA-Z0-9_\\.-\\s]+$")
+
+            if column_type == np.int64:
+                reg_ex = RegularExpression.INTEGER
+            elif column_type == np.float64:
+                reg_ex = RegularExpression.DECIMAL
+            else:
+                reg_ex = RegularExpression.ANYTHING
+
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
 

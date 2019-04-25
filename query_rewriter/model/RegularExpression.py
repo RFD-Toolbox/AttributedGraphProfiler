@@ -3,6 +3,10 @@ from PyQt5.QtCore import QRegExp
 
 class RegularExpression:
     ANYTHING = QRegExp(".*")
-    INTEGERS = QRegExp("^0$|^(-)?[1-9]+[0-9]*$")
-    DECIMALS = QRegExp("^(0|[1-9]+[0-9]*)(\\.\\d+)?$")
-    STRINGS = QRegExp("^[\\w-\\s\\.\\(\\)]*$")
+    ANYTHING_LIST = QRegExp("^\\[(.*,?)+\\]$")
+    INTEGER = QRegExp("^0$|^(-)?[1-9]+[0-9]*$")
+    INTEGER_LIST = QRegExp("^\\[(-?\\d+,?)+\\]$")
+    DECIMAL = QRegExp("^(0|[1-9]+[0-9]*)(\\.\\d+)?$")
+    DECIMAL_LIST = QRegExp("^\\[(((0|([1-9]+[0-9]*))(\\.\\d+)?),?)+\\]$")
+    STRING = QRegExp("^[\\w-\\s\\.\\(\\)]*$")
+    STRING_LIST = QRegExp("^\\[((\\w|\\s|-|\\(|\\)),*)+\\]$")
