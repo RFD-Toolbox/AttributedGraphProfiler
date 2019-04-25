@@ -1,6 +1,6 @@
 import copy
 
-from PyQt5.QtCore import QRegExp
+from PyQt5.QtCore import QRegExp, Qt
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QGroupBox, QGridLayout, QLabel, QLineEdit, QComboBox, \
     QPushButton, QTableView, QHeaderView
@@ -167,8 +167,8 @@ class QueryTab(QScrollArea):
         print("Original Query expression:")
         print(self.original_query_expression)
 
-        # self.original_query_expression = QueryRelaxer.query_operator_values_to_expression(operator_values)
-        self.query_label.setText(query.to_pretty_expression())
+        self.query_label.setText(query.to_rich_text_expression())
+        self.query_label.setTextFormat(Qt.RichText)
         # print("OriginalQuery expr: ", self.original_query_expression)
         original_query_result_set: DataFrame = self.csv_parser.data_frame.query(self.original_query_expression)
         # print("Original Query Result Set:\n", original_query_result_set)

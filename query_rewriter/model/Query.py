@@ -1,4 +1,5 @@
-from typing import ItemsView, KeysView, ValuesView, MappingView
+from typing import ItemsView, KeysView, ValuesView
+from string import Template
 
 from pandas import DataFrame, np
 
@@ -8,14 +9,37 @@ from query_rewriter.query.relaxer import QueryRelaxer
 
 VALUES = "VALUES"
 OPERATORS = "OPERATORS"
+COLUMN_CLASS = "column"
+OPERATOR_CLASS = "operator"
+VALUE_CLASS = "value"
+CONNECTOR_CLASS = "connector"
+
+STYLE_TEMPLATE: Template = Template(
+    """
+    <style>
+    .$column_class{color:$column_color}
+    .$operator_class{color:$operator_color}
+    .$value_class{color:$value_color}
+    .$connector_class{color:$connector_color}
+    </style>
+    """
+)
 
 
 class Query(dict):
     def __init__(self, operators: dict = {}, values: dict = {}) -> None:
+        super().__init__()
         operators = operators or {}
         values = values or {}
-        super().__init__()
         self.set_operators_values(operators, values)
+        self.set_colors()
+
+    def set_colors(self, column: str = "Blue", operator: str = "Green", value: str = "Black",
+                   connector: str = "DarkMagenta"):
+        self.column_color: str = column
+        self.operator_color: str = operator
+        self.value_color: str = value
+        self.connector_color: str = connector
 
     def set_operators_values(self, operators: dict = {}, values: dict = {}):
         if not operators.keys() == values.keys():
@@ -108,6 +132,31 @@ class Query(dict):
                 pretty_expr += "{} {} {}".format(str(key).title().replace("_", " "), operator, value)
 
         return pretty_expr
+
+    def to_rich_text_expression(self) -> str:
+        style = STYLE_TEMPLATE.safe_substitute(column_class=COLUMN_CLASS, column_color=self.column_color,
+                                               operator_class=OPERATOR_CLASS, operator_color=self.operator_color,
+                                               value_class=VALUE_CLASS, value_color=self.value_color,
+                                               connector_class=CONNECTOR_CLASS, connector_color=self.connector_color)
+
+        body = ""
+        operator_values = dict(filter(lambda item: item[1][1], self.items()))
+
+        if not list(operator_values.keys()):
+            body = "<span class=\"{}\">{}</span>".format(VALUE_CLASS, "All")
+        else:
+            first_key = list(operator_values.keys())[0]
+
+            for key, (operator, value) in operator_values.items():
+                if value:  # check if there is a value
+                    if key is not first_key:
+                        body += "<span class=\"{}\"> AND <span/>".format(CONNECTOR_CLASS)
+
+                    body += "<span class=\"{}\">{}</span>".format(COLUMN_CLASS, str(key).title().replace("_", " "))
+                    body += "<span class=\"{}\"> {} </span>".format(OPERATOR_CLASS, operator)
+                    body += "<span class=\"{}\">{}</span>".format(VALUE_CLASS, value)
+
+        return style + body
 
     def extend_ranges(self, rfd: RFD, data_set: DataFrame):
         column_types: dict = data_set.dtypes.to_dict()

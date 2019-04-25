@@ -101,7 +101,8 @@ class RelaxTab(QScrollArea):
 
             print("RelaxTab.Relaxed Query:")
             print(self.relaxed_query.to_expression())
-            self.relaxed_query_value.setText(self.relaxed_query.to_pretty_expression())
+            self.relaxed_query_value.setText(self.relaxed_query.to_rich_text_expression())
+            self.relaxed_query_value.setTextFormat(Qt.RichText)
 
             relaxed_result_set: DataFrame = self.data_frame.query(self.relaxed_query.to_expression())
 
