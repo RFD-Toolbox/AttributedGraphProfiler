@@ -63,6 +63,8 @@ class QueryRewriterUI(QMainWindow):
             self.tabs.init_extension_tab(csv_path)
             self.tabs.init_relax_tab(csv_path)
 
+            self.tabs.rfds_tab.set_initial_query_subject(self.tabs.query_tab.get_initial_query_subject())
+
             self.tabs.extension_tab.set_initial_query_subject(self.tabs.query_tab.get_initial_query_subject())
             self.tabs.extension_tab.set_rfd_subject(self.tabs.rfds_tab.get_rfd_subject())
 

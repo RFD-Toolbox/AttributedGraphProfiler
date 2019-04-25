@@ -5,7 +5,7 @@ import numpy as np
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QGroupBox, QHBoxLayout, QPushButton, QTableView, \
-    QHeaderView, QAbstractItemView, QTreeWidgetItem, QTreeWidget
+    QHeaderView, QAbstractItemView, QTreeWidgetItem, QTreeWidget, QLabel, QCheckBox
 from pandas import DataFrame
 from pandas.compat import reduce
 from rx.subjects import Subject
@@ -14,18 +14,26 @@ from dominance.dominance_tools import RFDDiscovery
 from loader.distance_mtr import DiffMatrix
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.io.rfd.rfd_extractor import RFDExtractor
+from query_rewriter.model.Query import Query
 from query_rewriter.model.RFD import RFD
 from query_rewriter.utils.DiffDataFrame import DiffDataFrame
+from query_rewriter.utils.RFDFilter import RFDFilter
 from query_rewriter.utils.Transformer import Transformer
 from ui.PandasTableModel import PandasTableModel
 
 
 class RFDsTab(QScrollArea):
     RFD, EXTENT, TIME = range(3)
+    RHS = "RHS"
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self.rfd_subject = Subject()
+
+        self.initial_query: Query = None
+        self.rfds: list = []
+
+        self.filters: dict = {RFDsTab.RHS: QCheckBox("RHS")}
 
         self.content_widget = QWidget()
         self.setWidget(self.content_widget)
@@ -70,8 +78,12 @@ class RFDsTab(QScrollArea):
         load_rfds_button.setMaximumWidth(width)
         load_rfds_button.clicked.connect(lambda: self.load_rfds())
 
+        rhs_filter_check_box: QCheckBox = self.filters[RFDsTab.RHS]
+        rhs_filter_check_box.stateChanged.connect(lambda: self.__show_rfds(self.__filter_rfds()))
+
         buttons_horizontal_layout.addWidget(discover_rfds_button)
         buttons_horizontal_layout.addWidget(load_rfds_button)
+        buttons_horizontal_layout.addWidget(rhs_filter_check_box)
 
         self.rfd_data_set_table = QTableView()
         self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.layout())
@@ -91,7 +103,7 @@ class RFDsTab(QScrollArea):
         self.rfd_data_set_table.clearSelection()
 
     def discover_rfds(self):
-        # print("Discovering RFDs")
+        print("Discovering RFDs")
 
         # print("Header: " + str(self.header))
 
@@ -138,7 +150,7 @@ class RFDsTab(QScrollArea):
             # print("\n")
             self.rfds.extend(Transformer.rfd_data_frame_to_rfd_list(df, self.header))
 
-        self.__show_rfds(self.rfds)
+        self.__show_rfds(self.__filter_rfds())
 
     def __show_rfds(self, rfds: list):
         if rfds:
@@ -159,7 +171,7 @@ class RFDsTab(QScrollArea):
             self.tree_widget.header().setSectionResizeMode(QHeaderView.ResizeToContents)
 
             # print("\nRFDs list: ")
-            for rfd in self.rfds:
+            for rfd in rfds:
                 # print(rfd)
 
                 item = QTreeWidgetItem()
@@ -280,3 +292,35 @@ class RFDsTab(QScrollArea):
 
     def get_rfd_subject(self):
         return self.rfd_subject
+
+    def set_initial_query_subject(self, query_subject: Subject):
+        self.initial_query_subject: Subject = query_subject
+        self.initial_query_subject.subscribe(
+            on_next=lambda query:
+            (
+                self.__update_initial_query(query),
+                self.__show_rfds(self.__filter_rfds())
+            )
+        )
+
+    def __update_initial_query(self, query: Query):
+        self.initial_query: Query = query
+
+    def __filter_rfds(self) -> list:
+        print("Filter RFDs...")
+        if self.initial_query and self.rfds:
+            rhs_filter: QCheckBox = self.filters[RFDsTab.RHS]
+
+            print("RHS filter: ")
+            print(rhs_filter.isChecked())
+
+            if rhs_filter.isChecked():
+                filtered_rfds: list = RFDFilter.query_not_in_rhs(self.rfds, self.initial_query)
+            else:
+                filtered_rfds: list = self.rfds
+        elif self.rfds:
+            filtered_rfds = self.rfds
+        else:
+            filtered_rfds = []
+
+        return filtered_rfds
