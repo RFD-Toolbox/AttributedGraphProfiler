@@ -32,10 +32,12 @@ class RelaxTab(QScrollArea):
             self.layout().itemAt(i).widget().deleteLater()
 
         self.relaxed_query_title = QLabel("Relaxed Query")
+        self.relaxed_query_title.setWordWrap(True)
         self.relaxed_query_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
         self.layout().addWidget(self.relaxed_query_title)
 
         self.relaxed_query_value = QLabel("")
+        self.relaxed_query_value.setWordWrap(True)
         self.relaxed_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
         self.layout().addWidget(self.relaxed_query_value)
 

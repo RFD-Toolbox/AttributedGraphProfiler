@@ -32,26 +32,32 @@ class ExtensionTab(QScrollArea):
             self.layout().itemAt(i).widget().deleteLater()
 
         self.initial_query_title = QLabel("Initial Query")
+        self.initial_query_title.setWordWrap(True)
         self.initial_query_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
         self.layout().addWidget(self.initial_query_title)
 
         self.initial_query_value = QLabel("")
+        self.initial_query_value.setWordWrap(True)
         self.initial_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
         self.layout().addWidget(self.initial_query_value)
 
         self.rfd_title = QLabel("RFD")
+        self.rfd_title.setWordWrap(True)
         self.rfd_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
         self.layout().addWidget(self.rfd_title)
 
         self.rfd_value = QLabel("")
+        self.rfd_value.setWordWrap(True)
         self.rfd_value.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Cursive))
         self.layout().addWidget(self.rfd_value)
 
         self.extended_query_title = QLabel("Extended Query")
+        self.extended_query_title.setWordWrap(True)
         self.extended_query_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
         self.layout().addWidget(self.extended_query_title)
 
         self.extended_query_value = QLabel("")
+        self.extended_query_value.setWordWrap(True)
         self.extended_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
         self.layout().addWidget(self.extended_query_value)
 

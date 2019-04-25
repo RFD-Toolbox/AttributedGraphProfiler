@@ -102,6 +102,7 @@ class QueryTab(QScrollArea):
         query_button.clicked.connect(lambda: self.execute_query())
 
         self.query_label = QLabel("", box2)
+        self.query_label.setWordWrap(True)
         grid_layout.addWidget(self.query_label, 0, 1, 1, 4)
 
         self.layout().addWidget(box2)
