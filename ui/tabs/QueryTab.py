@@ -1,5 +1,6 @@
 import copy
 
+from PyQt5 import QtGui
 from PyQt5.QtCore import QRegExp, Qt
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QGroupBox, QGridLayout, QLabel, QLineEdit, QComboBox, \
@@ -103,6 +104,7 @@ class QueryTab(QScrollArea):
 
         self.query_label = QLabel("", box2)
         self.query_label.setWordWrap(True)
+        self.query_label.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
         grid_layout.addWidget(self.query_label, 0, 1, 1, 4)
 
         self.layout().addWidget(box2)
