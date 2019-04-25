@@ -21,7 +21,6 @@ from ui.PandasTableModel import PandasTableModel
 
 
 class RFDsTab(QScrollArea):
-
     RFD, EXTENT, TIME = range(3)
 
     def __init__(self, parent=None):
@@ -93,13 +92,7 @@ class RFDsTab(QScrollArea):
 
     def discover_rfds(self):
         # print("Discovering RFDs")
-        # Cleaning
-        self.rfd_data_set_table.clearSelection()
 
-        for i in reversed(range(self.rfds_tree_wrapper_layout.count())):
-            self.rfds_tree_wrapper_layout.itemAt(i).widget().deleteLater()
-
-        self.rfds = []
         # print("Header: " + str(self.header))
 
         columns_count = self.columns_count
@@ -138,39 +131,50 @@ class RFDsTab(QScrollArea):
             self.rfd_data_frame_list.append(
                 rfd_discovery.get_rfds(rfd_discovery.standard_algorithm, combination))
 
+        self.rfds = []
         for df in self.rfd_data_frame_list:
             # print("\n")
             # print(df)
             # print("\n")
             self.rfds.extend(Transformer.rfd_data_frame_to_rfd_list(df, self.header))
 
-        self.tree_header = QTreeWidgetItem()
-        self.tree_header.setText(self.RFD, "RFD")
-        self.tree_header.setText(self.EXTENT, "Extent")
-        self.tree_header.setText(self.TIME, "Time")
+        self.__show_rfds(self.rfds)
 
-        self.tree_widget = QTreeWidget()
-        self.tree_widget.setHeaderItem(self.tree_header)
+    def __show_rfds(self, rfds: list):
+        if rfds:
+            # Cleaning
+            self.rfd_data_set_table.clearSelection()
 
-        self.tree_widget.header().setSectionResizeMode(QHeaderView.ResizeToContents)
+            for i in reversed(range(self.rfds_tree_wrapper_layout.count())):
+                self.rfds_tree_wrapper_layout.itemAt(i).widget().deleteLater()
 
-        # print("\nRFDs list: ")
-        for rfd in self.rfds:
-            # print(rfd)
+            self.tree_header = QTreeWidgetItem()
+            self.tree_header.setText(self.RFD, "RFD")
+            self.tree_header.setText(self.EXTENT, "Extent")
+            self.tree_header.setText(self.TIME, "Time")
 
-            item = QTreeWidgetItem()
-            item.setText(self.RFD, str(rfd).replace("{", "(").replace("}", ")"))
-            item.setData(self.RFD, Qt.UserRole, rfd)
-            item.setText(self.EXTENT, "")
+            self.tree_widget = QTreeWidget()
+            self.tree_widget.setHeaderItem(self.tree_header)
 
-            self.tree_widget.addTopLevelItem(item)
+            self.tree_widget.header().setSectionResizeMode(QHeaderView.ResizeToContents)
 
-        self.rfds_tree_wrapper_layout.addWidget(self.tree_widget)
-        self.layout().addWidget(self.rfds_tree_wrapper)
+            # print("\nRFDs list: ")
+            for rfd in self.rfds:
+                # print(rfd)
 
-        # combo.currentTextChanged.connect(lambda ix, key=h, select=combo: self.combo_changed(select, key))
-        # self.tree_view.currentItemChanged.connect(self.rfd_selected)
-        self.tree_widget.currentItemChanged.connect(self.rfd_selected_to_max_clique)
+                item = QTreeWidgetItem()
+                item.setText(self.RFD, str(rfd).replace("{", "(").replace("}", ")"))
+                item.setData(self.RFD, Qt.UserRole, rfd)
+                item.setText(self.EXTENT, "")
+
+                self.tree_widget.addTopLevelItem(item)
+
+            self.rfds_tree_wrapper_layout.addWidget(self.tree_widget)
+            self.layout().addWidget(self.rfds_tree_wrapper)
+
+            # combo.currentTextChanged.connect(lambda ix, key=h, select=combo: self.combo_changed(select, key))
+            # self.tree_view.currentItemChanged.connect(self.rfd_selected)
+            self.tree_widget.currentItemChanged.connect(self.rfd_selected_to_max_clique)
 
     def rfd_selected_to_max_clique(self, current: QTreeWidgetItem, previous: QTreeWidgetItem):
         # print("RFD selected")
