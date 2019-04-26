@@ -1,9 +1,9 @@
 class Operator:
     EQUAL = "="
-    NOT_EQUAL = "!="
+    NOT_EQUAL = "≠"
     BELONGING = "∈"
     NOT_BELONGING = "∉"
     GREATER = ">"
-    GREATER_EQUAL = ">="
+    GREATER_EQUAL = "≥"
     LESS = "<"
-    LESS_EQUAL = "<="
+    LESS_EQUAL = "≤"
