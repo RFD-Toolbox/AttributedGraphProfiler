@@ -34,7 +34,8 @@ class CSVParser:
     def __init__(self, csv_path: str):
         self.path = csv_path
         self.delimiter = self.__guess_delimiter()
-        self.data_frame = pd.read_csv(self.path, delimiter=self.delimiter)
+        self.data_frame = pd.read_csv(self.path,
+                                      delimiter=self.delimiter)
         self.rows_count, self.columns_count = self.data_frame.shape
         self.header = list(self.data_frame)
 
