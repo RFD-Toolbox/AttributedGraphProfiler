@@ -114,7 +114,6 @@ class RFDsTab(QScrollArea):
         self.layout().addWidget(main_group)
 
     def load_rfds(self):
-        # print("Loading RFDs")
         # Cleaning
         self.rfd_data_set_table.clearSelection()
 
@@ -126,8 +125,6 @@ class RFDsTab(QScrollArea):
         if rfds_path:
             with open(rfds_path, "r") as rfds_file:
                 rfds: list = json.load(rfds_file, object_hook=RFDJSONDecoder.as_rfd)
-                print("Loaded RFDs:")
-                print(rfds)
 
                 if rfds:
                     self.rfds = rfds
@@ -162,21 +159,16 @@ class RFDsTab(QScrollArea):
 
         self.rfds = []
         for df in self.rfd_data_frame_list:
-            # print("\n")
-            # print(df)
-            # print("\n")
             self.rfds.extend(Transformer.rfd_data_frame_to_rfd_list(df, self.header))
 
         self.__show_rfds(self.__filter_rfds())
 
     def store_rfds(self):
-        print("Store RFDs called")
         if self.rfds:
             save_file_dialog = QFileDialog(self)
             self.rfds_path, _filter = save_file_dialog.getSaveFileName(parent=self,
                                                                        directory=self.rfds_path,
                                                                        filter="JSON(*.json)")
-            print("RFDs JSON path: " + self.rfds_path)
 
             if self.rfds_path:
                 with open(self.rfds_path, "w") as rfds_file:
@@ -216,13 +208,10 @@ class RFDsTab(QScrollArea):
             self.tree_widget.currentItemChanged.connect(self.rfd_selected_to_max_clique)
 
     def rfd_selected_to_max_clique(self, current: QTreeWidgetItem, previous: QTreeWidgetItem):
-        # print("RFD selected")
-
         if current:
             t0 = time.time()
 
             rfd: RFD = current.data(self.RFD, Qt.UserRole)
-            # print("Current: " + str(rfd))
             self.rfd_subject.on_next(rfd)
 
             # https://stackoverflow.com/questions/38987/how-to-merge-two-dictionaries-in-a-single-expression#26853961
