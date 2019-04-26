@@ -158,7 +158,9 @@ class QueryTab(QScrollArea):
                     except ValueError:
                         value: list = [str(item) for item in line.text().replace('[', '').replace(']', '').split(',')]
 
-            if operator and value:
+            valid_input: bool = line.hasAcceptableInput()
+
+            if valid_input and operator and value:
                 query.add_operator_value(column, operator, value)
 
         return query
@@ -197,7 +199,7 @@ class QueryTab(QScrollArea):
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.BELONGING:
             self.query_items[key].setText("")
-            self.query_items[key].setPlaceholderText("A list of values for this property.")
+            self.query_items[key].setPlaceholderText("A list of values for this property ({})".format(column_type))
 
             if column_type == np.int64:
                 reg_ex = RegularExpression.INTEGER_LIST
@@ -212,7 +214,8 @@ class QueryTab(QScrollArea):
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.NOT_BELONGING:
             self.query_items[key].setText("")
-            self.query_items[key].setPlaceholderText("A list of values to exclude for this property.")
+            self.query_items[key].setPlaceholderText(
+                "A list of values to exclude for this property ({})".format(column_type))
 
             if column_type == np.int64:
                 reg_ex = RegularExpression.INTEGER_LIST
@@ -227,7 +230,8 @@ class QueryTab(QScrollArea):
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.GREATER:
             self.query_items[key].setText("")
-            self.query_items[key].setPlaceholderText("A minimum value of this property (value excluded)")
+            self.query_items[key].setPlaceholderText(
+                "A minimum value of this property (value excluded) ({})".format(column_type))
 
             if column_type == np.int64:
                 reg_ex = RegularExpression.INTEGER
@@ -240,7 +244,8 @@ class QueryTab(QScrollArea):
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.GREATER_EQUAL:
             self.query_items[key].setText("")
-            self.query_items[key].setPlaceholderText("A minimum value of this property (value included)")
+            self.query_items[key].setPlaceholderText(
+                "A minimum value of this property (value included) ({})".format(column_type))
 
             if column_type == np.int64:
                 reg_ex = RegularExpression.INTEGER
@@ -253,7 +258,8 @@ class QueryTab(QScrollArea):
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.LESS:
             self.query_items[key].setText("")
-            self.query_items[key].setPlaceholderText("A maximum value of this property (value excluded)")
+            self.query_items[key].setPlaceholderText(
+                "A maximum value of this property (value excluded) ({})".format(column_type))
 
             if column_type == np.int64:
                 reg_ex = RegularExpression.INTEGER
@@ -266,7 +272,8 @@ class QueryTab(QScrollArea):
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.LESS_EQUAL:
             self.query_items[key].setText("")
-            self.query_items[key].setPlaceholderText("A maximum value of this property (value included)")
+            self.query_items[key].setPlaceholderText(
+                "A maximum value of this property (value included) ({})".format(column_type))
 
             if column_type == np.int64:
                 reg_ex = RegularExpression.INTEGER
@@ -279,7 +286,7 @@ class QueryTab(QScrollArea):
             self.query_items[key].setValidator(input_validator)
         elif combo.currentText() == Operator.NOT_EQUAL:
             self.query_items[key].setText("")
-            self.query_items[key].setPlaceholderText("A value not admitted for this property")
+            self.query_items[key].setPlaceholderText("A value not admitted for this property ({})".format(column_type))
 
             if column_type == np.int64:
                 reg_ex = RegularExpression.INTEGER
