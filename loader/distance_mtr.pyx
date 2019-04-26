@@ -42,7 +42,7 @@ cdef class DiffMatrix:
     cdef object labels
 
 
-    def __init__(self, path, semantic=True, datetime=False, sep=';', missing='?', first_col_header=0, index_col=False):
+    def __init__(self, path, semantic=True, datetime=False, sep=';', missing='?', first_row_header=0, index_col=False):
         """
         Load the dataset and build the distance matrix.
         For any dataset's column, it choose the property distance function according to the column's data type.
@@ -56,8 +56,8 @@ cdef class DiffMatrix:
         :type sep: str
         :param missing: the character used to notify a missing value. Default behavior is as if set to '?' if no value is passed.
         :type missing: str
-        :param first_col_header: row number(s) to use as column names, and the start of the data. Default behavior is as if set to 0 if no value is passed.
-        :type first_col_header: int or list of int
+        :param first_row_header: row number(s) to use as column names, and the start of the data. Default behavior is as if set to 0 if no value is passed.
+        :type first_row_header: int or list of int
         :param index_col: the column which contains the primary key of the dataset. Specifying it, this will not calculate as distance.
         :type index_col: int
         """
@@ -79,7 +79,7 @@ cdef class DiffMatrix:
         """Separator used in the CSV file to separate values"""
         self.missing = missing
         """Value used to notify missing value"""
-        self.first_col_header = first_col_header
+        self.first_row_header = first_row_header
         """Row's index of the row's key in the CSV file"""
         self.__load(index_col=index_col)
         self.distance_df = self.__distance_matrix()
@@ -96,7 +96,7 @@ cdef class DiffMatrix:
         :return data frame containing the loaded dataset
         :rtype pandas.core.frame.DataFrame
         """
-        self.df = pnd.read_csv(self.path, sep=self.sep, header=self.first_col_header, index_col=index_col, engine='c',
+        self.df = pnd.read_csv(self.path, sep=self.sep, header=self.first_row_header, index_col=index_col, engine='c',
                                na_values=['', self.missing], parse_dates=self.datetime)
         self.labels = self.df.columns.values
         return self.df

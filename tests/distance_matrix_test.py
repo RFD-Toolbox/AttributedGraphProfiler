@@ -36,7 +36,7 @@ class MyTestCase(unittest.TestCase):
             df = self.__load_df(current_ds, sep=c_sep, first_col_header=has_header)
             logging.info("Done")
             logging.info("Loading distance matrix")
-            dm = distance_mtr.DiffMatrix(current_ds, sep=c_sep, first_col_header=has_header)  # create class
+            dm = distance_mtr.DiffMatrix(current_ds, sep=c_sep, first_row_header=has_header)  # create class
             self.assertIsNotNone(dm, "check that dm is not null (none in python)")
             logging.info("Using a sample's splitting")
             dist_m = dm.split_sides({'lhs': [i for i in range(1, df.shape[1])], 'rhs': [0]})  # split dm according to control RHS and LHS

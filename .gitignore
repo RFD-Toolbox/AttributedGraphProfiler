@@ -5,6 +5,9 @@ __pycache__/
 
 # C extensions
 *.so
+dominance/*.c
+loader/*.c
+!loader/levenshtein.c
 
 # Distribution / packaging
 .Python

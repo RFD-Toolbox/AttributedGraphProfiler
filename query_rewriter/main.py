@@ -50,8 +50,9 @@ def start_process(arguments):
     #############################################################################################
     # ____________________________________________QUERY_________________________________________#
     #############################################################################################
-    original_query = ast.literal_eval(arguments.query)
+    original_query: dict = ast.literal_eval(arguments.query)
     print("Query is : ", original_query)
+    print(type(original_query))
 
     #############################################################################################
     # ____________________________________________RFDs__________________________________________#
@@ -61,7 +62,7 @@ def start_process(arguments):
         rfds_path = data_set_path.replace(".csv", "_rfds.csv")
         rfds_path = rfds_path.replace("dataset/", "dataset/rfds/")
         rfds_search_start_time = time.time()
-        store_load_rfds.search_rfds(data_set_path, rfds_path)
+        store_load_rfds.discover_rfds(data_set_path, rfds_path)
         rfds_search_end_time = time.time()
         print("RFDs search executed in ", int((rfds_search_end_time - rfds_search_start_time) * 1000))
     init_time = time.time()
@@ -116,13 +117,13 @@ def start_process(arguments):
         ################################################
         # @@@@@@@@@@@@__EXTENDED QUERY__@@@@@@@@@@@@@@@#
         ################################################
-        # print("#" * 200)
-        # print("@" * 90 + " __EXTENDED QUERY__ " + "@" * 90)
-        # print("#" * 200)
+        print("#" * 200)
+        print("@" * 90 + " __EXTENDED QUERY__ " + "@" * 90)
+        print("#" * 200)
         extended_query: dict = QueryRelaxer.extend_query_ranges(copy.deepcopy(original_query),
                                                                 copy.deepcopy(chosen_rfd),
                                                                 data_set_df)
-        # print("Query extended: ", extended_query)
+        print("Query extended: ", extended_query)
         extended_query_expression = QueryRelaxer.query_dict_to_expr(extended_query)
         print("Query Extended Expr: ", extended_query_expression)
 
@@ -134,15 +135,16 @@ def start_process(arguments):
 
         relaxing_attributes = [col for col in list(data_set_df)
                                if col not in original_query.keys() and not np.isnan(chosen_rfd[col])]
-        # print("RELAXING ATTRIBUTES:\n", relaxing_attributes)
+        print("RELAXING ATTRIBUTES:\n", relaxing_attributes)
 
-        # print("\n" + "+" * 35 + "Slices..." + "+" * 35)
+        print("\n" + "+" * 35 + "Slices..." + "+" * 35)
 
         all_row_values_dict = {}
 
         current_row = 0
         for row in rows_df_list:
-            row_values = QueryRelaxer.extract_value_lists(row, relaxing_attributes)
+            # Values of the row in dictionary form: column --> values
+            row_values: dict = QueryRelaxer.extract_columns_value_list(row, relaxing_attributes)
 
             relaxing_values_extended = {}
             for attr, lst in row_values.items():
@@ -168,9 +170,9 @@ def start_process(arguments):
         ################################################
         # @@@@@@@@@@@@__RELAXED QUERY__@@@@@@@@@@@@@@@#
         ################################################
-        # print("#" * 200)
-        # print("@" * 90 + " __RELAXED QUERY__ " + "@" * 90)
-        # print("#" * 200)
+        print("#" * 200)
+        print("@" * 90 + " __RELAXED QUERY__ " + "@" * 90)
+        print("#" * 200)
 
         # print("Relaxing values extended dict: ", relaxing_values_extended)
         final_expr = ""

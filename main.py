@@ -32,7 +32,7 @@ def main(args):
     print()
 
     try:
-        check_correctness(has_date_time, half_sides_specifications, index_column)
+        check_correctness(has_date_time, hand_sides_specifications, index_column)
     except getopt.GetoptError as gex:
         usage()
         print(str(gex))
@@ -42,9 +42,9 @@ def main(args):
         print(str(aex))
         sys.exit(1)
 
-    if half_sides_specifications is None:
+    if hand_sides_specifications is None:
         usage()
-    if isinstance(half_sides_specifications, list):
+    if isinstance(hand_sides_specifications, list):
         with ut.timeit_context("Whole time"):
             with ut.timeit_context("Distance time"):
                 if isinstance(has_header, int) and not has_header:
@@ -56,13 +56,13 @@ def main(args):
                                           datetime=has_date_time)
                 else:  # has header
                     distance_matrix = DiffMatrix(csv_file,
-                                          sep=separator_character,
-                                          first_col_header=has_header,
-                                          semantic=semantic,
-                                          index_col=index_column,
-                                          missing=missing,
-                                          datetime=has_date_time)
-            for combination in half_sides_specifications:
+                                                 sep=separator_character,
+                                                 first_row_header=has_header,
+                                                 semantic=semantic,
+                                                 index_col=index_column,
+                                                 missing=missing,
+                                                 datetime=has_date_time)
+            for combination in hand_sides_specifications:
                 combination_distance_matrix = distance_matrix.split_sides(combination)
                 with ut.timeit_context("RFD Discover time for {}".format(str(combination))):
                     rfd_discovery = RFDDiscovery(combination_distance_matrix)
@@ -107,8 +107,8 @@ def extract_args(args):
         # Default values
         c_sep, has_header, semantic, has_dt, missing, ic, human = '', 0, True, False, "?", False, False
         csv_file = ''
-        left_half_side = []
-        right_half_side = []
+        left_hand_side = []
+        right_hand_side = []
         options, args = getopt.getopt(args, "c:r:l:s:hm:d:vi:", ["semantic", "help", "human"])
         for option, arg in options:
             if option == '-v':
@@ -117,12 +117,12 @@ def extract_args(args):
             if option == '-c':
                 csv_file = arg
             elif option == '-r':
-                right_half_side = [int(arg)]
-                if len(right_half_side) > 1:
+                right_hand_side = [int(arg)]
+                if len(right_hand_side) > 1:
                     print("You can specify at most 1 RHS attribute")
                     sys.exit(-1)
             elif option == '-l':
-                left_half_side = [int(_) for _ in arg.split(',')]
+                left_hand_side = [int(_) for _ in arg.split(',')]
             elif option == '-s':
                 c_sep = arg
             elif option == '-h':
@@ -160,8 +160,8 @@ def extract_args(args):
         if has_header is None:
             has_header = has_header_
         cols_count = ut.get_cols_count(csv_file, c_sep)
-        global half_sides_specifications
-        half_sides_specifications = extract_hss(cols_count, left_half_side, right_half_side)
+        global hand_sides_specifications
+        hand_sides_specifications = extract_hss(cols_count, left_hand_side, right_hand_side)
     except Exception as ex:
         print("Error while trying to understand arguments: {}".format(str(ex)))
         sys.exit(-1)
