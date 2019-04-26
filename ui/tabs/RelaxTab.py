@@ -63,8 +63,6 @@ class RelaxTab(QScrollArea):
 
     def update_initial_query(self, query: Query):
         self.initial_query: Query = query
-        print("Initial Query changed...")
-        print(self.initial_query)
 
     def set_extended_query_subject(self, query_subject: Subject):
         self.extended_query_subject: Subject = query_subject
@@ -79,8 +77,6 @@ class RelaxTab(QScrollArea):
     def update_extended_query(self, query: Query):
         self.extended_query: Query = query
         self.extended_result_set: DataFrame = self.data_frame.query(self.extended_query.to_expression())
-        print("Extended Query changed...")
-        print(self.extended_query)
 
     def set_rfd_subject(self, rfd_subject: Subject):
         self.rfd_subject: Subject = rfd_subject
@@ -93,16 +89,11 @@ class RelaxTab(QScrollArea):
 
     def update_selected_rfd(self, rfd: RFD):
         self.rfd: RFD = rfd
-        print("RFD changed...")
-        print(self.rfd)
 
     def relax_query(self):
         if self.initial_query and self.extended_query and self.extended_result_set is not None and self.rfd:
-            print("RelaxTab.Relaxing Query")
             self.relaxed_query: Query = self.extended_query.relax_constraints(self.rfd, self.data_frame)
 
-            print("RelaxTab.Relaxed Query:")
-            print(self.relaxed_query.to_expression())
             self.relaxed_query_value.setText(self.relaxed_query.to_rich_text_expression())
             self.relaxed_query_value.setTextFormat(Qt.RichText)
 

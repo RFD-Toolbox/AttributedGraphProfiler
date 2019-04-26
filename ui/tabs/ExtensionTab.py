@@ -83,8 +83,6 @@ class ExtensionTab(QScrollArea):
 
     def update_initial_query(self, query: Query):
         self.initial_query: Query = query
-        print("Query changed...")
-        print(self.initial_query)
         self.initial_query_value.setText(self.initial_query.to_rich_text_expression())
         self.initial_query_value.setTextFormat(Qt.RichText)
 
@@ -99,21 +97,13 @@ class ExtensionTab(QScrollArea):
 
     def update_selected_rfd(self, rfd: RFD):
         self.rfd: RFD = rfd
-        print("RFD changed...")
-        print(self.rfd)
         self.rfd_value.setText(self.rfd.__str__())
 
     def extend_query(self):
         if self.initial_query and self.rfd:
-            print("Extending query")
-
-            print("Initial Query:")
-            print(self.initial_query.to_expression())
             self.extended_query = self.initial_query.extend_ranges(self.rfd, self.data_frame)
             self.extended_query_subject.on_next(self.extended_query)
 
-            print("Extended query:")
-            print(self.extended_query.to_expression())
             self.extended_query_value.setText(self.extended_query.to_rich_text_expression())
             self.extended_query_value.setTextFormat(Qt.RichText)
 

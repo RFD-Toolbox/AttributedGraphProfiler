@@ -160,29 +160,17 @@ class Query(dict):
 
     def extend_ranges(self, rfd: RFD, data_set: DataFrame):
         column_types: dict = data_set.dtypes.to_dict()
-        print("Column Types:")
-        print(column_types)
         extended_query = Query()
-        print("BLANK Extended query:")
-        print(extended_query)
 
         for item_key, (item_operator, item_value) in self.items():
             if item_value:  # check if there is a value
-                # print("Key: " + item_key)
-
                 if rfd.__contains__(item_key):  # extend its range
                     threshold: float = rfd[item_key]
-                    # print("Threshold: " + str(threshold))
 
                     column_type = column_types.get(item_key)  # get the type of this column of the DataFrame
-                    print("Column Type:")
-                    print(column_type)
 
                     if item_operator == Operator.EQUAL:
-                        # print("It is equal")
-
                         if column_type == np.int64 or column_type == np.float64:
-                            # print("Column type is int64 or float64")
                             if threshold > 0:  # once extended it will turn into a belonging
                                 extended_value = list(
                                     range(int(item_value - threshold), int(item_value + threshold + 1)))
@@ -192,29 +180,22 @@ class Query(dict):
                                 extended_value = item_value
                                 extended_query.add_operator_value(item_key, Operator.EQUAL, extended_value)
                         elif column_type == np.object:
-                            print("It's string")
                             if threshold > 0:
                                 similar_strings: list[str] = list(set(QueryRelaxer.similar_strings(source=item_value,
                                                                                                    data=data_set,
                                                                                                    col=item_key,
                                                                                                    threshold=threshold)))
                                 similar_strings.sort()
-                                print("Similar strings:")
-                                print(similar_strings)
-
                                 extended_query.add_operator_value(item_key, Operator.BELONGING, similar_strings)
                             elif threshold == 0:
                                 extended_query.add_operator_value(item_key, Operator.EQUAL, item_value)
                     elif item_operator == Operator.NOT_EQUAL:
-                        print("It's different")
                         #  TODO think for improvements
                         extended_query.add_operator_value(item_key, Operator.NOT_EQUAL, item_value)
                     elif item_operator == Operator.BELONGING:
-                        print("It's belonging")
                         if threshold > 0:
                             if isinstance(item_value, list) \
                                     and all(isinstance(element, str) for element in item_value):
-                                print("It's a list of strings")
 
                                 extended_value: list = []
 
@@ -229,7 +210,6 @@ class Query(dict):
 
                             elif isinstance(item_value, list) and all(
                                     isinstance(element, (int, float)) for element in item_value):
-                                print("It's a list of numbers")
 
                                 extended_value: list = []
 
@@ -242,11 +222,9 @@ class Query(dict):
                         elif threshold == 0:
                             extended_query.add_operator_value(item_key, Operator.BELONGING, item_value)
                     elif item_operator == Operator.NOT_BELONGING:
-                        print("It's NOT belonging")
                         #  TODO think for improvements
                         extended_query.add_operator_value(item_key, Operator.NOT_BELONGING, item_value)
                     elif item_operator == Operator.GREATER:
-                        print("It's Greater")
                         # reduce the lower bound
                         if isinstance(item_value, (int, float)):
                             extended_value = item_value - threshold
@@ -255,7 +233,6 @@ class Query(dict):
 
                         extended_query.add_operator_value(item_key, Operator.GREATER, extended_value)
                     elif item_operator == Operator.GREATER_EQUAL:
-                        print("It's Greater equal")
                         # reduce the lower bound
                         if isinstance(item_value, (int, float)):
                             extended_value = item_value - threshold
@@ -264,7 +241,6 @@ class Query(dict):
 
                         extended_query.add_operator_value(item_key, Operator.GREATER_EQUAL, extended_value)
                     elif item_operator == Operator.LESS:
-                        print("It's Less")
                         # increase the upper bound
                         if isinstance(item_value, (int, float)):
                             extended_value = item_value + threshold
@@ -273,7 +249,6 @@ class Query(dict):
 
                         extended_query.add_operator_value(item_key, Operator.LESS, extended_value)
                     elif item_operator == Operator.LESS_EQUAL:
-                        print("It's Less equal")
                         # increase the upper bound
                         if isinstance(item_value, (int, float)):
                             extended_value = item_value + threshold
@@ -297,29 +272,18 @@ class Query(dict):
         :return: the Relaxed Query
         '''
 
-        print("Query.Relax constraints...")
         extended_result_set: DataFrame = data_set.query(self.to_expression())
-        print("Query.Extended Result Set:")
-        print(extended_result_set)
 
         # List containing only the columns/attributes that will be in the Relaxed Query
         relaxing_columns: list = [col for col in list(extended_result_set)
                                   if col not in self.keys() and col in rfd]
 
-        print("Query.Relaxing columns:")
-        print(relaxing_columns)
-
         relaxed_query: Query = Query()
 
         # These columns are not part of the query, hence we can use a simple belonging operator
         for col in relaxing_columns:
-            print("Col: " + col)
             extended_column_values: list = extended_result_set[col].tolist()
-            print(extended_column_values)
-
             threshold: float = rfd[col]
-            print("Threshold:")
-            print(threshold)
 
             relaxed_column_values: list = []
 

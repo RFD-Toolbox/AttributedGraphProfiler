@@ -57,10 +57,7 @@ class QueryTab(QScrollArea):
             operatorsComboBox.addItem(Operator.BELONGING)
             operatorsComboBox.addItem(Operator.NOT_BELONGING)
 
-            # TODO check for column type
             column_type: dtype = self.column_types[self.header[row]]
-            print("Column " + self.header[row] + " is of Type:")
-            print(column_type)
 
             if column_type == np.int64 or column_type == np.float64:
                 operatorsComboBox.addItem(Operator.GREATER)
@@ -129,10 +126,7 @@ class QueryTab(QScrollArea):
         query: Query = Query()
 
         for column, line in self.query_items.items():
-            # print("Column: " + column)
-
             operator = self.query_operators[column].currentText()
-            # print("Operator: " + operator)
 
             if operator == Operator.EQUAL \
                     or operator == Operator.NOT_EQUAL \
@@ -148,8 +142,6 @@ class QueryTab(QScrollArea):
                     except ValueError:
                         value = line.text()
             elif operator == Operator.BELONGING or operator == Operator.NOT_BELONGING:
-                print("Line text list:")
-                print(line.text())
                 try:
                     value: list = [int(item) for item in line.text().replace('[', '').replace(']', '').split(',')]
                 except ValueError:
@@ -166,19 +158,14 @@ class QueryTab(QScrollArea):
         return query
 
     def execute_query(self):
-        # print("Clicked")
-
         query: Query = self.build_query()
         self.query_subject.on_next(query)
         self.original_query_expression = query.to_expression()
-        print("Original Query expression:")
-        print(self.original_query_expression)
 
         self.query_label.setText(query.to_rich_text_expression())
         self.query_label.setTextFormat(Qt.RichText)
-        # print("OriginalQuery expr: ", self.original_query_expression)
+
         original_query_result_set: DataFrame = self.csv_parser.data_frame.query(self.original_query_expression)
-        # print("Original Query Result Set:\n", original_query_result_set)
         self._query_data_model.update_data(original_query_result_set)
 
     def combo_changed(self, combo: QComboBox, key: str, column_type: dtype):

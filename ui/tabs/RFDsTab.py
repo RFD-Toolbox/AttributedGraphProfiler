@@ -103,25 +103,11 @@ class RFDsTab(QScrollArea):
         self.rfd_data_set_table.clearSelection()
 
     def discover_rfds(self):
-        print("Discovering RFDs")
-
-        # print("Header: " + str(self.header))
-
         columns_count = self.columns_count
-        # print("Columns count: " + str(self.columns_count))
-        # print("Rows count: " + str(self.rows_count))
-
-        # print("Separator: " + str(self.separator))
-
         hand_sides_specifications = RFDExtractor.extract_hss(columns_count)
-        # print("Hand Sides Specifications: ")
-        # print(hand_sides_specifications)
 
         self.distance_matrix = DiffMatrix(path=self.path, sep=self.separator)
         self.distance_df: DataFrame = self.distance_matrix.distance_df
-
-        # print("Distance Matrix: ")
-        # print(self.distance_df)
 
         self.rfd_data_frame_list: list[DataFrame] = list()
 
@@ -170,10 +156,7 @@ class RFDsTab(QScrollArea):
 
             self.tree_widget.header().setSectionResizeMode(QHeaderView.ResizeToContents)
 
-            # print("\nRFDs list: ")
             for rfd in rfds:
-                # print(rfd)
-
                 item = QTreeWidgetItem()
                 item.setText(self.RFD, str(rfd).replace("{", "(").replace("}", ")"))
                 item.setData(self.RFD, Qt.UserRole, rfd)
@@ -194,16 +177,12 @@ class RFDsTab(QScrollArea):
         if current:
             t0 = time.time()
 
-            # print("Current:")
-            # print(current)
             rfd: RFD = current.data(self.RFD, Qt.UserRole)
             # print("Current: " + str(rfd))
             self.rfd_subject.on_next(rfd)
 
             # https://stackoverflow.com/questions/38987/how-to-merge-two-dictionaries-in-a-single-expression#26853961
             rfd_thresholds: dict = {**rfd.get_left_hand_side(), **rfd.get_right_hand_side()}
-            # print("RFD thresholds:")
-            # print(rfd_thresholds)
 
             lhs = rfd.get_left_hand_side()
             rhs = rfd.get_right_hand_side()
@@ -211,18 +190,10 @@ class RFDsTab(QScrollArea):
             lhs_keys = lhs.keys()
             rhs_keys = rhs.keys()
 
-            # print("LHS Keys: " + str(lhs_keys))
-            # print("RHS Keys: " + str(rhs_keys))
-
             # https://stackoverflow.com/questions/1720421/how-to-concatenate-two-lists-in-python#answer-35631185
             rfd_columns = [*lhs_keys, *rhs_keys]
-            # print("RFD Columns:")
-            # print(rfd_columns)
 
             rfd_columns_index: dict = {value: position for (position, value) in enumerate(rfd_columns)}
-
-            # print("RFD Columns index:")
-            # print(rfd_columns_index)
 
             rows, columns = self.data_frame.shape
 
@@ -231,28 +202,17 @@ class RFDsTab(QScrollArea):
             # dist: ndarray = np.abs(rfd_columns_data[:, None] - rfd_columns_data)
 
             full_dist = DiffDataFrame.full_diff(self.data_frame[rfd_columns])
-            # print("Full Dist:")
-            # print(full_dist)
 
             dist: np.ndarray = np.array(
                 [[full_dist.iloc[row1 * rows + row2] for row2 in range(0, rows)] for row1 in range(0, rows)])
-            # print("Dist:")
-            # print(dist)
 
             # Identify the suitable pairs of rows:
             # im: ndarray = (dist[:, :, 0] <= 2) & (dist[:, :, 1] <= 0) & (dist[:, :, 2] <= 1)
-            # print("IM:")
-            # print(im)
 
             conditions_arrays: np.ndarray = [(dist[:, :, rfd_columns_index[column]] <= rfd_thresholds[column])
                                              for column in rfd_columns]
 
-            # print("Conditions Array:")
-            # print(conditions_arrays)
-
             adjacency_matrix: np.ndarray = np.array(reduce(lambda a, b: np.bitwise_and(a, b), conditions_arrays))
-            # print("Adjacency Matrix:")
-            # print(adjacency_matrix)
 
             # Use them as an adjacency matrix and construct a graph.
             # The graph nodes represent rows in the original dataframe.
@@ -267,22 +227,10 @@ class RFDsTab(QScrollArea):
             seconds = t1 - t0
             current.setText(self.TIME, str(seconds) + "''")
 
-            # print("Time: " + str(seconds))
-
-            # print("DataFrame:")
-            # print(self.data_frame)
-
-            # print("RFD: " + str(rfd))
-            # print("RFD Subset:")
-            # print(df)
-
             percentage = round((df.shape[0] / self.rows_count) * 100)
-            # print("Percentage: " + str(percentage))
             current.setText(self.EXTENT, str(percentage) + "%")
 
-            # print("Indexes:")
             df_indexes = df.index.values.tolist()
-            # print(df_indexes)
 
             self.pandas_model.update_data(self.data_frame)
 
@@ -307,12 +255,8 @@ class RFDsTab(QScrollArea):
         self.initial_query: Query = query
 
     def __filter_rfds(self) -> list:
-        print("Filter RFDs...")
         if self.initial_query and self.rfds:
             rhs_filter: QCheckBox = self.filters[RFDsTab.RHS]
-
-            print("RHS filter: ")
-            print(rhs_filter.isChecked())
 
             if rhs_filter.isChecked():
                 filtered_rfds: list = RFDFilter.query_not_in_rhs(self.rfds, self.initial_query)

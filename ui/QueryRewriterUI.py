@@ -54,7 +54,7 @@ class QueryRewriterUI(QMainWindow):
         csv_path, _filter = open_file_dialog.getOpenFileName(parent=self,
                                                              directory=os.getenv("HOME"),
                                                              filter="CSV(*.csv)")
-        print("File Name: " + csv_path)
+        print("DataSet: " + csv_path)
 
         if csv_path != "":
             self.tabs.init_data_tab(csv_path)
@@ -71,49 +71,6 @@ class QueryRewriterUI(QMainWindow):
             self.tabs.relax_tab.set_initial_query_subject(self.tabs.query_tab.get_initial_query_subject())
             self.tabs.relax_tab.set_rfd_subject(self.tabs.rfds_tab.get_rfd_subject())
             self.tabs.relax_tab.set_extended_query_subject(self.tabs.extension_tab.get_extended_query_subject())
-
-            # self.tabs.init_rewrite_tab()
-            '''with open(file_name) as csv_file:
-                sniffer = csv.Sniffer()
-                dialect = sniffer.sniff(csv_file.readline())
-                csv_file.seek(0)
-                has_header = sniffer.has_header(csv_file.readline())
-                csv_file.seek(0)
-                rows = sum(1 for line in csv_file)
-                csv_file.seek(0)
-                reader = csv.reader(csv_file, dialect)
-                columns = len(next(reader))  # Read first line and count columns
-                csv_file.seek(0)
-
-                print("Delimiter: " + dialect.delimiter)
-                print("Has Header: " + str(has_header))
-                print("Rows: " + str(rows))
-                print("Columns: " + str(columns))
-
-                table = QTableWidget(rows, columns)
-                table.setEnabled(True)
-                table.setRowCount(rows - 1)  # excluding the header from the count
-                table.setColumnCount(columns)
-
-                header = next(reader)
-                print("Header: ")
-                print(header)
-
-                # write the header
-                for col in range(0, columns):
-                    table.setHorizontalHeaderItem(col, QTableWidgetItem(header[col]))
-
-                # write the rows
-                data_row = 0
-                for row in reader:
-                    for col in range(0, columns):
-                        table.setItem(data_row, col, QTableWidgetItem(row[col]))
-                    data_row += 1
-
-                table.setSortingEnabled(True)
-                self.setCentralWidget(table)
-                layout = QVBoxLayout()
-                table.setLayout(layout)'''
 
 
 if __name__ == '__main__':
