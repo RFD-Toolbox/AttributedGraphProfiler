@@ -36,30 +36,33 @@ class RFD(dict):
                self.get_right_hand_side().__contains__(o)
 
     def __str__(self) -> str:
-        label = "("
+        label = ""
+        
+        if self.get_left_hand_side() and self.get_right_hand_side():
+            label = "("
 
-        lhs_last_key: str = list(self.get_left_hand_side().keys())[-1]
+            lhs_last_key: str = list(self.get_left_hand_side().keys())[-1]
 
-        for key, value in self.get_left_hand_side().items():
-            label += key.title().replace("_", " ")
-            label += " " + Operator.LESS_EQUAL + " "
-            label += str(value)
+            for key, value in self.get_left_hand_side().items():
+                label += key.title().replace("_", " ")
+                label += " " + Operator.LESS_EQUAL + " "
+                label += str(value)
 
-            if key is not lhs_last_key:
-                label += ", "
+                if key is not lhs_last_key:
+                    label += ", "
 
-        label += ") → ("
+            label += ") → ("
 
-        rhs_last_key: str = list(self.get_right_hand_side().keys())[-1]
+            rhs_last_key: str = list(self.get_right_hand_side().keys())[-1]
 
-        for key, value in self.get_right_hand_side().items():
-            label += key.title().replace("_", " ")
-            label += " " + Operator.LESS_EQUAL + " "
-            label += str(value)
+            for key, value in self.get_right_hand_side().items():
+                label += key.title().replace("_", " ")
+                label += " " + Operator.LESS_EQUAL + " "
+                label += str(value)
 
-            if key is not rhs_last_key:
-                label += ", "
+                if key is not rhs_last_key:
+                    label += ", "
 
-        label += ")"
+            label += ")"
 
         return label

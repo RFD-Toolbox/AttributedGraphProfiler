@@ -47,6 +47,7 @@ class RFDsTab(QScrollArea):
 
     def display(self, path: str):
         self.path = path
+        self.rfds_path: str = self.path.replace(".csv", "-RFDs.json")
         self.csv_parser: CSVParser = CSVParser(path)
         self.data_frame: DataFrame = self.csv_parser.data_frame
         self.header = self.csv_parser.header
@@ -172,11 +173,13 @@ class RFDsTab(QScrollArea):
         print("Store RFDs called")
         if self.rfds:
             save_file_dialog = QFileDialog(self)
-            rfds_path, _filter = save_file_dialog.getSaveFileName(parent=self, directory=os.getenv("HOME"))
-            print("RFDs JSON path: " + rfds_path)
+            self.rfds_path, _filter = save_file_dialog.getSaveFileName(parent=self,
+                                                                       directory=self.rfds_path,
+                                                                       filter="JSON(*.json)")
+            print("RFDs JSON path: " + self.rfds_path)
 
-            if rfds_path:
-                with open(rfds_path, "w") as rfds_file:
+            if self.rfds_path:
+                with open(self.rfds_path, "w") as rfds_file:
                     json.dump(self.rfds, rfds_file)
 
     def __show_rfds(self, rfds: list):
