@@ -30,7 +30,7 @@ class RFD(dict):
                self.get_right_hand_side().__contains__(o)
 
     def __str__(self) -> str:
-        return str(self["LHS"]) + " ==> " + str(self["RHS"])
+        return str(self["LHS"]) + " → " + str(self["RHS"])
 
 
 if __name__ == '__main__':

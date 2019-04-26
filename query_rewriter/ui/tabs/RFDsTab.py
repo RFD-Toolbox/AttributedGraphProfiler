@@ -24,6 +24,7 @@ from query_rewriter.ui.PandasTableModel import PandasTableModel
 
 class RFDsTab(QScrollArea):
     RFD, EXTENT, TIME = range(3)
+    LHS = "LHS"
     RHS = "RHS"
 
     def __init__(self, parent=None):
@@ -33,7 +34,7 @@ class RFDsTab(QScrollArea):
         self.initial_query: Query = None
         self.rfds: list = []
 
-        self.filters: dict = {RFDsTab.RHS: QCheckBox("RHS")}
+        self.filters: dict = {RFDsTab.LHS: QCheckBox("LHS"), RFDsTab.RHS: QCheckBox("RHS")}
 
         self.content_widget = QWidget()
         self.setWidget(self.content_widget)
@@ -78,12 +79,17 @@ class RFDsTab(QScrollArea):
         load_rfds_button.setMaximumWidth(width)
         load_rfds_button.clicked.connect(lambda: self.load_rfds())
 
+        lhs_filter_check_box: QCheckBox = self.filters[RFDsTab.LHS]
+        lhs_filter_check_box.stateChanged.connect(lambda: self.__show_rfds(self.__filter_rfds()))
+
         rhs_filter_check_box: QCheckBox = self.filters[RFDsTab.RHS]
         rhs_filter_check_box.stateChanged.connect(lambda: self.__show_rfds(self.__filter_rfds()))
 
         buttons_horizontal_layout.addWidget(discover_rfds_button)
         buttons_horizontal_layout.addWidget(load_rfds_button)
+        buttons_horizontal_layout.addWidget(lhs_filter_check_box)
         buttons_horizontal_layout.addWidget(rhs_filter_check_box)
+        buttons_horizontal_layout.setAlignment(Qt.AlignLeft)
 
         self.rfd_data_set_table = QTableView()
         self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.layout())
@@ -255,13 +261,20 @@ class RFDsTab(QScrollArea):
         self.initial_query: Query = query
 
     def __filter_rfds(self) -> list:
+        filtered_rfds: list = []
+
         if self.initial_query and self.rfds:
+            filtered_rfds = self.rfds
+
+            lhs_filter: QCheckBox = self.filters[RFDsTab.LHS]
             rhs_filter: QCheckBox = self.filters[RFDsTab.RHS]
 
             if rhs_filter.isChecked():
-                filtered_rfds: list = RFDFilter.query_not_in_rhs(self.rfds, self.initial_query)
-            else:
-                filtered_rfds: list = self.rfds
+                filtered_rfds = RFDFilter.query_not_in_rhs(filtered_rfds, self.initial_query)
+
+            if lhs_filter.isChecked():
+                filtered_rfds = RFDFilter.query_in_lhs(filtered_rfds, self.initial_query)
+
         elif self.rfds:
             filtered_rfds = self.rfds
         else:
