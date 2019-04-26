@@ -275,8 +275,14 @@ class Query(dict):
         extended_result_set: DataFrame = data_set.query(self.to_expression())
 
         # List containing only the columns/attributes that will be in the Relaxed Query
+        # In order to do this we look for columns not in the original query
         relaxing_columns: list = [col for col in list(extended_result_set)
                                   if col not in self.keys() and col in rfd]
+
+        # Check if the list is empty
+        if not relaxing_columns:
+            # Use only columns in the RHS
+            relaxing_columns = [col for col in rfd.get_right_hand_side().keys()]
 
         relaxed_query: Query = Query()
 
