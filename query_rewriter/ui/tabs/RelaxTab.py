@@ -7,7 +7,7 @@ from rx.subjects import Subject
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Query import Query
 from query_rewriter.model.RFD import RFD
-from ui.PandasTableModel import PandasTableModel
+from query_rewriter.ui.PandasTableModel import PandasTableModel
 
 
 class RelaxTab(QScrollArea):

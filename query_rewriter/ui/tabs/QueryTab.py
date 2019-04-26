@@ -1,7 +1,7 @@
 import copy
 
 from PyQt5 import QtGui
-from PyQt5.QtCore import QRegExp, Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QGroupBox, QGridLayout, QLabel, QLineEdit, QComboBox, \
     QPushButton, QTableView, QHeaderView
@@ -14,7 +14,7 @@ from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Operator import Operator
 from query_rewriter.model.Query import Query
 from query_rewriter.model.RegularExpression import RegularExpression
-from ui.PandasTableModel import PandasTableModel
+from query_rewriter.ui.PandasTableModel import PandasTableModel
 
 
 class QueryTab(QScrollArea):

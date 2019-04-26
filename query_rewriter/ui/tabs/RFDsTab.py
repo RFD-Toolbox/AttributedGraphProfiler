@@ -5,7 +5,7 @@ import numpy as np
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QGroupBox, QHBoxLayout, QPushButton, QTableView, \
-    QHeaderView, QAbstractItemView, QTreeWidgetItem, QTreeWidget, QLabel, QCheckBox
+    QHeaderView, QAbstractItemView, QTreeWidgetItem, QTreeWidget, QCheckBox
 from pandas import DataFrame
 from pandas.compat import reduce
 from rx.subjects import Subject
@@ -19,7 +19,7 @@ from query_rewriter.model.RFD import RFD
 from query_rewriter.utils.DiffDataFrame import DiffDataFrame
 from query_rewriter.utils.RFDFilter import RFDFilter
 from query_rewriter.utils.Transformer import Transformer
-from ui.PandasTableModel import PandasTableModel
+from query_rewriter.ui.PandasTableModel import PandasTableModel
 
 
 class RFDsTab(QScrollArea):

@@ -3,7 +3,7 @@ import os
 
 from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFileDialog, QDesktopWidget
 
-from ui.tabs.TabsWidget import TabsWidget
+from query_rewriter.ui.tabs.TabsWidget import TabsWidget
 
 
 class QueryRewriterUI(QMainWindow):

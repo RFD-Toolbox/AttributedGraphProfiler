@@ -1,11 +1,11 @@
 import typing
 
 from PyQt5.QtWidgets import QTabWidget, QWidget
-from ui.tabs.DataTab import DataTab
-from ui.tabs.ExtensionTab import ExtensionTab
-from ui.tabs.QueryTab import QueryTab
-from ui.tabs.RFDsTab import RFDsTab
-from ui.tabs.RelaxTab import RelaxTab
+from query_rewriter.ui.tabs.DataTab import DataTab
+from query_rewriter.ui.tabs.ExtensionTab import ExtensionTab
+from query_rewriter.ui.tabs.QueryTab import QueryTab
+from query_rewriter.ui.tabs.RFDsTab import RFDsTab
+from query_rewriter.ui.tabs.RelaxTab import RelaxTab
 
 
 class TabsWidget(QTabWidget):
