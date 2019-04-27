@@ -105,7 +105,6 @@ class RFDsTab(QScrollArea):
         self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.layout())
         self.rfd_data_set_table.setModel(self.pandas_model)
         self.rfd_data_set_table.setSortingEnabled(False)
-        self.rfd_data_set_table.resizeRowsToContents()
         self.rfd_data_set_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
         self.rfd_data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
 

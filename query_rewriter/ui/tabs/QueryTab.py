@@ -112,9 +112,7 @@ class QueryTab(QScrollArea):
         self._query_data_model: PandasTableModel = PandasTableModel(self._query_data_frame, self)
         table.setModel(self._query_data_model)
         table.setSortingEnabled(True)
-        table.resizeRowsToContents()
         table.setMinimumHeight(200)
-        # ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
 
         layout = QVBoxLayout()

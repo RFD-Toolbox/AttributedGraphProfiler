@@ -21,7 +21,6 @@ class DataTab(QScrollArea):
         pandas_model: QAbstractTableModel = PandasTableModel(self.data_frame, self)
         table.setModel(pandas_model)
         table.setSortingEnabled(True)
-        table.resizeRowsToContents()
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
 
         for i in reversed(range(self.layout().count())):

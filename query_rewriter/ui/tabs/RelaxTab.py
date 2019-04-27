@@ -45,7 +45,6 @@ class RelaxTab(QScrollArea):
         self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.layout())
         self.data_set_table.setModel(self.pandas_model)
         self.data_set_table.setSortingEnabled(False)
-        self.data_set_table.resizeRowsToContents()
         self.data_set_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
         self.data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
 
