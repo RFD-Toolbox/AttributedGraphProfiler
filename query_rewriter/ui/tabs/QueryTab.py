@@ -1,7 +1,7 @@
 import copy
 
 from PyQt5 import QtGui
-from PyQt5.QtCore import QRegExp, Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QRegExpValidator
 from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QGroupBox, QGridLayout, QLabel, QLineEdit, QComboBox, \
     QPushButton, QTableView, QHeaderView
@@ -14,7 +14,7 @@ from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Operator import Operator
 from query_rewriter.model.Query import Query
 from query_rewriter.model.RegularExpression import RegularExpression
-from ui.PandasTableModel import PandasTableModel
+from query_rewriter.ui.PandasTableModel import PandasTableModel
 
 
 class QueryTab(QScrollArea):
@@ -112,9 +112,7 @@ class QueryTab(QScrollArea):
         self._query_data_model: PandasTableModel = PandasTableModel(self._query_data_frame, self)
         table.setModel(self._query_data_model)
         table.setSortingEnabled(True)
-        table.resizeRowsToContents()
         table.setMinimumHeight(200)
-        # ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
 
         layout = QVBoxLayout()
@@ -170,7 +168,6 @@ class QueryTab(QScrollArea):
 
     def combo_changed(self, combo: QComboBox, key: str, column_type: dtype):
         if combo.currentText() == Operator.EQUAL:
-            self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText("The exact value of this property ({})".format(column_type))
 
             if column_type == np.int64:
@@ -184,8 +181,11 @@ class QueryTab(QScrollArea):
 
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
+
+            if not self.query_items[key].hasAcceptableInput():
+                self.query_items[key].setText("")
+
         elif combo.currentText() == Operator.BELONGING:
-            self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText("A list of values for this property ({})".format(column_type))
 
             if column_type == np.int64:
@@ -199,8 +199,10 @@ class QueryTab(QScrollArea):
 
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
+
+            if not self.query_items[key].hasAcceptableInput():
+                self.query_items[key].setText("")
         elif combo.currentText() == Operator.NOT_BELONGING:
-            self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText(
                 "A list of values to exclude for this property ({})".format(column_type))
 
@@ -215,8 +217,10 @@ class QueryTab(QScrollArea):
 
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
+
+            if not self.query_items[key].hasAcceptableInput():
+                self.query_items[key].setText("")
         elif combo.currentText() == Operator.GREATER:
-            self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText(
                 "A minimum value of this property (value excluded) ({})".format(column_type))
 
@@ -229,8 +233,10 @@ class QueryTab(QScrollArea):
 
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
+
+            if not self.query_items[key].hasAcceptableInput():
+                self.query_items[key].setText("")
         elif combo.currentText() == Operator.GREATER_EQUAL:
-            self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText(
                 "A minimum value of this property (value included) ({})".format(column_type))
 
@@ -243,8 +249,10 @@ class QueryTab(QScrollArea):
 
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
+
+            if not self.query_items[key].hasAcceptableInput():
+                self.query_items[key].setText("")
         elif combo.currentText() == Operator.LESS:
-            self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText(
                 "A maximum value of this property (value excluded) ({})".format(column_type))
 
@@ -257,8 +265,10 @@ class QueryTab(QScrollArea):
 
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
+
+            if not self.query_items[key].hasAcceptableInput():
+                self.query_items[key].setText("")
         elif combo.currentText() == Operator.LESS_EQUAL:
-            self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText(
                 "A maximum value of this property (value included) ({})".format(column_type))
 
@@ -271,8 +281,10 @@ class QueryTab(QScrollArea):
 
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
+
+            if not self.query_items[key].hasAcceptableInput():
+                self.query_items[key].setText("")
         elif combo.currentText() == Operator.NOT_EQUAL:
-            self.query_items[key].setText("")
             self.query_items[key].setPlaceholderText("A value not admitted for this property ({})".format(column_type))
 
             if column_type == np.int64:
@@ -284,6 +296,9 @@ class QueryTab(QScrollArea):
 
             input_validator = QRegExpValidator(reg_ex, self.query_items[key])
             self.query_items[key].setValidator(input_validator)
+
+            if not self.query_items[key].hasAcceptableInput():
+                self.query_items[key].setText("")
 
     def get_initial_query_subject(self):
         return self.query_subject

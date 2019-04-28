@@ -1,11 +1,13 @@
+import os
 import time
+import json
 
 import networkx as nx
 import numpy as np
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QGroupBox, QHBoxLayout, QPushButton, QTableView, \
-    QHeaderView, QAbstractItemView, QTreeWidgetItem, QTreeWidget, QLabel, QCheckBox
+    QHeaderView, QAbstractItemView, QTreeWidgetItem, QTreeWidget, QCheckBox, QFileDialog
 from pandas import DataFrame
 from pandas.compat import reduce
 from rx.subjects import Subject
@@ -18,12 +20,14 @@ from query_rewriter.model.Query import Query
 from query_rewriter.model.RFD import RFD
 from query_rewriter.utils.DiffDataFrame import DiffDataFrame
 from query_rewriter.utils.RFDFilter import RFDFilter
+from query_rewriter.utils.RFDJSONDecoder import RFDJSONDecoder
 from query_rewriter.utils.Transformer import Transformer
-from ui.PandasTableModel import PandasTableModel
+from query_rewriter.ui.PandasTableModel import PandasTableModel
 
 
 class RFDsTab(QScrollArea):
     RFD, EXTENT, TIME = range(3)
+    LHS = "LHS"
     RHS = "RHS"
 
     def __init__(self, parent=None):
@@ -33,7 +37,7 @@ class RFDsTab(QScrollArea):
         self.initial_query: Query = None
         self.rfds: list = []
 
-        self.filters: dict = {RFDsTab.RHS: QCheckBox("RHS")}
+        self.filters: dict = {RFDsTab.LHS: QCheckBox("LHS"), RFDsTab.RHS: QCheckBox("RHS")}
 
         self.content_widget = QWidget()
         self.setWidget(self.content_widget)
@@ -43,6 +47,7 @@ class RFDsTab(QScrollArea):
 
     def display(self, path: str):
         self.path = path
+        self.rfds_path: str = self.path.replace(".csv", "-RFDs.json")
         self.csv_parser: CSVParser = CSVParser(path)
         self.data_frame: DataFrame = self.csv_parser.data_frame
         self.header = self.csv_parser.header
@@ -78,18 +83,28 @@ class RFDsTab(QScrollArea):
         load_rfds_button.setMaximumWidth(width)
         load_rfds_button.clicked.connect(lambda: self.load_rfds())
 
+        store_rfds_button = QPushButton("Store RFDs")
+        width = store_rfds_button.fontMetrics().boundingRect(load_rfds_button.text()).width() + 20
+        store_rfds_button.setMaximumWidth(width)
+        store_rfds_button.clicked.connect(lambda: self.store_rfds())
+
+        lhs_filter_check_box: QCheckBox = self.filters[RFDsTab.LHS]
+        lhs_filter_check_box.stateChanged.connect(lambda: self.__show_rfds(self.__filter_rfds()))
+
         rhs_filter_check_box: QCheckBox = self.filters[RFDsTab.RHS]
         rhs_filter_check_box.stateChanged.connect(lambda: self.__show_rfds(self.__filter_rfds()))
 
         buttons_horizontal_layout.addWidget(discover_rfds_button)
         buttons_horizontal_layout.addWidget(load_rfds_button)
+        buttons_horizontal_layout.addWidget(store_rfds_button)
+        buttons_horizontal_layout.addWidget(lhs_filter_check_box)
         buttons_horizontal_layout.addWidget(rhs_filter_check_box)
+        buttons_horizontal_layout.setAlignment(Qt.AlignLeft)
 
         self.rfd_data_set_table = QTableView()
         self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.layout())
         self.rfd_data_set_table.setModel(self.pandas_model)
         self.rfd_data_set_table.setSortingEnabled(False)
-        self.rfd_data_set_table.resizeRowsToContents()
         self.rfd_data_set_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
         self.rfd_data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
 
@@ -98,9 +113,21 @@ class RFDsTab(QScrollArea):
         self.layout().addWidget(main_group)
 
     def load_rfds(self):
-        # print("Loading RFDs")
         # Cleaning
         self.rfd_data_set_table.clearSelection()
+
+        open_file_dialog = QFileDialog(self)
+        rfds_path, _filter = open_file_dialog.getOpenFileName(parent=self,
+                                                              directory=os.getenv("HOME"),
+                                                              filter="JSON(*.json)")
+
+        if rfds_path:
+            with open(rfds_path, "r") as rfds_file:
+                rfds: list = json.load(rfds_file, object_hook=RFDJSONDecoder.as_rfd)
+
+                if rfds:
+                    self.rfds = rfds
+                    self.__show_rfds(self.__filter_rfds())
 
     def discover_rfds(self):
         columns_count = self.columns_count
@@ -131,12 +158,20 @@ class RFDsTab(QScrollArea):
 
         self.rfds = []
         for df in self.rfd_data_frame_list:
-            # print("\n")
-            # print(df)
-            # print("\n")
             self.rfds.extend(Transformer.rfd_data_frame_to_rfd_list(df, self.header))
 
         self.__show_rfds(self.__filter_rfds())
+
+    def store_rfds(self):
+        if self.rfds:
+            save_file_dialog = QFileDialog(self)
+            self.rfds_path, _filter = save_file_dialog.getSaveFileName(parent=self,
+                                                                       directory=self.rfds_path,
+                                                                       filter="JSON(*.json)")
+
+            if self.rfds_path:
+                with open(self.rfds_path, "w") as rfds_file:
+                    json.dump(self.rfds, rfds_file)
 
     def __show_rfds(self, rfds: list):
         if rfds:
@@ -172,13 +207,10 @@ class RFDsTab(QScrollArea):
             self.tree_widget.currentItemChanged.connect(self.rfd_selected_to_max_clique)
 
     def rfd_selected_to_max_clique(self, current: QTreeWidgetItem, previous: QTreeWidgetItem):
-        # print("RFD selected")
-
         if current:
             t0 = time.time()
 
             rfd: RFD = current.data(self.RFD, Qt.UserRole)
-            # print("Current: " + str(rfd))
             self.rfd_subject.on_next(rfd)
 
             # https://stackoverflow.com/questions/38987/how-to-merge-two-dictionaries-in-a-single-expression#26853961
@@ -255,13 +287,20 @@ class RFDsTab(QScrollArea):
         self.initial_query: Query = query
 
     def __filter_rfds(self) -> list:
+        filtered_rfds: list = []
+
         if self.initial_query and self.rfds:
+            filtered_rfds = self.rfds
+
+            lhs_filter: QCheckBox = self.filters[RFDsTab.LHS]
             rhs_filter: QCheckBox = self.filters[RFDsTab.RHS]
 
             if rhs_filter.isChecked():
-                filtered_rfds: list = RFDFilter.query_not_in_rhs(self.rfds, self.initial_query)
-            else:
-                filtered_rfds: list = self.rfds
+                filtered_rfds = RFDFilter.query_not_in_rhs(filtered_rfds, self.initial_query)
+
+            if lhs_filter.isChecked():
+                filtered_rfds = RFDFilter.query_in_lhs(filtered_rfds, self.initial_query)
+
         elif self.rfds:
             filtered_rfds = self.rfds
         else:

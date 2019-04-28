@@ -8,7 +8,7 @@ from rx.subjects import Subject
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Query import Query
 from query_rewriter.model.RFD import RFD
-from ui.PandasTableModel import PandasTableModel
+from query_rewriter.ui.PandasTableModel import PandasTableModel
 
 
 class ExtensionTab(QScrollArea):
@@ -65,7 +65,6 @@ class ExtensionTab(QScrollArea):
         self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.layout())
         self.data_set_table.setModel(self.pandas_model)
         self.data_set_table.setSortingEnabled(False)
-        self.data_set_table.resizeRowsToContents()
         self.data_set_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
         self.data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
 

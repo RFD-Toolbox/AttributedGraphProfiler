@@ -14,3 +14,16 @@ class RFDFilter:
         return [rfd for rfd in rfds
                 if all(attribute not in rfd.get_right_hand_side()
                        for attribute in query.get_fields())]
+
+    @staticmethod
+    def query_in_lhs(rfds: list, query: Query) -> list:
+        '''
+        Returns the subset of the RFD where AT LEAST ONE attribute of the query is in the LHS.
+        :param rfds: the list of the RFDs to filter
+        :param query: the query
+        :return: the subset of the RFD where AT LEAST ONE attribute of the query is in the RHS.
+        '''
+
+        return [rfd for rfd in rfds
+                if any(attribute in rfd.get_left_hand_side()
+                       for attribute in query.get_fields())]

@@ -1,9 +1,9 @@
 from PyQt5.QtCore import QAbstractTableModel
-from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QTableView, QHeaderView
+from PyQt5.QtWidgets import QScrollArea, QVBoxLayout, QTableView, QHeaderView
 from pandas import DataFrame
 
 from query_rewriter.io.csv.csv_parser import CSVParser
-from ui.PandasTableModel import PandasTableModel
+from query_rewriter.ui.PandasTableModel import PandasTableModel
 
 
 class DataTab(QScrollArea):
@@ -21,7 +21,6 @@ class DataTab(QScrollArea):
         pandas_model: QAbstractTableModel = PandasTableModel(self.data_frame, self)
         table.setModel(pandas_model)
         table.setSortingEnabled(True)
-        table.resizeRowsToContents()
         table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
 
         for i in reversed(range(self.layout().count())):

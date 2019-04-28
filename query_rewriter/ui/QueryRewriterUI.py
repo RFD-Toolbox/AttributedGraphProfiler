@@ -1,9 +1,11 @@
 import sys
 import os
 
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFileDialog, QDesktopWidget
 
-from ui.tabs.TabsWidget import TabsWidget
+from query_rewriter.ui.tabs.TabsWidget import TabsWidget
+from pkg_resources import resource_filename
 
 
 class QueryRewriterUI(QMainWindow):
@@ -14,6 +16,11 @@ class QueryRewriterUI(QMainWindow):
     def initUI(self):
         # Window's title
         self.setWindowTitle("RFD Query Rewriter")
+
+        # Window's icon
+        icon_path = resource_filename("query_rewriter", "assets/images/growth.png")
+        icon: QIcon = QIcon(icon_path)
+        self.setWindowIcon(icon)
 
         # Menu
         menu_bar = self.menuBar()
