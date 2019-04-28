@@ -1,18 +1,18 @@
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel, QTableView, QHeaderView, QAbstractItemView
+from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel
 from pandas import DataFrame
 from rx.subjects import Subject
 
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Query import Query
 from query_rewriter.model.RFD import RFD
-from query_rewriter.ui.PandasTableModel import PandasTableModel
 
 
 class RelaxTab(QScrollArea):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.relaxed_query_subject = Subject()
         self.content_widget = QWidget()
         self.setWidget(self.content_widget)
         self.setWidgetResizable(True)
@@ -41,14 +41,14 @@ class RelaxTab(QScrollArea):
         self.relaxed_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
         self.layout().addWidget(self.relaxed_query_value)
 
-        self.data_set_table = QTableView()
+        '''self.data_set_table = QTableView()
         self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.layout())
         self.data_set_table.setModel(self.pandas_model)
         self.data_set_table.setSortingEnabled(False)
         self.data_set_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
         self.data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
 
-        self.layout().addWidget(self.data_set_table)
+        self.layout().addWidget(self.data_set_table)'''
 
     def set_initial_query_subject(self, query_subject: Subject):
         self.query_subject: Subject = query_subject
@@ -92,14 +92,18 @@ class RelaxTab(QScrollArea):
     def relax_query(self):
         if self.initial_query and self.extended_query and self.extended_result_set is not None and self.rfd:
             self.relaxed_query: Query = self.extended_query.relax_constraints(self.rfd, self.data_frame)
+            self.relaxed_query_subject.on_next(self.relaxed_query)
 
             self.relaxed_query_value.setText(self.relaxed_query.to_rich_text_expression())
             self.relaxed_query_value.setTextFormat(Qt.RichText)
 
-            relaxed_result_set: DataFrame = self.data_frame.query(self.relaxed_query.to_expression())
+            '''relaxed_result_set: DataFrame = self.data_frame.query(self.relaxed_query.to_expression())
 
             df_indexes = relaxed_result_set.index.values.tolist()
 
             self.data_set_table.clearSelection()
             for index in df_indexes:
-                self.data_set_table.selectRow(index)
+                self.data_set_table.selectRow(index)'''
+
+    def get_relaxed_query_subject(self) -> Subject:
+        return self.relaxed_query_subject

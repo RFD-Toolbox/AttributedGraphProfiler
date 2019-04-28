@@ -1,14 +1,12 @@
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel, QTableView, QHeaderView, \
-    QAbstractItemView
+from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel
 from pandas import DataFrame
 from rx.subjects import Subject
 
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Query import Query
 from query_rewriter.model.RFD import RFD
-from query_rewriter.ui.PandasTableModel import PandasTableModel
 
 
 class ExtensionTab(QScrollArea):
@@ -61,15 +59,6 @@ class ExtensionTab(QScrollArea):
         self.extended_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
         self.layout().addWidget(self.extended_query_value)
 
-        self.data_set_table = QTableView()
-        self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.layout())
-        self.data_set_table.setModel(self.pandas_model)
-        self.data_set_table.setSortingEnabled(False)
-        self.data_set_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
-        self.data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
-
-        self.layout().addWidget(self.data_set_table)
-
     def set_initial_query_subject(self, query_subject: Subject):
         self.initial_query_subject: Subject = query_subject
         self.initial_query_subject.subscribe(
@@ -105,14 +94,6 @@ class ExtensionTab(QScrollArea):
 
             self.extended_query_value.setText(self.extended_query.to_rich_text_expression())
             self.extended_query_value.setTextFormat(Qt.RichText)
-
-            extended_result_set: DataFrame = self.data_frame.query(self.extended_query.to_expression())
-
-            df_indexes = extended_result_set.index.values.tolist()
-
-            self.data_set_table.clearSelection()
-            for index in df_indexes:
-                self.data_set_table.selectRow(index)
 
     def get_extended_query_subject(self) -> Subject:
         return self.extended_query_subject

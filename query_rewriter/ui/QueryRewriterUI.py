@@ -56,6 +56,8 @@ class QueryRewriterUI(QMainWindow):
         splitter: QSplitter = QSplitter(Qt.Vertical)
 
         self.tabs = TabsWidget(self)
+        # self.tabs.blockSignals(True) #just for not showing the initial message
+        self.tabs.currentChanged.connect(self.onTabChange)  # changed!
         # self.setCentralWidget(self.tabs)
 
         splitter.addWidget(self.tabs)
@@ -67,6 +69,11 @@ class QueryRewriterUI(QMainWindow):
         self.setCentralWidget(splitter)
 
         self.show()
+
+    def onTabChange(self, index):
+        print("On Tab Change...")
+        print("Index: " + str(index))
+        self.data_tab.onTabChange(index)
 
     def open_file(self):
         open_file_dialog = QFileDialog(self)
@@ -85,6 +92,8 @@ class QueryRewriterUI(QMainWindow):
 
             self.data_tab.set_initial_query_subject(self.tabs.query_tab.get_initial_query_subject())
             self.data_tab.set_rfd_subject(self.tabs.rfds_tab.get_rfd_subject())
+            self.data_tab.set_extended_query_subject(self.tabs.extension_tab.get_extended_query_subject())
+            self.data_tab.set_relaxed_query_subject(self.tabs.relax_tab.get_relaxed_query_subject())
 
             self.tabs.rfds_tab.set_initial_query_subject(self.tabs.query_tab.get_initial_query_subject())
 
