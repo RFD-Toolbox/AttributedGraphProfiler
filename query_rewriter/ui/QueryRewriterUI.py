@@ -1,9 +1,11 @@
 import sys
 import os
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFileDialog, QDesktopWidget
+from PyQt5.QtWidgets import QMainWindow, QApplication, QAction, QFileDialog, QDesktopWidget, QSplitter, QLabel
 
+from query_rewriter.ui.tabs.DataTab import DataTab
 from query_rewriter.ui.tabs.TabsWidget import TabsWidget
 from pkg_resources import resource_filename
 
@@ -37,7 +39,7 @@ class QueryRewriterUI(QMainWindow):
         exit_button.triggered.connect(self.close)
         file_menu.addAction(exit_button)
 
-        self.setGeometry(0, 0, 900, 500)
+        self.setGeometry(0, 0, 1200, 700)
 
         # geometry of the main window
         qr = self.frameGeometry()
@@ -51,8 +53,18 @@ class QueryRewriterUI(QMainWindow):
         # top left of rectangle becomes top left of window centering it
         self.move(qr.topLeft())
 
+        splitter: QSplitter = QSplitter(Qt.Vertical)
+
         self.tabs = TabsWidget(self)
-        self.setCentralWidget(self.tabs)
+        # self.setCentralWidget(self.tabs)
+
+        splitter.addWidget(self.tabs)
+
+        self.data_tab: DataTab = DataTab()
+        splitter.addWidget(self.data_tab)
+
+        splitter.setSizes([500, 500])
+        self.setCentralWidget(splitter)
 
         self.show()
 
@@ -64,11 +76,15 @@ class QueryRewriterUI(QMainWindow):
         print("DataSet: " + csv_path)
 
         if csv_path != "":
-            self.tabs.init_data_tab(csv_path)
+            # self.tabs.init_data_tab(csv_path)
+            self.data_tab.display(csv_path)
             self.tabs.init_query_tab(csv_path)
             self.tabs.init_rfds_tab(csv_path)
             self.tabs.init_extension_tab(csv_path)
             self.tabs.init_relax_tab(csv_path)
+
+            self.data_tab.set_initial_query_subject(self.tabs.query_tab.get_initial_query_subject())
+            self.data_tab.set_rfd_subject(self.tabs.rfds_tab.get_rfd_subject())
 
             self.tabs.rfds_tab.set_initial_query_subject(self.tabs.query_tab.get_initial_query_subject())
 

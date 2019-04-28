@@ -19,6 +19,7 @@ from query_rewriter.io.rfd.rfd_extractor import RFDExtractor
 from query_rewriter.model.Query import Query
 from query_rewriter.model.RFD import RFD
 from query_rewriter.utils.DiffDataFrame import DiffDataFrame
+from query_rewriter.utils.RFDExtent import RFDExtent
 from query_rewriter.utils.RFDFilter import RFDFilter
 from query_rewriter.utils.RFDJSONDecoder import RFDJSONDecoder
 from query_rewriter.utils.Transformer import Transformer
@@ -101,20 +102,20 @@ class RFDsTab(QScrollArea):
         buttons_horizontal_layout.addWidget(rhs_filter_check_box)
         buttons_horizontal_layout.setAlignment(Qt.AlignLeft)
 
-        self.rfd_data_set_table = QTableView()
+        '''self.rfd_data_set_table = QTableView()
         self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.layout())
         self.rfd_data_set_table.setModel(self.pandas_model)
         self.rfd_data_set_table.setSortingEnabled(False)
         self.rfd_data_set_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
         self.rfd_data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
 
-        group_vertical_layout.addWidget(self.rfd_data_set_table)
+        group_vertical_layout.addWidget(self.rfd_data_set_table)'''
 
         self.layout().addWidget(main_group)
 
     def load_rfds(self):
         # Cleaning
-        self.rfd_data_set_table.clearSelection()
+        # self.rfd_data_set_table.clearSelection()
 
         open_file_dialog = QFileDialog(self)
         rfds_path, _filter = open_file_dialog.getOpenFileName(parent=self,
@@ -176,7 +177,7 @@ class RFDsTab(QScrollArea):
     def __show_rfds(self, rfds: list):
         if rfds:
             # Cleaning
-            self.rfd_data_set_table.clearSelection()
+            # self.rfd_data_set_table.clearSelection()
 
             for i in reversed(range(self.rfds_tree_wrapper_layout.count())):
                 self.rfds_tree_wrapper_layout.itemAt(i).widget().deleteLater()
@@ -204,7 +205,7 @@ class RFDsTab(QScrollArea):
 
             # combo.currentTextChanged.connect(lambda ix, key=h, select=combo: self.combo_changed(select, key))
             # self.tree_view.currentItemChanged.connect(self.rfd_selected)
-            self.tree_widget.currentItemChanged.connect(self.rfd_selected_to_max_clique)
+            self.tree_widget.currentItemChanged.connect(self.highlight_rfd_extent)
 
     def rfd_selected_to_max_clique(self, current: QTreeWidgetItem, previous: QTreeWidgetItem):
         if current:
@@ -264,11 +265,24 @@ class RFDsTab(QScrollArea):
 
             df_indexes = df.index.values.tolist()
 
-            self.pandas_model.update_data(self.data_frame)
+            # self.pandas_model.update_data(self.data_frame)
 
-            self.rfd_data_set_table.clearSelection()
+            '''self.rfd_data_set_table.clearSelection()
             for index in df_indexes:
-                self.rfd_data_set_table.selectRow(index)
+                self.rfd_data_set_table.selectRow(index)'''
+
+    def highlight_rfd_extent(self, current: QTreeWidgetItem, previous: QTreeWidgetItem):
+        if current:
+            t0 = time.time()
+
+            rfd: RFD = current.data(self.RFD, Qt.UserRole)
+            self.rfd_subject.on_next(rfd)
+
+            rfd_df_indexes = RFDExtent.extent_indexes(self.data_frame, rfd)
+
+            '''self.rfd_data_set_table.clearSelection()
+            for index in rfd_df_indexes:
+                self.rfd_data_set_table.selectRow(index)'''
 
     def get_rfd_subject(self):
         return self.rfd_subject

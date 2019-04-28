@@ -15,8 +15,8 @@ class TabsWidget(QTabWidget):
         super().__init__(parent)
 
         # Data Tab
-        self.data_tab: DataTab = DataTab()
-        self.addTab(self.data_tab, "Data")
+        # self.data_tab: DataTab = DataTab()
+        # self.addTab(self.data_tab, "Data")
 
         # Query Tab
         self.query_tab: QueryTab = QueryTab()

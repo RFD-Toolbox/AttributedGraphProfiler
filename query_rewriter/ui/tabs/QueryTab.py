@@ -106,7 +106,7 @@ class QueryTab(QScrollArea):
 
         self.layout().addWidget(box2)
 
-        self._query_data_frame = copy.deepcopy(self.data_frame)
+        '''self._query_data_frame = copy.deepcopy(self.data_frame)
 
         table = QTableView()
         self._query_data_model: PandasTableModel = PandasTableModel(self._query_data_frame, self)
@@ -118,7 +118,7 @@ class QueryTab(QScrollArea):
         layout = QVBoxLayout()
         table.setLayout(layout)
 
-        self.layout().addWidget(table)
+        self.layout().addWidget(table)'''
 
     def build_query(self) -> Query:
         query: Query = Query()
@@ -163,8 +163,8 @@ class QueryTab(QScrollArea):
         self.query_label.setText(query.to_rich_text_expression())
         self.query_label.setTextFormat(Qt.RichText)
 
-        original_query_result_set: DataFrame = self.csv_parser.data_frame.query(self.original_query_expression)
-        self._query_data_model.update_data(original_query_result_set)
+        '''original_query_result_set: DataFrame = self.csv_parser.data_frame.query(self.original_query_expression)
+        self._query_data_model.update_data(original_query_result_set)'''
 
     def combo_changed(self, combo: QComboBox, key: str, column_type: dtype):
         if combo.currentText() == Operator.EQUAL:
