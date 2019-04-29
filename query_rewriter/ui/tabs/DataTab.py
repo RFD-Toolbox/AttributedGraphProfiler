@@ -14,6 +14,7 @@ from query_rewriter.utils.RFDExtent import RFDExtent
 class DataTab(QScrollArea):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.tab = TabsWidget.QUERY_TAB_INDEX
         self.initial_query: Query = None
         self.initial_result_set: DataFrame = None
         self.rfd: RFD = None
@@ -59,14 +60,15 @@ class DataTab(QScrollArea):
         self.__highlight_initial_query()
 
     def __highlight_initial_query(self):
-        if self.table:
-            self.table.clearSelection()
+        if self.tab == TabsWidget.QUERY_TAB_INDEX:
+            if self.table:
+                self.table.clearSelection()
 
-        if self.initial_result_set is not None:
-            df_indexes = self.initial_result_set.index.values.tolist()
+            if self.initial_result_set is not None:
+                df_indexes = self.initial_result_set.index.values.tolist()
 
-            for index in df_indexes:
-                self.table.selectRow(index)
+                for index in df_indexes:
+                    self.table.selectRow(index)
 
     def set_rfd_subject(self, rfd_subject: Subject):
         self.rfd_subject: Subject = rfd_subject
@@ -83,13 +85,14 @@ class DataTab(QScrollArea):
         self.__highlight_rfd()
 
     def __highlight_rfd(self):
-        if self.table:
-            self.table.clearSelection()
+        if self.tab == TabsWidget.RFDS_TAB_INDEX:
+            if self.table:
+                self.table.clearSelection()
 
-        if self.data_frame is not None and self.rfd:
-            rfd_df_indexes = RFDExtent.extent_indexes(self.data_frame, self.rfd)
-            for index in rfd_df_indexes:
-                self.table.selectRow(index)
+            if self.data_frame is not None and self.rfd:
+                rfd_df_indexes = RFDExtent.extent_indexes(self.data_frame, self.rfd)
+                for index in rfd_df_indexes:
+                    self.table.selectRow(index)
 
     def set_extended_query_subject(self, query_subject: Subject):
         self.extended_query_subject: Subject = query_subject
@@ -109,14 +112,15 @@ class DataTab(QScrollArea):
         self.__highlight_extended_query()
 
     def __highlight_extended_query(self):
-        if self.table:
-            self.table.clearSelection()
+        if self.tab == TabsWidget.EXTENSION_TAB_INDEX:
+            if self.table:
+                self.table.clearSelection()
 
-        if self.extended_result_set is not None:
-            df_indexes = self.extended_result_set.index.values.tolist()
+            if self.extended_result_set is not None:
+                df_indexes = self.extended_result_set.index.values.tolist()
 
-            for index in df_indexes:
-                self.table.selectRow(index)
+                for index in df_indexes:
+                    self.table.selectRow(index)
 
     def set_relaxed_query_subject(self, query_subject: Subject):
         self.relaxed_query_subject: Subject = query_subject
@@ -136,26 +140,31 @@ class DataTab(QScrollArea):
         self.__highlight_relaxed_query()
 
     def __highlight_relaxed_query(self):
-        if self.table:
-            self.table.clearSelection()
+        if self.tab == TabsWidget.RELAX_TAB_INDEX:
+            if self.table:
+                self.table.clearSelection()
 
-        if self.relaxed_result_set is not None:
-            df_indexes = self.relaxed_result_set.index.values.tolist()
+            if self.relaxed_result_set is not None:
+                df_indexes = self.relaxed_result_set.index.values.tolist()
 
-            for index in df_indexes:
-                self.table.selectRow(index)
+                for index in df_indexes:
+                    self.table.selectRow(index)
 
     def onTabChange(self, index):
         print("DataTab: On Tab Change...")
         if index == TabsWidget.QUERY_TAB_INDEX:
             print("Query TAB")
+            self.tab = TabsWidget.QUERY_TAB_INDEX
             self.__highlight_initial_query()
         elif index == TabsWidget.RFDS_TAB_INDEX:
             print("RFD TAB")
+            self.tab = TabsWidget.RFDS_TAB_INDEX
             self.__highlight_rfd()
         elif index == TabsWidget.EXTENSION_TAB_INDEX:
             print("Extension TAB")
+            self.tab = TabsWidget.EXTENSION_TAB_INDEX
             self.__highlight_extended_query()
         elif index == TabsWidget.RELAX_TAB_INDEX:
             print("Relax TAB")
+            self.tab = TabsWidget.RELAX_TAB_INDEX
             self.__highlight_relaxed_query()
