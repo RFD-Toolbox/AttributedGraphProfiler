@@ -1,10 +1,8 @@
-import copy
-
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QRegExpValidator
-from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QGroupBox, QGridLayout, QLabel, QLineEdit, QComboBox, \
-    QPushButton, QTableView, QHeaderView
+from PyQt5.QtWidgets import QScrollArea, QVBoxLayout, QGroupBox, QGridLayout, QLabel, QLineEdit, QComboBox, \
+    QPushButton
 from pandas import DataFrame
 import numpy as np
 from numpy import dtype
@@ -14,7 +12,6 @@ from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Operator import Operator
 from query_rewriter.model.Query import Query
 from query_rewriter.model.RegularExpression import RegularExpression
-from query_rewriter.ui.PandasTableModel import PandasTableModel
 
 
 class QueryTab(QScrollArea):
@@ -22,23 +19,26 @@ class QueryTab(QScrollArea):
         super().__init__(parent)
         self.query_subject = Subject()
 
-        self.content_widget = QWidget()
-        self.setWidget(self.content_widget)
-        self.setWidgetResizable(True)
-
-        self.setLayout(QVBoxLayout(self.content_widget))
-
     def display(self, path: str):
+        print("Display")
         self.path = path
-        self.csv_parser: CSVParser = CSVParser(path)
+        self.csv_parser: CSVParser = CSVParser(self.path)
         self.data_frame: DataFrame = self.csv_parser.data_frame
         self.column_types: dict = self.data_frame.dtypes.to_dict()
         self.header = self.csv_parser.header
         self.separator = self.csv_parser.delimiter
 
-        groupBox = QGroupBox()
-        input_rows_layout = QGridLayout()
-        groupBox.setLayout(input_rows_layout)
+        container_vertical_layout = QVBoxLayout()
+        container_group_box = QGroupBox()
+        container_group_box.setLayout(container_vertical_layout)
+        self.setWidget(container_group_box)
+        self.setWidgetResizable(True)
+
+        input_grid_layout = QGridLayout()
+        input_group_box = QGroupBox()
+        input_group_box.setLayout(input_grid_layout)
+
+        container_vertical_layout.addWidget(input_group_box)
 
         self.line_labels: dict[str, QLabel] = {}
         self.query_operators: dict[str, QComboBox] = {}
@@ -46,10 +46,14 @@ class QueryTab(QScrollArea):
 
         rows = self.header.__len__()
 
+        for i in reversed(range(input_group_box.layout().count())):
+            input_group_box.layout().itemAt(i).widget().deleteLater()
+
         for row in range(0, rows):
             h: str = self.header[row]
 
             self.line_labels[h] = QLabel(h.title().replace("_", " "))
+            self.line_labels[h].setMinimumHeight(30)
 
             operatorsComboBox = QComboBox()
             operatorsComboBox.addItem(Operator.EQUAL)
@@ -66,7 +70,9 @@ class QueryTab(QScrollArea):
                 operatorsComboBox.addItem(Operator.LESS_EQUAL)
 
             self.query_operators[h] = operatorsComboBox
+            self.query_operators[h].setMinimumHeight(30)
             self.query_items[h] = QLineEdit()
+            self.query_items[h].setMinimumHeight(30)
             self.query_items[h].returnPressed.connect(lambda: self.execute_query())
 
             operatorsComboBox.currentTextChanged.connect(
@@ -75,18 +81,13 @@ class QueryTab(QScrollArea):
             operatorsComboBox.setCurrentIndex(0)
 
             if row % 2 == 0:
-                input_rows_layout.addWidget(self.line_labels[h], row, 0)
-                input_rows_layout.addWidget(self.query_operators[h], row, 1)
-                input_rows_layout.addWidget(self.query_items[h], row, 2)
+                input_grid_layout.addWidget(self.line_labels[h], row, 0)
+                input_grid_layout.addWidget(self.query_operators[h], row, 1)
+                input_grid_layout.addWidget(self.query_items[h], row, 2)
             else:
-                input_rows_layout.addWidget(self.line_labels[h], row - 1, 3)
-                input_rows_layout.addWidget(self.query_operators[h], row - 1, 4)
-                input_rows_layout.addWidget(self.query_items[h], row - 1, 5)
-
-        for i in reversed(range(self.layout().count())):
-            self.layout().itemAt(i).widget().deleteLater()
-
-        self.layout().addWidget(groupBox)
+                input_grid_layout.addWidget(self.line_labels[h], row - 1, 3)
+                input_grid_layout.addWidget(self.query_operators[h], row - 1, 4)
+                input_grid_layout.addWidget(self.query_items[h], row - 1, 5)
 
         box2 = QGroupBox()
         grid_layout = QGridLayout()
@@ -104,21 +105,7 @@ class QueryTab(QScrollArea):
         self.query_label.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
         grid_layout.addWidget(self.query_label, 0, 1, 1, 4)
 
-        self.layout().addWidget(box2)
-
-        '''self._query_data_frame = copy.deepcopy(self.data_frame)
-
-        table = QTableView()
-        self._query_data_model: PandasTableModel = PandasTableModel(self._query_data_frame, self)
-        table.setModel(self._query_data_model)
-        table.setSortingEnabled(True)
-        table.setMinimumHeight(200)
-        table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
-
-        layout = QVBoxLayout()
-        table.setLayout(layout)
-
-        self.layout().addWidget(table)'''
+        container_vertical_layout.addWidget(box2)
 
     def build_query(self) -> Query:
         query: Query = Query()
@@ -162,9 +149,6 @@ class QueryTab(QScrollArea):
 
         self.query_label.setText(query.to_rich_text_expression())
         self.query_label.setTextFormat(Qt.RichText)
-
-        '''original_query_result_set: DataFrame = self.csv_parser.data_frame.query(self.original_query_expression)
-        self._query_data_model.update_data(original_query_result_set)'''
 
     def combo_changed(self, combo: QComboBox, key: str, column_type: dtype):
         if combo.currentText() == Operator.EQUAL:
