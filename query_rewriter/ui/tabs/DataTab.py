@@ -6,6 +6,7 @@ from rx.subjects import Subject
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Query import Query
 from query_rewriter.model.RFD import RFD
+from query_rewriter.ui.ItemDelegate import ItemDelegate
 from query_rewriter.ui.PandasTableModel import PandasTableModel
 from query_rewriter.ui.tabs.TabsWidget import TabsWidget
 from query_rewriter.utils.RFDExtent import RFDExtent
@@ -37,6 +38,11 @@ class DataTab(QScrollArea):
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
         self.table.setSelectionMode(QAbstractItemView.MultiSelection)
         self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        delegate = ItemDelegate(self)
+        self.table.setItemDelegate(delegate)
+        self.table.horizontalHeader().setSectionsClickable(False)
+        self.table.verticalHeader().setSectionsClickable(False)
 
         for i in reversed(range(self.layout().count())):
             self.layout().itemAt(i).widget().deleteLater()
