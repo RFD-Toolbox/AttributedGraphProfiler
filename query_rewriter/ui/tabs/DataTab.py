@@ -36,6 +36,7 @@ class DataTab(QScrollArea):
         self.table.setSortingEnabled(False)
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
         self.table.setSelectionMode(QAbstractItemView.MultiSelection)
+        self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         for i in reversed(range(self.layout().count())):
             self.layout().itemAt(i).widget().deleteLater()
