@@ -8,7 +8,8 @@ class ItemDelegate(QStyledItemDelegate):
                 QEvent.MouseButtonPress,
                 QEvent.MouseButtonRelease,
                 QEvent.MouseButtonDblClick,
-                QEvent.MouseMove
+                QEvent.MouseMove,
+                QEvent.KeyPress
         ):
             return True
         else:
