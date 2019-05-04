@@ -69,10 +69,10 @@ class DataTab(QScrollArea):
 
     def __highlight_initial_query(self):
         if self.tab == TabsWidget.QUERY_TAB_INDEX:
-            if self.table:
+            if hasattr(self, "table") and self.table:
                 self.table.clearSelection()
 
-            if self.initial_result_set is not None:
+            if hasattr(self, "initial_result_set") and self.initial_result_set is not None:
                 df_indexes = self.initial_result_set.index.values.tolist()
 
                 for index in df_indexes:
@@ -94,10 +94,10 @@ class DataTab(QScrollArea):
 
     def __highlight_rfd(self):
         if self.tab == TabsWidget.RFDS_TAB_INDEX:
-            if self.table:
+            if hasattr(self, "table") and self.table:
                 self.table.clearSelection()
 
-            if self.data_frame is not None and self.rfd:
+            if hasattr(self, "data_frame") and self.data_frame is not None and self.rfd:
                 rfd_df_indexes = RFDExtent.extent_indexes(self.data_frame, self.rfd)
                 for index in rfd_df_indexes:
                     self.table.selectRow(index)
@@ -121,10 +121,10 @@ class DataTab(QScrollArea):
 
     def __highlight_extended_query(self):
         if self.tab == TabsWidget.EXTENSION_TAB_INDEX:
-            if self.table:
+            if hasattr(self, "table") and self.table:
                 self.table.clearSelection()
 
-            if self.extended_result_set is not None:
+            if hasattr(self, "extended_result_set") and self.extended_result_set is not None:
                 df_indexes = self.extended_result_set.index.values.tolist()
 
                 for index in df_indexes:
@@ -149,10 +149,10 @@ class DataTab(QScrollArea):
 
     def __highlight_relaxed_query(self):
         if self.tab == TabsWidget.RELAX_TAB_INDEX:
-            if self.table:
+            if hasattr(self, "table") and self.table:
                 self.table.clearSelection()
 
-            if self.relaxed_result_set is not None:
+            if hasattr(self, "relaxed_result_set") and self.relaxed_result_set is not None:
                 df_indexes = self.relaxed_result_set.index.values.tolist()
 
                 for index in df_indexes:

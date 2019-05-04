@@ -86,9 +86,11 @@ class RFDsTab(QScrollArea):
         self.filters: dict = {RFDsTab.LHS: QCheckBox("LHS"), RFDsTab.RHS: QCheckBox("RHS")}
         lhs_filter_check_box: QCheckBox = self.filters[RFDsTab.LHS]
         lhs_filter_check_box.stateChanged.connect(lambda: self.__show_rfds(self.__filter_rfds()))
+        lhs_filter_check_box.setToolTip("Show RFDs with at least ONE attribute of the query in the LHS")
 
         rhs_filter_check_box: QCheckBox = self.filters[RFDsTab.RHS]
         rhs_filter_check_box.stateChanged.connect(lambda: self.__show_rfds(self.__filter_rfds()))
+        rhs_filter_check_box.setToolTip("Show RFDs with NO attribute of the query in the RHS")
 
         buttons_horizontal_layout.addWidget(discover_rfds_button)
         buttons_horizontal_layout.addWidget(load_rfds_button)
@@ -96,7 +98,6 @@ class RFDsTab(QScrollArea):
         buttons_horizontal_layout.addWidget(lhs_filter_check_box)
         buttons_horizontal_layout.addWidget(rhs_filter_check_box)
         buttons_horizontal_layout.setAlignment(Qt.AlignLeft)
-
 
     def load_rfds(self):
         # Cleaning
