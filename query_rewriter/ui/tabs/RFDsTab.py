@@ -29,6 +29,12 @@ class RFDsTab(QScrollArea):
     RFD, EXTENT, TIME = range(3)
     LHS = "LHS"
     RHS = "RHS"
+    TOOLTIP_STYLE = """QToolTip { 
+                        border: 1px solid black;
+                        padding: 3px;
+                        border-radius: 5px;
+                        opacity: 200;
+                    }"""
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -87,20 +93,12 @@ class RFDsTab(QScrollArea):
         lhs_filter_check_box: QCheckBox = self.filters[RFDsTab.LHS]
         lhs_filter_check_box.stateChanged.connect(lambda: self.__show_rfds(self.__filter_rfds()))
         lhs_filter_check_box.setToolTip("Show RFDs with at least ONE attribute of the query in the LHS")
-        lhs_filter_check_box.setStyleSheet("""QToolTip { 
-                            background-color: black; 
-                            color: white; 
-                            border: black solid 1px;
-                           }""")
+        lhs_filter_check_box.setStyleSheet(RFDsTab.TOOLTIP_STYLE)
 
         rhs_filter_check_box: QCheckBox = self.filters[RFDsTab.RHS]
         rhs_filter_check_box.stateChanged.connect(lambda: self.__show_rfds(self.__filter_rfds()))
         rhs_filter_check_box.setToolTip("Show RFDs with NO attribute of the query in the RHS")
-        rhs_filter_check_box.setStyleSheet("""QToolTip { 
-                            background-color: black; 
-                            color: white; 
-                            border: black solid 1px;
-                           }""")
+        rhs_filter_check_box.setStyleSheet(RFDsTab.TOOLTIP_STYLE)
 
         buttons_horizontal_layout.addWidget(discover_rfds_button)
         buttons_horizontal_layout.addWidget(load_rfds_button)
