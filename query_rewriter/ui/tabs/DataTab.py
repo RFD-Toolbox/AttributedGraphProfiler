@@ -15,6 +15,8 @@ from query_rewriter.utils.RFDExtent import RFDExtent
 class DataTab(QScrollArea):
     def __init__(self, parent=None):
         super().__init__(parent)
+
+    def display(self, path: str):
         self.tab = TabsWidget.QUERY_TAB_INDEX
         self.initial_query: Query = None
         self.initial_result_set: DataFrame = None
@@ -27,7 +29,6 @@ class DataTab(QScrollArea):
         self.setWidgetResizable(True)
         self.setLayout(QVBoxLayout())
 
-    def display(self, path: str):
         self.csv_parser: CSVParser = CSVParser(path)
         self.data_frame: DataFrame = self.csv_parser.data_frame
 

@@ -6,8 +6,8 @@ import networkx as nx
 import numpy as np
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QGroupBox, QHBoxLayout, QPushButton, QTableView, \
-    QHeaderView, QAbstractItemView, QTreeWidgetItem, QTreeWidget, QCheckBox, QFileDialog
+from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QGroupBox, QHBoxLayout, QPushButton, \
+    QHeaderView, QTreeWidgetItem, QTreeWidget, QCheckBox, QFileDialog
 from pandas import DataFrame
 from pandas.compat import reduce
 from rx.subjects import Subject
@@ -23,7 +23,6 @@ from query_rewriter.utils.RFDExtent import RFDExtent
 from query_rewriter.utils.RFDFilter import RFDFilter
 from query_rewriter.utils.RFDJSONDecoder import RFDJSONDecoder
 from query_rewriter.utils.Transformer import Transformer
-from query_rewriter.ui.PandasTableModel import PandasTableModel
 
 
 class RFDsTab(QScrollArea):
@@ -33,20 +32,12 @@ class RFDsTab(QScrollArea):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.rfd_subject = Subject()
 
+    def display(self, path: str):
+        self.rfd_subject = Subject()
         self.initial_query: Query = None
         self.rfds: list = []
 
-        self.filters: dict = {RFDsTab.LHS: QCheckBox("LHS"), RFDsTab.RHS: QCheckBox("RHS")}
-
-        self.content_widget = QWidget()
-        self.setWidget(self.content_widget)
-        self.setWidgetResizable(True)
-
-        self.setLayout(QVBoxLayout(self.content_widget))
-
-    def display(self, path: str):
         self.path = path
         self.rfds_path: str = self.path.replace(".csv", "-RFDs.json")
         self.csv_parser: CSVParser = CSVParser(path)
@@ -56,15 +47,18 @@ class RFDsTab(QScrollArea):
         self.columns_count = self.csv_parser.columns_count
         self.rows_count = self.csv_parser.rows_count
 
-        for i in reversed(range(self.layout().count())):
-            self.layout().itemAt(i).widget().deleteLater()
+        self.container_vertical_layout = QVBoxLayout()
+        container_group_box = QGroupBox()
+        container_group_box.setLayout(self.container_vertical_layout)
+        self.setWidget(container_group_box)
+        self.setWidgetResizable(True)
+
+        for i in reversed(range(self.container_vertical_layout.count())):
+            self.container_vertical_layout.itemAt(i).widget().deleteLater()
 
         self.rfds_tree_wrapper = QGroupBox()
+        self.rfds_tree_wrapper.setMinimumHeight(200)
         self.rfds_tree_wrapper_layout = QVBoxLayout(self.rfds_tree_wrapper)
-
-        main_group = QGroupBox()
-        group_vertical_layout = QVBoxLayout()
-        main_group.setLayout(group_vertical_layout)
 
         buttons_group_box = QGroupBox()
         buttons_horizontal_layout = QHBoxLayout()
@@ -72,7 +66,7 @@ class RFDsTab(QScrollArea):
         buttons_horizontal_layout.setAlignment(Qt.AlignTop)
         buttons_group_box.setLayout(buttons_horizontal_layout)
 
-        group_vertical_layout.addWidget(buttons_group_box)
+        self.container_vertical_layout.addWidget(buttons_group_box)
 
         discover_rfds_button = QPushButton("Discover RFDs")
         width = discover_rfds_button.fontMetrics().boundingRect(discover_rfds_button.text()).width() + 20
@@ -89,6 +83,7 @@ class RFDsTab(QScrollArea):
         store_rfds_button.setMaximumWidth(width)
         store_rfds_button.clicked.connect(lambda: self.store_rfds())
 
+        self.filters: dict = {RFDsTab.LHS: QCheckBox("LHS"), RFDsTab.RHS: QCheckBox("RHS")}
         lhs_filter_check_box: QCheckBox = self.filters[RFDsTab.LHS]
         lhs_filter_check_box.stateChanged.connect(lambda: self.__show_rfds(self.__filter_rfds()))
 
@@ -102,16 +97,6 @@ class RFDsTab(QScrollArea):
         buttons_horizontal_layout.addWidget(rhs_filter_check_box)
         buttons_horizontal_layout.setAlignment(Qt.AlignLeft)
 
-        '''self.rfd_data_set_table = QTableView()
-        self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.layout())
-        self.rfd_data_set_table.setModel(self.pandas_model)
-        self.rfd_data_set_table.setSortingEnabled(False)
-        self.rfd_data_set_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
-        self.rfd_data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
-
-        group_vertical_layout.addWidget(self.rfd_data_set_table)'''
-
-        self.layout().addWidget(main_group)
 
     def load_rfds(self):
         # Cleaning
@@ -201,7 +186,7 @@ class RFDsTab(QScrollArea):
                 self.tree_widget.addTopLevelItem(item)
 
             self.rfds_tree_wrapper_layout.addWidget(self.tree_widget)
-            self.layout().addWidget(self.rfds_tree_wrapper)
+            self.container_vertical_layout.addWidget(self.rfds_tree_wrapper)
 
             # combo.currentTextChanged.connect(lambda ix, key=h, select=combo: self.combo_changed(select, key))
             # self.tree_view.currentItemChanged.connect(self.rfd_selected)

@@ -1,6 +1,6 @@
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel, QGroupBox
 from pandas import DataFrame
 from rx.subjects import Subject
 
@@ -12,52 +12,55 @@ from query_rewriter.model.RFD import RFD
 class ExtensionTab(QScrollArea):
     def __init__(self, parent=None):
         super().__init__(parent)
+
+    def display(self, path: str):
         self.extended_query_subject = Subject()
-        self.content_widget = QWidget()
-        self.setWidget(self.content_widget)
+
+        self.container_vertical_layout = QVBoxLayout()
+        container_group_box = QGroupBox()
+        container_group_box.setLayout(self.container_vertical_layout)
+        self.setWidget(container_group_box)
         self.setWidgetResizable(True)
-        self.setLayout(QVBoxLayout(self.content_widget))
-        self.layout().setAlignment(Qt.AlignTop)
+
+        for i in reversed(range(self.container_vertical_layout.count())):
+            self.container_vertical_layout.itemAt(i).widget().deleteLater()
+
         self.initial_query: Query = None
         self.rfd: RFD = None
 
-    def display(self, path: str):
         self.path = path
         self.csv_parser: CSVParser = CSVParser(path)
         self.data_frame: DataFrame = self.csv_parser.data_frame
 
-        for i in reversed(range(self.layout().count())):
-            self.layout().itemAt(i).widget().deleteLater()
-
         self.initial_query_title = QLabel("Initial Query")
         self.initial_query_title.setWordWrap(True)
         self.initial_query_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
-        self.layout().addWidget(self.initial_query_title)
+        self.container_vertical_layout.addWidget(self.initial_query_title)
 
         self.initial_query_value = QLabel("")
         self.initial_query_value.setWordWrap(True)
         self.initial_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
-        self.layout().addWidget(self.initial_query_value)
+        self.container_vertical_layout.addWidget(self.initial_query_value)
 
         self.rfd_title = QLabel("RFD")
         self.rfd_title.setWordWrap(True)
         self.rfd_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
-        self.layout().addWidget(self.rfd_title)
+        self.container_vertical_layout.addWidget(self.rfd_title)
 
         self.rfd_value = QLabel("")
         self.rfd_value.setWordWrap(True)
         self.rfd_value.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Cursive))
-        self.layout().addWidget(self.rfd_value)
+        self.container_vertical_layout.addWidget(self.rfd_value)
 
         self.extended_query_title = QLabel("Extended Query")
         self.extended_query_title.setWordWrap(True)
         self.extended_query_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
-        self.layout().addWidget(self.extended_query_title)
+        self.container_vertical_layout.addWidget(self.extended_query_title)
 
         self.extended_query_value = QLabel("")
         self.extended_query_value.setWordWrap(True)
         self.extended_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
-        self.layout().addWidget(self.extended_query_value)
+        self.container_vertical_layout.addWidget(self.extended_query_value)
 
     def set_initial_query_subject(self, query_subject: Subject):
         self.initial_query_subject: Subject = query_subject

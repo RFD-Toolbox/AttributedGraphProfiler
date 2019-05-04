@@ -1,6 +1,6 @@
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QLabel, QGroupBox
 from pandas import DataFrame
 from rx.subjects import Subject
 
@@ -12,43 +12,36 @@ from query_rewriter.model.RFD import RFD
 class RelaxTab(QScrollArea):
     def __init__(self, parent=None):
         super().__init__(parent)
+
+    def display(self, path: str):
         self.relaxed_query_subject = Subject()
-        self.content_widget = QWidget()
-        self.setWidget(self.content_widget)
-        self.setWidgetResizable(True)
-        self.setLayout(QVBoxLayout(self.content_widget))
-        self.layout().setAlignment(Qt.AlignTop)
 
         self.initial_query: Query = None
         self.rfd: RFD = None
         self.extended_query: Query = None
 
-    def display(self, path: str):
         self.path = path
         self.csv_parser: CSVParser = CSVParser(path)
         self.data_frame: DataFrame = self.csv_parser.data_frame
 
-        for i in reversed(range(self.layout().count())):
-            self.layout().itemAt(i).widget().deleteLater()
+        self.container_vertical_layout = QVBoxLayout()
+        container_group_box = QGroupBox()
+        container_group_box.setLayout(self.container_vertical_layout)
+        self.setWidget(container_group_box)
+        self.setWidgetResizable(True)
+
+        for i in reversed(range(self.container_vertical_layout.count())):
+            self.container_vertical_layout.itemAt(i).widget().deleteLater()
 
         self.relaxed_query_title = QLabel("Relaxed Query")
         self.relaxed_query_title.setWordWrap(True)
         self.relaxed_query_title.setFont(QtGui.QFont("Times", 12, QtGui.QFont.Bold))
-        self.layout().addWidget(self.relaxed_query_title)
+        self.container_vertical_layout.addWidget(self.relaxed_query_title)
 
         self.relaxed_query_value = QLabel("")
         self.relaxed_query_value.setWordWrap(True)
         self.relaxed_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
-        self.layout().addWidget(self.relaxed_query_value)
-
-        '''self.data_set_table = QTableView()
-        self.pandas_model: PandasTableModel = PandasTableModel(self.data_frame, self.layout())
-        self.data_set_table.setModel(self.pandas_model)
-        self.data_set_table.setSortingEnabled(False)
-        self.data_set_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # full width table
-        self.data_set_table.setSelectionMode(QAbstractItemView.MultiSelection)
-
-        self.layout().addWidget(self.data_set_table)'''
+        self.container_vertical_layout.addWidget(self.relaxed_query_value)
 
     def set_initial_query_subject(self, query_subject: Subject):
         self.query_subject: Subject = query_subject
@@ -96,14 +89,6 @@ class RelaxTab(QScrollArea):
 
             self.relaxed_query_value.setText(self.relaxed_query.to_rich_text_expression())
             self.relaxed_query_value.setTextFormat(Qt.RichText)
-
-            '''relaxed_result_set: DataFrame = self.data_frame.query(self.relaxed_query.to_expression())
-
-            df_indexes = relaxed_result_set.index.values.tolist()
-
-            self.data_set_table.clearSelection()
-            for index in df_indexes:
-                self.data_set_table.selectRow(index)'''
 
     def get_relaxed_query_subject(self) -> Subject:
         return self.relaxed_query_subject

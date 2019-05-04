@@ -17,10 +17,10 @@ from query_rewriter.model.RegularExpression import RegularExpression
 class QueryTab(QScrollArea):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.query_subject = Subject()
 
     def display(self, path: str):
-        print("Display")
+        self.query_subject = Subject()
+
         self.path = path
         self.csv_parser: CSVParser = CSVParser(self.path)
         self.data_frame: DataFrame = self.csv_parser.data_frame
