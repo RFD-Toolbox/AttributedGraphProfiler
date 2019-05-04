@@ -1,7 +1,6 @@
 import typing
 
 from PyQt5.QtWidgets import QTabWidget, QWidget
-from query_rewriter.ui.tabs.DataTab import DataTab
 from query_rewriter.ui.tabs.ExtensionTab import ExtensionTab
 from query_rewriter.ui.tabs.QueryTab import QueryTab
 from query_rewriter.ui.tabs.RFDsTab import RFDsTab
@@ -9,14 +8,11 @@ from query_rewriter.ui.tabs.RelaxTab import RelaxTab
 
 
 class TabsWidget(QTabWidget):
+    QUERY_TAB_INDEX, RFDS_TAB_INDEX, EXTENSION_TAB_INDEX, RELAX_TAB_INDEX = range(4)
     RFD, EXTENT, TIME = range(3)
 
     def __init__(self, parent: typing.Optional[QWidget] = ...) -> None:
         super().__init__(parent)
-
-        # Data Tab
-        self.data_tab: DataTab = DataTab()
-        self.addTab(self.data_tab, "Data")
 
         # Query Tab
         self.query_tab: QueryTab = QueryTab()
