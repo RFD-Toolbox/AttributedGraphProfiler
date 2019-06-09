@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QAbstractTableModel
-from PyQt5.QtWidgets import QScrollArea, QVBoxLayout, QTableView, QHeaderView, QAbstractItemView
+from PyQt5.QtWidgets import QScrollArea, QVBoxLayout, QTableView, QHeaderView, QAbstractItemView, QLabel
 from pandas import DataFrame
 from rx.subjects import Subject
 
@@ -48,6 +48,9 @@ class DataTab(QScrollArea):
         for i in reversed(range(self.layout().count())):
             self.layout().itemAt(i).widget().deleteLater()
 
+        self.extent_label: QLabel = QLabel('Extent percentage: 0%')
+        self.layout().addWidget(self.extent_label)
+
         self.layout().addWidget(self.table)
 
     def set_initial_query_subject(self, query_subject: Subject):
@@ -78,6 +81,11 @@ class DataTab(QScrollArea):
                 for index in df_indexes:
                     self.table.selectRow(index)
 
+                extent_percentage = self.initial_result_set.shape[0] / self.data_frame.shape[0]
+                self.extent_label.setText('Extent percentage: ' + str(round(extent_percentage * 100, 2)) + '%')
+            else:
+                self.extent_label.setText('Extent percentage: 0%')
+
     def set_rfd_subject(self, rfd_subject: Subject):
         self.rfd_subject: Subject = rfd_subject
         self.rfd_subject.subscribe(
@@ -101,6 +109,11 @@ class DataTab(QScrollArea):
                 rfd_df_indexes = RFDExtent.extent_indexes(self.data_frame, self.rfd)
                 for index in rfd_df_indexes:
                     self.table.selectRow(index)
+
+                extent_percentage = len(rfd_df_indexes) / self.data_frame.shape[0]
+                self.extent_label.setText('Extent percentage: ' + str(round(extent_percentage * 100, 2)) + '%')
+            else:
+                self.extent_label.setText('Extent percentage: 0%')
 
     def set_extended_query_subject(self, query_subject: Subject):
         self.extended_query_subject: Subject = query_subject
@@ -130,6 +143,11 @@ class DataTab(QScrollArea):
                 for index in df_indexes:
                     self.table.selectRow(index)
 
+                extent_percentage = self.extended_result_set.shape[0] / self.data_frame.shape[0]
+                self.extent_label.setText('Extent percentage: ' + str(round(extent_percentage * 100, 2)) + '%')
+            else:
+                self.extent_label.setText('Extent percentage: 0%')
+
     def set_relaxed_query_subject(self, query_subject: Subject):
         self.relaxed_query_subject: Subject = query_subject
 
@@ -157,6 +175,11 @@ class DataTab(QScrollArea):
 
                 for index in df_indexes:
                     self.table.selectRow(index)
+
+                extent_percentage = self.relaxed_result_set.shape[0] / self.data_frame.shape[0]
+                self.extent_label.setText('Extent percentage: ' + str(round(extent_percentage * 100, 2)) + '%')
+            else:
+                self.extent_label.setText('Extent percentage: 0%')
 
     def onTabChange(self, index):
         print("DataTab: On Tab Change...")
