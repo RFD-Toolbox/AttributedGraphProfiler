@@ -154,7 +154,16 @@ class Query(dict):
 
                     body += "<span class=\"{}\">{}</span>".format(COLUMN_CLASS, str(key).title().replace("_", " "))
                     body += "<span class=\"{}\"> {} </span>".format(OPERATOR_CLASS, operator)
-                    body += "<span class=\"{}\">{}</span>".format(VALUE_CLASS, value)
+
+                    if isinstance(value, list):
+                        # If it is a list of integers print just first and last
+                        if all(isinstance(x, int) for x in value):
+                            body += "<span class=\"{}\">{}</span>".format(VALUE_CLASS, "[{}-{}]"
+                                                                          .format(value[0], value[-1]))
+                        else:
+                            body += "<span class=\"{}\">{}</span>".format(VALUE_CLASS, value)
+                    else:
+                        body += "<span class=\"{}\">{}</span>".format(VALUE_CLASS, value)
 
         return style + body
 
