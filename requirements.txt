@@ -1,4 +1,4 @@
-PyQt5
+PyQt5==5.11.3
 rx==1.6.1
 networkx==2.2
 click>=6.7
