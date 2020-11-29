@@ -58,6 +58,7 @@ class ExtensionTab(QScrollArea):
         self.container_vertical_layout.addWidget(self.extended_query_title)
 
         self.extended_query_value = QLabel("")
+        self.extended_query_value.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.extended_query_value.setWordWrap(True)
         self.extended_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
         self.container_vertical_layout.addWidget(self.extended_query_value)

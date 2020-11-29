@@ -39,6 +39,7 @@ class RelaxTab(QScrollArea):
         self.container_vertical_layout.addWidget(self.relaxed_query_title)
 
         self.relaxed_query_value = QLabel("")
+        self.relaxed_query_value.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.relaxed_query_value.setWordWrap(True)
         self.relaxed_query_value.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
         self.container_vertical_layout.addWidget(self.relaxed_query_value)
