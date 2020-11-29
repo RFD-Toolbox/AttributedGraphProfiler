@@ -6,6 +6,7 @@ from pandas import DataFrame, np
 from query_rewriter.model.Operator import Operator
 from query_rewriter.model.RFD import RFD
 from query_rewriter.query.relaxer import QueryRelaxer
+from query_rewriter.utils.Checker import Checker
 
 VALUES = "VALUES"
 OPERATORS = "OPERATORS"
@@ -158,8 +159,11 @@ class Query(dict):
                     if isinstance(value, list):
                         # If it is a list of integers print just first and last
                         if all(isinstance(x, int) for x in value):
-                            body += "<span class=\"{}\">{}</span>".format(VALUE_CLASS, "[{}-{}]"
-                                                                          .format(value[0], value[-1]))
+                            if Checker.check_consecutive_integers(value):
+                                body += "<span class=\"{}\">{}</span>".format(VALUE_CLASS, "[{}-{}]"
+                                                                              .format(value[0], value[-1]))
+                            else:
+                                body += "<span class=\"{}\">{}</span>".format(VALUE_CLASS, value)
                         else:
                             body += "<span class=\"{}\">{}</span>".format(VALUE_CLASS, value)
                     else:
