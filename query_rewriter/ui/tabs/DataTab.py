@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QAbstractTableModel
 from PyQt5.QtWidgets import QScrollArea, QVBoxLayout, QTableView, QHeaderView, QAbstractItemView, QLabel
 from pandas import DataFrame
-from rx.subject import Subject
+from rx.subjects import Subject
 
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Query import Query

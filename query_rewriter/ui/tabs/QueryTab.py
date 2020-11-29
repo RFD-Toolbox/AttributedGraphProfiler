@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QScrollArea, QVBoxLayout, QGroupBox, QGridLayout, QL
 from pandas import DataFrame
 import numpy as np
 from numpy import dtype
-from rx.subject import Subject
+from rx.subjects import Subject
 
 from query_rewriter.io.csv.csv_parser import CSVParser
 from query_rewriter.model.Operator import Operator
