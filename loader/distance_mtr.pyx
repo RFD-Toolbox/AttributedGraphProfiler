@@ -38,7 +38,7 @@ cdef class DiffMatrix:
     cdef object datetime
     cdef object sep
     cdef object missing
-    cdef object first_col_header
+    cdef object first_row_header
     cdef object labels
 
 
