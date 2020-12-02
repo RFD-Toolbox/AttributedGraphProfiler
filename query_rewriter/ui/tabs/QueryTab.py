@@ -102,6 +102,7 @@ class QueryTab(QScrollArea):
 
         self.query_label = QLabel("", box2)
         self.query_label.setWordWrap(True)
+        self.query_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
         self.query_label.setFont(QtGui.QFont("Arial", 12, QtGui.QFont.Cursive))
         grid_layout.addWidget(self.query_label, 0, 1, 1, 4)
 

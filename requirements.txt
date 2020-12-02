@@ -1,4 +1,6 @@
-PyQt5
+PyQt5==5.11.3
+rx==1.6.1
+networkx==2.2
 click>=6.7
 cycler>=0.10.0
 Cython>=0.25.2
@@ -8,8 +10,8 @@ Jinja2>=2.9.6
 MarkupSafe>=0.23
 matplotlib>=2.0.2
 nltk>=3.2.4
-numpy>=1.13.0
-pandas>=0.19.2
+numpy==1.16.0
+pandas==0.19.2
 pyparsing>=2.2.0
 python-dateutil>=2.6.0
 pytz>=2017.2
