@@ -1,4 +1,4 @@
-from query_rewriter.io.rfd.io import RFDInputOutput
+from query_rewriter.io.rfd.rfd_io import RFDInputOutput
 import pandas as pd
 
 

@@ -1,7 +1,7 @@
 import pandas as pd
 from pandas import DataFrame
 
-from query_rewriter.io.csv.io import CSVInputOutput
+from query_rewriter.io.csv.csv_io import CSVInputOutput
 from query_rewriter.io.rfd.rfd_extractor import RFDExtractor
 
 

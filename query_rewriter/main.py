@@ -2,7 +2,7 @@ import sys
 import argparse
 import logging
 import ast
-from query_rewriter.io.csv.io import CSVInputOutput
+from query_rewriter.io.csv.csv_io import CSVInputOutput
 from query_rewriter.query.relaxer import QueryRelaxer
 from query_rewriter.io.rfd import store_load_rfds
 import pandas as pd

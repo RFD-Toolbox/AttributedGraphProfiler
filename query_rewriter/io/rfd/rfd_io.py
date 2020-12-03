@@ -1,5 +1,5 @@
 import pandas as pd
-from query_rewriter.io.csv.io import CSVInputOutput
+from query_rewriter.io.csv.csv_io import CSVInputOutput
 
 
 class RFDInputOutput:

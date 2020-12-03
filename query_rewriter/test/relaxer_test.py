@@ -1,5 +1,5 @@
 from query_rewriter.query.relaxer import QueryRelaxer
-from query_rewriter.io.csv.io import CSVInputOutput
+from query_rewriter.io.csv.csv_io import CSVInputOutput
 import numpy as np
 import pandas as pd
 import editdistance
