@@ -1,7 +1,7 @@
 import pandas as pd
 
 
-class Slicer:
+class DataFrameSlicer:
     '''
     Auxiliary class to divide a DataFrame in a list of one-row DataFrames.
     '''

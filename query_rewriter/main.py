@@ -3,12 +3,12 @@ import argparse
 import logging
 import ast
 from query_rewriter.io.csv.csv_io import CSVInputOutput
-from query_rewriter.query.relaxer import QueryRelaxer
+from query_rewriter.utils.QueryRelaxer import QueryRelaxer
 from query_rewriter.io.rfd import store_load_rfds
 import pandas as pd
 import numpy as np
 import json
-from query_rewriter.query.slicer import Slicer
+from query_rewriter.utils.DataFrameSlicer import DataFrameSlicer
 import copy
 import time
 
@@ -131,7 +131,7 @@ def start_process(arguments):
         print("Query Extended Result Set:\n ", query_extended_res_set)
 
         # ++++++++++++++++++++++++RELAXING ROW BY ROW+++++++++++++++++++++++++++
-        rows_df_list = Slicer.slice(query_extended_res_set)
+        rows_df_list = DataFrameSlicer.slice(query_extended_res_set)
 
         relaxing_attributes = [col for col in list(data_set_df)
                                if col not in original_query.keys() and not np.isnan(chosen_rfd[col])]

@@ -1,4 +1,4 @@
-from query_rewriter.query.relaxer import QueryRelaxer
+from query_rewriter.utils.QueryRelaxer import QueryRelaxer
 from query_rewriter.io.csv.csv_io import CSVInputOutput
 import numpy as np
 import pandas as pd

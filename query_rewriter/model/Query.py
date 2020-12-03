@@ -5,7 +5,7 @@ from pandas import DataFrame, np
 
 from query_rewriter.model.Operator import Operator
 from query_rewriter.model.RFD import RFD
-from query_rewriter.query.relaxer import QueryRelaxer
+from query_rewriter.utils.QueryRelaxer import QueryRelaxer
 from query_rewriter.utils.Checker import Checker
 
 VALUES = "VALUES"

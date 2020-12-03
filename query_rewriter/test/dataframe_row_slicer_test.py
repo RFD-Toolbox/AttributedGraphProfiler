@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
-from query_rewriter.query.slicer import Slicer
-from query_rewriter.query.relaxer import QueryRelaxer
+from query_rewriter.utils.DataFrameSlicer import DataFrameSlicer
+from query_rewriter.utils.QueryRelaxer import QueryRelaxer
 
 
 def main():
@@ -26,7 +26,7 @@ def main():
     for slice1 in slices:
         print(slice1, end="\n\n")
 
-    slices2 = Slicer.slice(df)
+    slices2 = DataFrameSlicer.slice(df)
     print("#" * 10 + "Slices 2 of DF..." + "#" * 10)
     for slice2 in slices2:
         print(slice2, end="\n\n")
