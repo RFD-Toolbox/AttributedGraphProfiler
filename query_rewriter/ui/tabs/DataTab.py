@@ -112,8 +112,7 @@ class DataTab(QScrollArea):
 
                 extent_percentage = len(rfd_df_indexes) / self.data_frame.shape[0]
                 self.extent_label.setText('Extent percentage: ' + str(round(extent_percentage * 100, 2)) + '%')
-            else:
-                if hasattr(self, "extent_label"):
+            elif hasattr(self, "extent_label"):
                     self.extent_label.setText('Extent percentage: 0%')
 
     def set_extended_query_subject(self, query_subject: Subject):
