@@ -83,7 +83,7 @@ class DataTab(QScrollArea):
 
                 extent_percentage = self.initial_result_set.shape[0] / self.data_frame.shape[0]
                 self.extent_label.setText('Extent percentage: ' + str(round(extent_percentage * 100, 2)) + '%')
-            else:
+            elif hasattr(self, 'extent_label'):
                 self.extent_label.setText('Extent percentage: 0%')
 
     def set_rfd_subject(self, rfd_subject: Subject):
@@ -113,7 +113,8 @@ class DataTab(QScrollArea):
                 extent_percentage = len(rfd_df_indexes) / self.data_frame.shape[0]
                 self.extent_label.setText('Extent percentage: ' + str(round(extent_percentage * 100, 2)) + '%')
             else:
-                self.extent_label.setText('Extent percentage: 0%')
+                if hasattr(self, "extent_label"):
+                    self.extent_label.setText('Extent percentage: 0%')
 
     def set_extended_query_subject(self, query_subject: Subject):
         self.extended_query_subject: Subject = query_subject
@@ -145,7 +146,7 @@ class DataTab(QScrollArea):
 
                 extent_percentage = self.extended_result_set.shape[0] / self.data_frame.shape[0]
                 self.extent_label.setText('Extent percentage: ' + str(round(extent_percentage * 100, 2)) + '%')
-            else:
+            elif hasattr(self, 'extent_label'):
                 self.extent_label.setText('Extent percentage: 0%')
 
     def set_relaxed_query_subject(self, query_subject: Subject):
@@ -178,7 +179,7 @@ class DataTab(QScrollArea):
 
                 extent_percentage = self.relaxed_result_set.shape[0] / self.data_frame.shape[0]
                 self.extent_label.setText('Extent percentage: ' + str(round(extent_percentage * 100, 2)) + '%')
-            else:
+            elif hasattr(self, 'extent_label'):
                 self.extent_label.setText('Extent percentage: 0%')
 
     def onTabChange(self, index):
