@@ -7,6 +7,7 @@ from query_rewriter.model.Operator import Operator
 from query_rewriter.model.RFD import RFD
 from query_rewriter.utils.QueryRelaxer import QueryRelaxer
 from query_rewriter.utils.Checker import Checker
+from query_rewriter.utils.ArraySplitter import ArraySplitter
 
 VALUES = "VALUES"
 OPERATORS = "OPERATORS"
@@ -163,7 +164,12 @@ class Query(dict):
                                 body += "<span class=\"{}\">{}</span>".format(VALUE_CLASS, "[{}-{}]"
                                                                               .format(value[0], value[-1]))
                             else:
-                                body += "<span class=\"{}\">{}</span>".format(VALUE_CLASS, value)
+                                # Split array into consecutive subsequences
+                                subsequences = ArraySplitter.consecutive_subsequences(value)
+                                for sequence in subsequences:
+                                    body += "<span class=\"{}\">{}</span>".format(VALUE_CLASS, "[{}-{}]".format(sequence[0], sequence[-1]))
+                                    if not sequence == subsequences[-1]:
+                                        body += "<span class=\"{}\"> &cup; <span/>".format(CONNECTOR_CLASS)
                         else:
                             body += "<span class=\"{}\">{}</span>".format(VALUE_CLASS, value)
                     else:
