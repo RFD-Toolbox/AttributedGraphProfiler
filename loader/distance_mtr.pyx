@@ -42,7 +42,7 @@ cdef class DiffMatrix:
     cdef object labels
 
 
-    def __init__(self, path, semantic=True, datetime=False, sep=';', missing='?', first_row_header=0, index_col=False):
+    def __init__(self, path, semantic=False, datetime=False, sep=';', missing='?', first_row_header=0, index_col=False):
         """
         Load the dataset and build the distance matrix.
         For any dataset's column, it choose the property distance function according to the column's data type.

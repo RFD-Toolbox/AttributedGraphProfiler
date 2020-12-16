@@ -45,7 +45,7 @@ class DiffDataFrame:
         return distance_df
 
     @staticmethod
-    def map_types_to_distance_function(data_frame: DataFrame, semantic=True):
+    def map_types_to_distance_function(data_frame: DataFrame, semantic=False):
         """
         For each attribute, find a distance function according to its type. According to the value
         of the instance variable semantic, the function will use a appropriate mapping function.
